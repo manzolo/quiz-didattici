@@ -1,6 +1,12 @@
 # 🎓 Quiz Didattici
 
+[![GitHub Pages](https://img.shields.io/badge/demo-live-success?style=for-the-badge)](https://manzolo.github.io/quiz-didattici/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Made with Love](https://img.shields.io/badge/Made%20with-❤-red?style=for-the-badge)](https://github.com/manzolo/quiz-didattici)
+
 Una raccolta di quiz educativi interattivi per esercitarsi in matematica e altre materie. Completamente gratuito, open source e utilizzabile offline.
+
+**🌐 [Prova subito il sito live!](https://manzolo.github.io/quiz-didattici/)**
 
 <a href="https://www.buymeacoffee.com/manzolo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
@@ -39,12 +45,16 @@ Converti istantaneamente tra diverse unità di misura:
 
 ## 🚀 Come Usare
 
-### Online
-1. Apri semplicemente il file `index.html` in un browser moderno
+### 🌐 Online (GitHub Pages)
+Il modo più semplice per usare i quiz:
+
+1. Vai su **[https://manzolo.github.io/quiz-didattici/](https://manzolo.github.io/quiz-didattici/)**
 2. Scegli la materia desiderata
 3. Inizia a esercitarti!
 
-### Locale
+Nessuna installazione necessaria, funziona direttamente nel browser!
+
+### 💻 Locale
 ```bash
 # Clona il repository
 git clone https://github.com/manzolo/quiz-didattici.git
@@ -103,6 +113,18 @@ quiz-didattici/
 - [ ] Difficoltà personalizzabile
 - [ ] Temi personalizzabili
 - [ ] Modalità scura
+
+## 🚀 Deploy su GitHub Pages
+
+Vuoi hostare la tua versione su GitHub Pages?
+
+1. Fai un fork del repository
+2. Vai su **Settings** → **Pages** nel tuo fork
+3. Sotto "Source":
+   - Branch: `main`
+   - Folder: `/ (root)`
+4. Click su **Save**
+5. Dopo 1-2 minuti, il sito sarà disponibile su `https://[tuo-username].github.io/quiz-didattici/`
 
 ## 🤝 Contribuire
 
