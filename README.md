@@ -1,10 +1,15 @@
 # 🎓 Quiz Didattici
 
+[![Language: IT](https://img.shields.io/badge/Lang-IT-green?style=flat-square)](README.md)
+[![Language: EN](https://img.shields.io/badge/Lang-EN-blue?style=flat-square)](README.en.md)
+
 [![GitHub Pages](https://img.shields.io/badge/demo-live-success?style=for-the-badge)](https://manzolo.github.io/quiz-didattici/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Made with Love](https://img.shields.io/badge/Made%20with-❤-red?style=for-the-badge)](https://github.com/manzolo/quiz-didattici)
 
 Una raccolta di quiz educativi interattivi per esercitarsi in matematica e altre materie. Completamente gratuito, open source e utilizzabile offline.
+
+> 🌍 **[English version available here](README.en.md)**
 
 **🌐 [Prova subito il sito live!](https://manzolo.github.io/quiz-didattici/)**
 

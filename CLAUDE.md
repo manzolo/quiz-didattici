@@ -8,6 +8,8 @@ Quiz Didattici is a static web application for educational quizzes, focused on m
 
 **Live demo**: https://manzolo.github.io/quiz-didattici/
 
+**Documentation**: Available in Italian (README.md) and English (README.en.md)
+
 ## Architecture
 
 ### File Structure
