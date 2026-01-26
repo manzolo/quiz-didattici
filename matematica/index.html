@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz di Matematica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3em;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .quiz-card:nth-child(1) { animation-delay: 0.1s; }
+        .quiz-card:nth-child(2) { animation-delay: 0.2s; }
+        .quiz-card:nth-child(3) { animation-delay: 0.3s; }
+        .quiz-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .quiz-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .quiz-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .quiz-title {
+            color: #667eea;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .quiz-description {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .quiz-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .coming-soon {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .coming-soon:hover {
+            transform: none;
+        }
+
+        .coming-soon-badge {
+            background: #ccc;
+            color: #666;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .quiz-card {
+                padding: 30px;
+            }
+
+            .quiz-title {
+                font-size: 1.5em;
+            }
+
+            .language-selector {
+                position: relative;
+                top: 0;
+                right: 0;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it')">🇮🇹 IT</button>
+        <button class="lang-btn" onclick="setLanguage('en')">🇬🇧 EN</button>
+    </div>
+    <div class="container">
+        <a href="../index.html" class="back-button">
+            <span data-i18n="back">← Torna all'indice</span>
+        </a>
+
+        <div class="header">
+            <h1 data-i18n="title">🔢 Quiz di Matematica</h1>
+            <p data-i18n="subtitle">Scegli un argomento e allenati!</p>
+        </div>
+
+        <div class="quiz-grid">
+            <a href="equivalenze.html" class="quiz-card">
+                <div class="quiz-icon">📏</div>
+                <div class="quiz-title" data-i18n="conversions">Equivalenze</div>
+                <div class="quiz-description" data-i18n="conversions-desc">
+                    Esercitati con le equivalenze di massa, lunghezza e volume.
+                    Converti tra kg, g, mg e molte altre unità!
+                </div>
+                <div class="quiz-badge" data-i18n="available">Disponibile</div>
+            </a>
+
+            <a href="calcolatore.html" class="quiz-card">
+                <div class="quiz-icon">🧮</div>
+                <div class="quiz-title" data-i18n="calculator">Calcolatore</div>
+                <div class="quiz-description" data-i18n="calculator-desc">
+                    Converti rapidamente tra diverse unità di misura.
+                    Inserisci un valore e vedi tutte le conversioni!
+                </div>
+                <div class="quiz-badge" data-i18n="available">Disponibile</div>
+            </a>
+
+            <div class="quiz-card coming-soon">
+                <div class="quiz-icon">➕</div>
+                <div class="quiz-title" data-i18n="operations">Operazioni</div>
+                <div class="quiz-description" data-i18n="operations-desc">
+                    Addizioni, sottrazioni, moltiplicazioni e divisioni
+                    per allenare il calcolo mentale.
+                </div>
+                <div class="quiz-badge coming-soon-badge" data-i18n="coming-soon">Prossimamente</div>
+            </div>
+
+            <div class="quiz-card coming-soon">
+                <div class="quiz-icon">🍕</div>
+                <div class="quiz-title" data-i18n="fractions">Frazioni</div>
+                <div class="quiz-description" data-i18n="fractions-desc">
+                    Impara a semplificare, sommare e confrontare le frazioni
+                    con esercizi interattivi.
+                </div>
+                <div class="quiz-badge coming-soon-badge" data-i18n="coming-soon">Prossimamente</div>
+            </div>
+
+            <div class="quiz-card coming-soon">
+                <div class="quiz-icon">📐</div>
+                <div class="quiz-title" data-i18n="geometry">Geometria</div>
+                <div class="quiz-description" data-i18n="geometry-desc">
+                    Calcola aree, perimetri e volumi di figure geometriche.
+                    Scopri il mondo della geometria!
+                </div>
+                <div class="quiz-badge coming-soon-badge" data-i18n="coming-soon">Prossimamente</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            it: {
+                'back': '← Torna all\'indice',
+                'title': '🔢 Quiz di Matematica',
+                'subtitle': 'Scegli un argomento e allenati!',
+                'conversions': 'Equivalenze',
+                'conversions-desc': 'Esercitati con le equivalenze di massa, lunghezza e volume. Converti tra kg, g, mg e molte altre unità!',
+                'operations': 'Operazioni',
+                'operations-desc': 'Addizioni, sottrazioni, moltiplicazioni e divisioni per allenare il calcolo mentale.',
+                'fractions': 'Frazioni',
+                'fractions-desc': 'Impara a semplificare, sommare e confrontare le frazioni con esercizi interattivi.',
+                'geometry': 'Geometria',
+                'geometry-desc': 'Calcola aree, perimetri e volumi di figure geometriche. Scopri il mondo della geometria!',
+                'calculator': 'Calcolatore',
+                'calculator-desc': 'Converti rapidamente tra diverse unità di misura. Inserisci un valore e vedi tutte le conversioni!',
+                'available': 'Disponibile',
+                'coming-soon': 'Prossimamente'
+            },
+            en: {
+                'back': '← Back to index',
+                'title': '🔢 Math Quizzes',
+                'subtitle': 'Choose a topic and practice!',
+                'conversions': 'Unit Conversions',
+                'conversions-desc': 'Practice with mass, length and volume conversions. Convert between kg, g, mg and many other units!',
+                'operations': 'Operations',
+                'operations-desc': 'Addition, subtraction, multiplication and division to train mental calculation.',
+                'fractions': 'Fractions',
+                'fractions-desc': 'Learn to simplify, add and compare fractions with interactive exercises.',
+                'geometry': 'Geometry',
+                'geometry-desc': 'Calculate areas, perimeters and volumes of geometric shapes. Discover the world of geometry!',
+                'calculator': 'Calculator',
+                'calculator-desc': 'Quickly convert between different units of measurement. Enter a value and see all conversions!',
+                'available': 'Available',
+                'coming-soon': 'Coming Soon'
+            }
+        };
+
+        function setLanguage(lang) {
+            localStorage.setItem('language', lang);
+
+            // Aggiorna i bottoni
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Aggiorna i testi
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        // Carica la lingua salvata o usa italiano come default
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('language') || 'it';
+            if (savedLang === 'en') {
+                document.querySelector('.lang-btn.active').classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+
+                // Aggiorna i testi
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (translations['en'][key]) {
+                        element.textContent = translations['en'][key];
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

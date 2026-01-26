@@ -1,0 +1,25 @@
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# LibreOffice lock files
+.~lock.*
+
+# Node modules (se in futuro si aggiungono)
+node_modules/
+
+# Build artifacts (se in futuro si aggiungono)
+dist/
+build/

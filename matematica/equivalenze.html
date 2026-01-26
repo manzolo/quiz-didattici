@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Equivalenze</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            background: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score-value.correct {
+            color: #28a745;
+        }
+
+        .score-value.wrong {
+            color: #dc3545;
+        }
+
+        .quiz-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .question {
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .category-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2em;
+        }
+
+        .answer-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-input {
+            padding: 20px 30px;
+            font-size: 2.5em;
+            border: 4px solid #667eea;
+            border-radius: 15px;
+            text-align: center;
+            width: 300px;
+            font-weight: bold;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #f093fb;
+            box-shadow: 0 0 20px rgba(240, 147, 251, 0.5);
+        }
+
+        .answer-input.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .answer-input.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .unit-label {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-check:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-next {
+            background: #28a745;
+            color: white;
+            display: none;
+        }
+
+        .btn-next:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-next.show {
+            display: block;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 40px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            color: #28a745;
+        }
+
+        .feedback.wrong {
+            color: #dc3545;
+        }
+
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .final-screen.show {
+            display: flex;
+        }
+
+        .final-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .final-title {
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .final-grade {
+            color: white;
+            font-size: 5em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .final-message {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .history-box {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-width: 600px;
+        }
+
+        .history-title {
+            color: #667eea;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .history-list {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .history-item {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history-item.current {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .trend {
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .trend.improving {
+            color: #28a745;
+        }
+
+        .trend.declining {
+            color: #dc3545;
+        }
+
+        .trend.stable {
+            color: #ffc107;
+        }
+
+        .btn-restart {
+            background: #667eea;
+            color: white;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-restart:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset-history {
+            background: #dc3545;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-reset-history:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #d3d6db;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .help-container {
+            position: relative;
+            display: inline-block;
+            margin-left: 15px;
+            vertical-align: middle;
+        }
+
+        .help-icon {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: help;
+            transition: all 0.3s;
+        }
+
+        .help-icon:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .help-tooltip {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 90vw;
+        }
+
+        .help-container:hover .help-tooltip {
+            display: block;
+        }
+
+        .help-tooltip h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .scale-section {
+            display: none;
+        }
+
+        .scale-section.active {
+            display: block;
+        }
+
+        .scale-title {
+            color: #764ba2;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .scale-items {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .scale-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .scale-row.units {
+            gap: 10px;
+        }
+
+        .scale-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 4px;
+            min-width: 80px;
+        }
+
+        .scale-unit {
+            font-weight: bold;
+            color: white;
+            background: #667eea;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            min-width: 45px;
+            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .scale-label {
+            color: #666;
+            font-size: 0.6em;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .scale-arrow {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin: 0 5px;
+        }
+
+        .scale-arrow-symbol {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        .scale-arrow-label {
+            color: #764ba2;
+            font-weight: bold;
+            font-size: 0.75em;
+            background: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .scale-arrow.reverse .scale-arrow-symbol {
+            color: #f5576c;
+        }
+
+        .scale-arrow.reverse .scale-arrow-label {
+            color: #f5576c;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            transition: all 0.3s;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span data-i18n="back">← Matematica</span>
+    </a>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it')">🇮🇹 IT</button>
+        <button class="lang-btn" onclick="setLanguage('en')">🇬🇧 EN</button>
+    </div>
+    <div class="container">
+        <h1>
+            <span data-i18n="title">Quiz Equivalenze</span>
+            <div class="help-container">
+                <div class="help-icon">?</div>
+                <div class="help-tooltip">
+                    <h3 data-i18n="conversion-scale">Scala di Conversione</h3>
+
+                    <div class="scale-section" data-category="massa">
+                        <div class="scale-title" data-i18n="mass-title">MASSA</div>
+                        <div class="scale-items">
+                            <!-- Riga superiore: divisione ÷10 -->
+                            <div class="scale-row">
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                            </div>
+
+                            <!-- Riga centrale: unità con frecce → -->
+                            <div class="scale-row units">
+                                <div class="scale-item">
+                                    <div class="scale-unit">kg</div>
+                                    <div class="scale-label" data-i18n-unit="massa.kg">Chilogrammi</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">hg</div>
+                                    <div class="scale-label" data-i18n-unit="massa.hg">Ettogrammi</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">dag</div>
+                                    <div class="scale-label" data-i18n-unit="massa.dag">Decagrammi</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">g</div>
+                                    <div class="scale-label" data-i18n-unit="massa.g">Grammi</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">dg</div>
+                                    <div class="scale-label" data-i18n-unit="massa.dg">Decigrammi</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">cg</div>
+                                    <div class="scale-label" data-i18n-unit="massa.cg">Centigrammi</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">mg</div>
+                                    <div class="scale-label" data-i18n-unit="massa.mg">Milligrammi</div>
+                                </div>
+                            </div>
+
+                            <!-- Riga inferiore: moltiplicazione ×10 -->
+                            <div class="scale-row">
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scale-section" data-category="lunghezza">
+                        <div class="scale-title" data-i18n="length-title">LUNGHEZZA</div>
+                        <div class="scale-items">
+                            <!-- Riga superiore: divisione ÷10 -->
+                            <div class="scale-row">
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                            </div>
+
+                            <!-- Riga centrale: unità con frecce → -->
+                            <div class="scale-row units">
+                                <div class="scale-item">
+                                    <div class="scale-unit">km</div>
+                                    <div class="scale-label" data-i18n-unit="lunghezza.km">Chilometri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">hm</div>
+                                    <div class="scale-label" data-i18n-unit="lunghezza.hm">Ettometri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">dam</div>
+                                    <div class="scale-label" data-i18n-unit="lunghezza.dam">Decametri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">m</div>
+                                    <div class="scale-label" data-i18n-unit="lunghezza.m">Metri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">dm</div>
+                                    <div class="scale-label" data-i18n-unit="lunghezza.dm">Decimetri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">cm</div>
+                                    <div class="scale-label" data-i18n-unit="lunghezza.cm">Centimetri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">mm</div>
+                                    <div class="scale-label" data-i18n-unit="lunghezza.mm">Millimetri</div>
+                                </div>
+                            </div>
+
+                            <!-- Riga inferiore: moltiplicazione ×10 -->
+                            <div class="scale-row">
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scale-section" data-category="volume">
+                        <div class="scale-title" data-i18n="volume-title">VOLUME</div>
+                        <div class="scale-items">
+                            <!-- Riga superiore: divisione ÷10 -->
+                            <div class="scale-row">
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow reverse">
+                                    <div class="scale-arrow-symbol">←</div>
+                                    <div class="scale-arrow-label">÷10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                            </div>
+
+                            <!-- Riga centrale: unità con frecce → -->
+                            <div class="scale-row units">
+                                <div class="scale-item">
+                                    <div class="scale-unit">kl</div>
+                                    <div class="scale-label" data-i18n-unit="volume.kl">Chilolitri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">hl</div>
+                                    <div class="scale-label" data-i18n-unit="volume.hl">Ettolitri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">dal</div>
+                                    <div class="scale-label" data-i18n-unit="volume.dal">Decalitri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">l</div>
+                                    <div class="scale-label" data-i18n-unit="volume.l">Litri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">dl</div>
+                                    <div class="scale-label" data-i18n-unit="volume.dl">Decilitri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">cl</div>
+                                    <div class="scale-label" data-i18n-unit="volume.cl">Centilitri</div>
+                                </div>
+                                <div class="scale-arrow-symbol" style="margin: 0 10px; color: #667eea; font-weight: bold; font-size: 1.5em;">→</div>
+                                <div class="scale-item">
+                                    <div class="scale-unit">ml</div>
+                                    <div class="scale-label" data-i18n-unit="volume.ml">Millilitri</div>
+                                </div>
+                            </div>
+
+                            <!-- Riga inferiore: moltiplicazione ×10 -->
+                            <div class="scale-row">
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                                <div class="scale-arrow">
+                                    <div class="scale-arrow-symbol">→</div>
+                                    <div class="scale-arrow-label">×10</div>
+                                </div>
+                                <div style="width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h1>
+
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="score">Punteggio</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct">Corrette</div>
+                <div class="score-value correct" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong">Sbagliate</div>
+                <div class="score-value wrong" id="wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="questions">Domande</div>
+                <div class="score-value" id="total">0/10</div>
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="tab active" onclick="changeCategory('tutte')" data-i18n="all">Tutte</button>
+            <button class="tab" onclick="changeCategory('massa')" data-i18n="mass-only">Solo Massa</button>
+            <button class="tab" onclick="changeCategory('lunghezza')" data-i18n="length-only">Solo Lunghezza</button>
+            <button class="tab" onclick="changeCategory('volume')" data-i18n="volume-only">Solo Volume</button>
+        </div>
+
+        <div class="quiz-area">
+            <div class="question-box">
+                <div class="question" id="question"></div>
+                <div class="category-label" id="categoryLabel"></div>
+            </div>
+
+            <div class="answer-box">
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" step="any" autofocus>
+                <div class="unit-label" id="targetUnit"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()" data-i18n="check">Verifica</button>
+                <button class="btn btn-next" id="btnNext" onclick="nextQuestion()" data-i18n="next">Prossima Domanda</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message"><span data-i18n="answered-correctly">Hai risposto correttamente a</span> <span id="finalCorrect">0</span> <span data-i18n="questions-out-of">domande su 10</span></div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+            </div>
+
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'it';
+
+        const translations = {
+            it: {
+                'back': '← Matematica',
+                'title': 'Quiz Equivalenze',
+                'score': 'Punteggio',
+                'correct': 'Corrette',
+                'wrong': 'Sbagliate',
+                'questions': 'Domande',
+                'all': 'Tutte',
+                'mass-only': 'Solo Massa',
+                'length-only': 'Solo Lunghezza',
+                'volume-only': 'Solo Volume',
+                'check': 'Verifica',
+                'next': 'Prossima Domanda',
+                'restart': 'Ricomincia Quiz',
+                'reset-history': 'Cancella Storico Voti',
+                'conversion-scale': 'Scala di Conversione',
+                'mass-title': 'MASSA',
+                'length-title': 'LUNGHEZZA',
+                'volume-title': 'VOLUME',
+                'mass': 'Massa',
+                'length': 'Lunghezza',
+                'volume': 'Volume',
+                'insert-value': 'Inserisci un valore!',
+                'correct-answer': 'Corretto!',
+                'wrong-answer': 'Sbagliato! La risposta corretta è',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti',
+                'improving': 'Stai migliorando!',
+                'declining': 'Stai peggiorando',
+                'same-result': 'Stesso risultato',
+                'overall-trend': 'Trend generale: miglioramento (media',
+                'vs': 'vs',
+                'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+                'history-deleted': 'Storico voti cancellato!',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti'
+            },
+            en: {
+                'back': '← Mathematics',
+                'title': 'Unit Conversions Quiz',
+                'score': 'Score',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'questions': 'Questions',
+                'all': 'All',
+                'mass-only': 'Mass Only',
+                'length-only': 'Length Only',
+                'volume-only': 'Volume Only',
+                'check': 'Check',
+                'next': 'Next Question',
+                'restart': 'Restart Quiz',
+                'reset-history': 'Clear History',
+                'conversion-scale': 'Conversion Scale',
+                'mass-title': 'MASS',
+                'length-title': 'LENGTH',
+                'volume-title': 'VOLUME',
+                'mass': 'Mass',
+                'length': 'Length',
+                'volume': 'Volume',
+                'insert-value': 'Please insert a value!',
+                'correct-answer': 'Correct!',
+                'wrong-answer': 'Wrong! The correct answer is',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades',
+                'improving': 'You\'re improving!',
+                'declining': 'You\'re declining',
+                'same-result': 'Same result',
+                'overall-trend': 'Overall trend: improvement (average',
+                'vs': 'vs',
+                'confirm-reset': 'Are you sure you want to delete all saved grades?',
+                'history-deleted': 'History deleted!',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades'
+            }
+        };
+
+        function t(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+
+            // Aggiorna i bottoni
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Aggiorna i testi statici
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Aggiorna le unità di misura nel tooltip
+            document.querySelectorAll('[data-i18n-unit]').forEach(element => {
+                const path = element.getAttribute('data-i18n-unit');
+                const [category, unit] = path.split('.');
+                if (conversions[category] && conversions[category][unit]) {
+                    element.textContent = conversions[category][unit].label[lang];
+                }
+            });
+
+            // Rigenera la domanda corrente se esiste
+            if (currentQuestion) {
+                updateQuestionDisplay();
+            }
+        }
+
+        function updateQuestionDisplay() {
+            if (!currentQuestion) return;
+
+            const fromUnitLabel = conversions[currentQuestion.category][currentQuestion.fromUnit].label[currentLanguage];
+            const toUnitLabel = conversions[currentQuestion.category][currentQuestion.toUnit].label[currentLanguage];
+
+            document.getElementById('question').textContent = `${currentQuestion.value} ${currentQuestion.fromUnit} (${fromUnitLabel})`;
+            document.getElementById('categoryLabel').textContent = categoryNames[currentQuestion.category][currentLanguage];
+            document.getElementById('targetUnit').textContent = `${currentQuestion.toUnit} (${toUnitLabel})`;
+        }
+
+        const conversions = {
+            massa: {
+                kg: { label: { it: 'Chilogrammi', en: 'Kilograms' }, toBase: 1000 },
+                hg: { label: { it: 'Ettogrammi', en: 'Hectograms' }, toBase: 100 },
+                dag: { label: { it: 'Decagrammi', en: 'Decagrams' }, toBase: 10 },
+                g: { label: { it: 'Grammi', en: 'Grams' }, toBase: 1 },
+                dg: { label: { it: 'Decigrammi', en: 'Decigrams' }, toBase: 0.1 },
+                cg: { label: { it: 'Centigrammi', en: 'Centigrams' }, toBase: 0.01 },
+                mg: { label: { it: 'Milligrammi', en: 'Milligrams' }, toBase: 0.001 }
+            },
+            lunghezza: {
+                km: { label: { it: 'Chilometri', en: 'Kilometers' }, toBase: 1000 },
+                hm: { label: { it: 'Ettometri', en: 'Hectometers' }, toBase: 100 },
+                dam: { label: { it: 'Decametri', en: 'Decameters' }, toBase: 10 },
+                m: { label: { it: 'Metri', en: 'Meters' }, toBase: 1 },
+                dm: { label: { it: 'Decimetri', en: 'Decimeters' }, toBase: 0.1 },
+                cm: { label: { it: 'Centimetri', en: 'Centimeters' }, toBase: 0.01 },
+                mm: { label: { it: 'Millimetri', en: 'Millimeters' }, toBase: 0.001 }
+            },
+            volume: {
+                kl: { label: { it: 'Chilolitri', en: 'Kiloliters' }, toBase: 1000 },
+                hl: { label: { it: 'Ettolitri', en: 'Hectoliters' }, toBase: 100 },
+                dal: { label: { it: 'Decalitri', en: 'Decaliters' }, toBase: 10 },
+                l: { label: { it: 'Litri', en: 'Liters' }, toBase: 1 },
+                dl: { label: { it: 'Decilitri', en: 'Deciliters' }, toBase: 0.1 },
+                cl: { label: { it: 'Centilitri', en: 'Centiliters' }, toBase: 0.01 },
+                ml: { label: { it: 'Millilitri', en: 'Milliliters' }, toBase: 0.001 }
+            }
+        };
+
+        const categoryNames = {
+            massa: { it: 'Massa', en: 'Mass' },
+            lunghezza: { it: 'Lunghezza', en: 'Length' },
+            volume: { it: 'Volume', en: 'Volume' }
+        };
+
+        let currentQuestion = null;
+        let score = 0;
+        let correct = 0;
+        let wrong = 0;
+        let total = 0;
+        let selectedCategory = 'tutte';
+        const MAX_QUESTIONS = 10;
+        let previousQuestions = []; // Traccia le ultime domande per evitare ripetizioni
+
+        function changeCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Reset quiz se si cambia categoria
+            if (total > 0) {
+                score = 0;
+                correct = 0;
+                wrong = 0;
+                total = 0;
+                previousQuestions = []; // Reset storico domande
+                document.getElementById('score').textContent = score;
+                document.getElementById('correct').textContent = correct;
+                document.getElementById('wrong').textContent = wrong;
+                document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+            }
+
+            nextQuestion();
+        }
+
+        function generateQuestion() {
+            let attempts = 0;
+            const maxAttempts = 50;
+
+            while (attempts < maxAttempts) {
+                attempts++;
+
+                // Scegli una categoria
+                let category;
+                if (selectedCategory === 'tutte') {
+                    const categories = ['massa', 'lunghezza', 'volume'];
+                    category = categories[Math.floor(Math.random() * categories.length)];
+                } else {
+                    category = selectedCategory;
+                }
+
+                // Ottieni tutte le unità della categoria
+                const units = Object.keys(conversions[category]);
+
+                // Scegli due indici casuali completamente random (non basati su distanza)
+                let fromIndex = Math.floor(Math.random() * units.length);
+                let toIndex = Math.floor(Math.random() * units.length);
+
+                // Assicurati che siano diversi
+                if (fromIndex === toIndex) continue;
+
+                const fromUnit = units[fromIndex];
+                const toUnit = units[toIndex];
+
+                // Verifica che non sia uguale all'ultima domanda o troppo simile
+                const questionKey = `${category}-${fromUnit}-${toUnit}`;
+                if (previousQuestions.length > 0) {
+                    const lastKey = previousQuestions[previousQuestions.length - 1];
+                    // Evita la stessa conversione consecutiva
+                    if (questionKey === lastKey) continue;
+
+                    // Evita conversioni invertite consecutive (es. kg->g poi g->kg)
+                    const reverseKey = `${category}-${toUnit}-${fromUnit}`;
+                    if (reverseKey === lastKey) continue;
+                }
+
+                // Genera un valore casuale più variato
+                const possibleValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 23, 24, 25, 30, 32, 35, 36, 40, 45, 48, 50, 60, 72, 80, 90, 100];
+                const value = possibleValues[Math.floor(Math.random() * possibleValues.length)];
+
+                // Calcola la risposta corretta
+                const baseValue = value * conversions[category][fromUnit].toBase;
+                let answer = baseValue / conversions[category][toUnit].toBase;
+
+                // Arrotonda per evitare errori di precisione floating point
+                answer = Math.round(answer * 100000) / 100000;
+
+                // Salva questa domanda nello storico (mantieni solo le ultime 3)
+                previousQuestions.push(questionKey);
+                if (previousQuestions.length > 3) {
+                    previousQuestions.shift();
+                }
+
+                return {
+                    category,
+                    fromUnit,
+                    toUnit,
+                    value,
+                    answer
+                };
+            }
+
+            // Fallback: genera una domanda semplice se non riesce a trovarne una varia
+            const category = selectedCategory === 'tutte' ?
+                ['massa', 'lunghezza', 'volume'][Math.floor(Math.random() * 3)] :
+                selectedCategory;
+            const units = Object.keys(conversions[category]);
+            const fromUnit = units[Math.floor(Math.random() * units.length)];
+            let toUnit;
+            do {
+                toUnit = units[Math.floor(Math.random() * units.length)];
+            } while (toUnit === fromUnit);
+
+            const value = [1, 2, 5, 10][Math.floor(Math.random() * 4)];
+            const baseValue = value * conversions[category][fromUnit].toBase;
+            let answer = baseValue / conversions[category][toUnit].toBase;
+            answer = Math.round(answer * 100000) / 100000;
+
+            return {
+                category,
+                fromUnit,
+                toUnit,
+                value,
+                answer
+            };
+        }
+
+        function nextQuestion() {
+            currentQuestion = generateQuestion();
+
+            // Aggiorna la domanda
+            const fromUnitLabel = conversions[currentQuestion.category][currentQuestion.fromUnit].label[currentLanguage];
+            const toUnitLabel = conversions[currentQuestion.category][currentQuestion.toUnit].label[currentLanguage];
+
+            document.getElementById('question').textContent = `${currentQuestion.value} ${currentQuestion.fromUnit} (${fromUnitLabel})`;
+            document.getElementById('categoryLabel').textContent = categoryNames[currentQuestion.category][currentLanguage];
+            document.getElementById('targetUnit').textContent = `${currentQuestion.toUnit} (${toUnitLabel})`;
+
+            // Aggiorna l'help per mostrare solo la scala della categoria corrente
+            document.querySelectorAll('.scale-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const currentScale = document.querySelector(`.scale-section[data-category="${currentQuestion.category}"]`);
+            if (currentScale) {
+                currentScale.classList.add('active');
+            }
+
+            // Reset input e feedback
+            const input = document.getElementById('answerInput');
+            input.value = '';
+            input.className = 'answer-input';
+            input.disabled = false;
+            input.focus();
+
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+
+            // Reset bottoni
+            document.getElementById('btnCheck').style.display = 'block';
+            document.getElementById('btnNext').classList.remove('show');
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseFloat(document.getElementById('answerInput').value);
+            const input = document.getElementById('answerInput');
+            const feedback = document.getElementById('feedback');
+
+            if (isNaN(userAnswer)) {
+                feedback.textContent = t('insert-value');
+                feedback.className = 'feedback wrong';
+                return;
+            }
+
+            // Verifica con tolleranza per errori di arrotondamento
+            const tolerance = Math.abs(currentQuestion.answer) * 0.0001;
+            const isCorrect = Math.abs(userAnswer - currentQuestion.answer) <= tolerance;
+
+            const fromUnitLabel = conversions[currentQuestion.category][currentQuestion.fromUnit].label[currentLanguage];
+            const toUnitLabel = conversions[currentQuestion.category][currentQuestion.toUnit].label[currentLanguage];
+
+            total++;
+
+            if (isCorrect) {
+                correct++;
+                score += 10;
+                input.className = 'answer-input correct';
+                feedback.textContent = `${t('correct-answer')} ${currentQuestion.value} ${currentQuestion.fromUnit} (${fromUnitLabel}) = ${currentQuestion.answer} ${currentQuestion.toUnit} (${toUnitLabel})`;
+                feedback.className = 'feedback correct';
+            } else {
+                wrong++;
+                input.className = 'answer-input wrong';
+                feedback.textContent = `${t('wrong-answer')} ${currentQuestion.answer} ${currentQuestion.toUnit} (${toUnitLabel})`;
+                feedback.className = 'feedback wrong';
+            }
+
+            // Aggiorna punteggi
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+
+            // Disabilita input e mostra bottone prossima domanda
+            input.disabled = true;
+            document.getElementById('btnCheck').style.display = 'none';
+
+            // Controlla se abbiamo raggiunto 10 domande
+            if (total >= MAX_QUESTIONS) {
+                // Nascondi il bottone "Prossima Domanda" e mostra direttamente il risultato finale
+                setTimeout(showFinalResults, 1500);
+            } else {
+                document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        function showFinalResults() {
+            // Nascondi area quiz
+            document.querySelector('.quiz-area').style.display = 'none';
+
+            // Mostra schermata finale
+            const finalScreen = document.getElementById('finalScreen');
+            finalScreen.classList.add('show');
+
+            // Calcola il voto (su 10)
+            const grade = correct;
+
+            // Mostra risultati
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalGrade').textContent = `${grade}/10`;
+
+            // Commento in base al voto
+            const comments = {
+                it: [
+                    'Devi esercitarti ancora un po\'!',
+                    'Sufficiente, continua a esercitarti!',
+                    'Discreto, ma puoi fare meglio!',
+                    'Bene! Stai migliorando!',
+                    'Molto bene! Continua così!',
+                    'Eccellente! Ottimo lavoro!',
+                    'Perfetto! Sei un campione!'
+                ],
+                en: [
+                    'You need more practice!',
+                    'Sufficient, keep practicing!',
+                    'Fair, but you can do better!',
+                    'Good! You\'re improving!',
+                    'Very good! Keep it up!',
+                    'Excellent! Great job!',
+                    'Perfect! You\'re a champion!'
+                ]
+            };
+
+            let commentIndex;
+            if (grade === 10) commentIndex = 6;
+            else if (grade >= 9) commentIndex = 5;
+            else if (grade >= 8) commentIndex = 4;
+            else if (grade >= 7) commentIndex = 3;
+            else if (grade >= 6) commentIndex = 2;
+            else if (grade >= 5) commentIndex = 1;
+            else commentIndex = 0;
+
+            document.getElementById('finalComment').textContent = comments[currentLanguage][commentIndex];
+
+            // Salva il voto nello storico
+            saveGrade(grade);
+
+            // Mostra storico
+            displayHistory();
+        }
+
+        function saveGrade(grade) {
+            // Recupera lo storico da localStorage
+            let history = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+
+            // Aggiungi il nuovo voto
+            history.push(grade);
+
+            // Mantieni solo gli ultimi 10 voti
+            if (history.length > 10) {
+                history = history.slice(-10);
+            }
+
+            // Salva in localStorage
+            localStorage.setItem('quizHistory', JSON.stringify(history));
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+
+            if (history.length === 0) {
+                document.getElementById('historyBox').style.display = 'none';
+                return;
+            }
+
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            // Mostra gli ultimi voti (dal più vecchio al più recente)
+            history.forEach((grade, index) => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                if (index === history.length - 1) {
+                    item.classList.add('current');
+                }
+                item.textContent = `${grade}/10`;
+                historyList.appendChild(item);
+            });
+
+            // Calcola e mostra il trend
+            if (history.length >= 2) {
+                const lastGrade = history[history.length - 1];
+                const previousGrade = history[history.length - 2];
+
+                const trendMessage = document.getElementById('trendMessage');
+
+                if (lastGrade > previousGrade) {
+                    trendMessage.textContent = `🎉 ${t('improving')} (+${lastGrade - previousGrade})`;
+                    trendMessage.className = 'trend improving';
+                } else if (lastGrade < previousGrade) {
+                    trendMessage.textContent = `📉 ${t('declining')} (${lastGrade - previousGrade})`;
+                    trendMessage.className = 'trend declining';
+                } else {
+                    trendMessage.textContent = `➡️ ${t('same-result')}`;
+                    trendMessage.className = 'trend stable';
+                }
+
+                // Calcola media ultimi 3 voti vs media voti precedenti
+                if (history.length >= 4) {
+                    const recentAvg = (history.slice(-3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+                    const previousAvg = (history.slice(-6, -3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+
+                    if (recentAvg > previousAvg) {
+                        trendMessage.textContent += ` | ${t('overall-trend')} ${recentAvg} ${t('vs')} ${previousAvg})`;
+                    }
+                }
+            }
+        }
+
+        function restartQuiz() {
+            // Reset variabili
+            score = 0;
+            correct = 0;
+            wrong = 0;
+            total = 0;
+            previousQuestions = []; // Reset storico domande
+
+            // Reset visualizzazione
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+
+            // Nascondi schermata finale
+            document.getElementById('finalScreen').classList.remove('show');
+
+            // Mostra area quiz
+            document.querySelector('.quiz-area').style.display = 'flex';
+
+            // Avvia nuova domanda
+            nextQuestion();
+        }
+
+        function resetHistory() {
+            if (confirm(t('confirm-reset'))) {
+                localStorage.removeItem('quizHistory');
+                document.getElementById('historyBox').style.display = 'none';
+                alert(t('history-deleted'));
+            }
+        }
+
+        // Gestione tasto Invio
+        document.getElementById('answerInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                if (document.getElementById('btnCheck').style.display !== 'none') {
+                    checkAnswer();
+                } else {
+                    nextQuestion();
+                }
+            }
+        });
+
+        // Carica la lingua salvata o usa italiano come default
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('language') || 'it';
+            currentLanguage = savedLang;
+
+            if (savedLang === 'en') {
+                document.querySelector('.lang-btn.active').classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+
+                // Aggiorna i testi statici
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (translations['en'][key]) {
+                        element.textContent = translations['en'][key];
+                    }
+                });
+
+                // Aggiorna le unità di misura nel tooltip
+                document.querySelectorAll('[data-i18n-unit]').forEach(element => {
+                    const path = element.getAttribute('data-i18n-unit');
+                    const [category, unit] = path.split('.');
+                    if (conversions[category] && conversions[category][unit]) {
+                        element.textContent = conversions[category][unit].label['en'];
+                    }
+                });
+            }
+        });
+
+        // Inizializza il quiz
+        nextQuestion();
+    </script>
+</body>
+</html>
