@@ -216,6 +216,79 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+
+            .back-button {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 10px;
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+
+            .language-selector {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+
+            .input-section {
+                padding: 15px;
+            }
+
+            .category-tabs {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .tab {
+                flex: 1 1 100%;
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+
+            .results {
+                flex-direction: column;
+                padding: 15px 10px;
+                gap: 15px;
+            }
+
+            .unit-column {
+                max-width: 100%;
+                width: 100%;
+                min-width: auto;
+                padding: 20px 15px;
+            }
+
+            .unit-column.center {
+                transform: scale(1.05);
+            }
+
+            .unit-label {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+
+            .unit-input {
+                padding: 10px 8px;
+                font-size: 16px;
+            }
+
+            .unit-symbol {
+                font-size: 16px;
+                margin-top: 10px;
+            }
+
             .buy-me-coffee {
                 bottom: 10px;
                 right: 10px;
@@ -223,6 +296,49 @@
 
             .buy-me-coffee img {
                 height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .input-section {
+                padding: 12px;
+            }
+
+            .tab {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+
+            .results {
+                padding: 10px;
+                gap: 12px;
+            }
+
+            .unit-column {
+                padding: 15px 12px;
+            }
+
+            .unit-column.center {
+                transform: scale(1.02);
+            }
+
+            .unit-label {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+
+            .unit-input {
+                padding: 8px 6px;
+                font-size: 14px;
+            }
+
+            .unit-symbol {
+                font-size: 14px;
+                margin-top: 8px;
             }
         }
     </style>
