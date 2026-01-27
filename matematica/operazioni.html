@@ -541,6 +541,36 @@
             background: #667eea;
             color: white;
         }
+
+        .buy-me-coffee {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .buy-me-coffee:hover {
+            transform: translateY(-5px);
+        }
+
+        .buy-me-coffee img {
+            height: 50px;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .buy-me-coffee {
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .buy-me-coffee img {
+                height: 40px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -650,6 +680,10 @@
             <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
         </div>
     </div>
+
+    <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+    </a>
 
     <script>
         let currentLanguage = 'it';
