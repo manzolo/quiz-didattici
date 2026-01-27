@@ -387,13 +387,28 @@
             justify-content: center;
             font-size: 20px;
             font-weight: bold;
-            cursor: help;
+            cursor: pointer;
             transition: all 0.3s;
         }
 
         .help-icon:hover {
             background: #5568d3;
             transform: scale(1.1);
+        }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .help-overlay.show {
+            display: block;
         }
 
         .help-tooltip {
@@ -406,19 +421,46 @@
             border: 3px solid #667eea;
             border-radius: 15px;
             padding: 25px;
+            padding-top: 45px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        .help-container:hover .help-tooltip {
+        .help-tooltip.show {
             display: block;
+        }
+
+        .help-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-close:hover {
+            background: #c82333;
+            transform: rotate(90deg);
         }
 
         .help-tooltip h3 {
             color: #667eea;
             margin-bottom: 20px;
-            font-size: 1.2em;
+            font-size: 1.3em;
             text-align: center;
         }
 
@@ -444,6 +486,28 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            position: relative;
+        }
+
+        .scale-items::after {
+            content: '← →';
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 1.2em;
+            color: #667eea;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 10px;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .scale-items::after {
+                display: block;
+            }
         }
 
         .scale-row {
@@ -452,6 +516,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            min-width: 800px;
         }
 
         .scale-row.units {
@@ -593,6 +658,248 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+
+            .back-button {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 10px;
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+
+            .language-selector {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+
+            .score-section {
+                flex-wrap: wrap;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .score-item {
+                flex: 1 1 40%;
+                min-width: 120px;
+            }
+
+            .score-label {
+                font-size: 12px;
+            }
+
+            .score-value {
+                font-size: 24px;
+            }
+
+            .category-tabs {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .tab {
+                flex: 1 1 45%;
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+
+            .quiz-area {
+                padding: 15px 10px;
+                justify-content: flex-start;
+            }
+
+            .question-box {
+                padding: 20px 15px;
+                border-radius: 15px;
+                margin-bottom: 20px;
+                min-width: auto;
+                width: 100%;
+            }
+
+            .question {
+                font-size: 1.4em;
+                word-break: break-word;
+            }
+
+            .category-label {
+                font-size: 0.95em;
+            }
+
+            .answer-box {
+                flex-direction: column;
+                gap: 12px;
+                align-items: center;
+            }
+
+            .answer-input {
+                padding: 12px 15px;
+                font-size: 1.6em;
+                width: 100%;
+                max-width: 220px;
+            }
+
+            .unit-label {
+                font-size: 1.2em;
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 15px;
+                width: 100%;
+                align-items: center;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 1.1em;
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .feedback {
+                font-size: 1em;
+                padding: 15px 10px;
+                margin-top: 10px;
+                min-height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .final-box {
+                padding: 30px 20px;
+                border-radius: 15px;
+                margin-bottom: 30px;
+                min-width: auto;
+                width: 100%;
+            }
+
+            .final-title {
+                font-size: 1.8em;
+            }
+
+            .final-grade {
+                font-size: 3.5em;
+            }
+
+            .final-message {
+                font-size: 1.2em;
+            }
+
+            .history-box {
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                min-width: auto;
+                width: 100%;
+            }
+
+            .history-title {
+                font-size: 1.2em;
+            }
+
+            .history-item {
+                padding: 10px 15px;
+                font-size: 1.1em;
+            }
+
+            .trend {
+                font-size: 1.1em;
+            }
+
+            .btn-restart {
+                padding: 15px 40px;
+                font-size: 1.2em;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .btn-reset-history {
+                padding: 12px 30px;
+                font-size: 1em;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .help-container {
+                display: block;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .help-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 18px;
+            }
+
+            .help-tooltip {
+                max-width: 95vw;
+                width: 95vw;
+                padding: 10px;
+                padding-top: 40px;
+                transform: translate(-50%, -50%);
+                max-height: 85vh;
+            }
+
+            .help-tooltip h3 {
+                font-size: 1.1em;
+                margin-bottom: 15px;
+            }
+
+            .scale-section {
+                margin-bottom: 20px;
+            }
+
+            .scale-title {
+                font-size: 0.9em;
+                margin-bottom: 10px;
+            }
+
+            .scale-items {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 5px 0;
+                width: 100%;
+                display: block;
+            }
+
+            .scale-row {
+                justify-content: flex-start;
+            }
+
+            .scale-unit {
+                font-size: 0.85em;
+                padding: 6px 8px;
+                min-width: 40px;
+            }
+
+            .scale-label {
+                font-size: 0.55em;
+            }
+
+            .scale-arrow-symbol {
+                font-size: 1.2em;
+            }
+
+            .scale-arrow-label {
+                font-size: 0.7em;
+            }
+
             .buy-me-coffee {
                 bottom: 10px;
                 right: 10px;
@@ -600,6 +907,62 @@
 
             .buy-me-coffee img {
                 height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .question-box {
+                padding: 15px 10px;
+                margin-bottom: 15px;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .category-label {
+                font-size: 0.85em;
+            }
+
+            .answer-input {
+                font-size: 1.4em;
+                padding: 10px 12px;
+                max-width: 200px;
+            }
+
+            .unit-label {
+                font-size: 1em;
+            }
+
+            .button-group {
+                margin-top: 10px;
+                gap: 10px;
+            }
+
+            .btn {
+                font-size: 0.95em;
+                padding: 10px 20px;
+                max-width: 260px;
+            }
+
+            .feedback {
+                font-size: 0.95em;
+                padding: 12px 8px;
+                min-height: 50px;
+            }
+
+            .final-grade {
+                font-size: 2.5em;
+            }
+
+            .tab {
+                flex: 1 1 100%;
+                font-size: 13px;
+                padding: 10px 12px;
             }
         }
     </style>
@@ -616,9 +979,14 @@
         <h1>
             <span data-i18n="title">Quiz Equivalenze</span>
             <div class="help-container">
-                <div class="help-icon">?</div>
-                <div class="help-tooltip">
-                    <h3 data-i18n="conversion-scale">Scala di Conversione</h3>
+                <div class="help-icon" onclick="toggleHelp()">?</div>
+            </div>
+        </h1>
+
+        <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+        <div class="help-tooltip" id="helpTooltip">
+            <button class="help-close" onclick="toggleHelp()">&times;</button>
+            <h3 data-i18n="conversion-scale">Scala di Conversione</h3>
 
                     <div class="scale-section" data-category="massa">
                         <div class="scale-title" data-i18n="mass-title">MASSA</div>
@@ -959,8 +1327,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </h1>
+        </div>
 
         <div class="score-section">
             <div class="score-item">
@@ -1027,7 +1394,7 @@
     </div>
 
     <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee">
     </a>
 
     <script>
@@ -1402,6 +1769,11 @@
             input.disabled = true;
             document.getElementById('btnCheck').style.display = 'none';
 
+            // Scroll automatico al feedback su mobile
+            setTimeout(() => {
+                feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+
             // Controlla se abbiamo raggiunto 10 domande
             if (total >= MAX_QUESTIONS) {
                 // Nascondi il bottone "Prossima Domanda" e mostra direttamente il risultato finale
@@ -1604,6 +1976,14 @@
                 });
             }
         });
+
+        // Toggle help tooltip
+        function toggleHelp() {
+            const overlay = document.getElementById('helpOverlay');
+            const tooltip = document.getElementById('helpTooltip');
+            overlay.classList.toggle('show');
+            tooltip.classList.toggle('show');
+        }
 
         // Inizializza il quiz
         nextQuestion();
