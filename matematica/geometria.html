@@ -1233,8 +1233,8 @@
                 <svg width="${w + 60}" height="${h + 60}" xmlns="http://www.w3.org/2000/svg">
                     <rect x="30" y="30" width="${w}" height="${h}"
                           fill="#e3f2fd" stroke="#667eea" stroke-width="3"/>
-                    ${labels.length ? `<text x="${30 + w/2}" y="20" text-anchor="middle" class="dimension-label">${labels[0]}</text>` : ''}
-                    ${labels.width ? `<text x="${w + 45}" y="${30 + h/2}" text-anchor="middle" class="dimension-label">${labels[1]}</text>` : ''}
+                    ${labels.length > 0 ? `<text x="${30 + w/2}" y="20" text-anchor="middle" class="dimension-label">${labels[0]}</text>` : ''}
+                    ${labels.length > 1 ? `<text x="${w + 45}" y="${30 + h/2}" text-anchor="middle" class="dimension-label">${labels[1]}</text>` : ''}
                 </svg>
             `;
         }
