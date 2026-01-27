@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Operazioni</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            background: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score-value.correct {
+            color: #28a745;
+        }
+
+        .score-value.wrong {
+            color: #dc3545;
+        }
+
+        .quiz-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .question {
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .category-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2em;
+        }
+
+        .answer-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-input {
+            padding: 20px 30px;
+            font-size: 2.5em;
+            border: 4px solid #667eea;
+            border-radius: 15px;
+            text-align: center;
+            width: 300px;
+            font-weight: bold;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #f093fb;
+            box-shadow: 0 0 20px rgba(240, 147, 251, 0.5);
+        }
+
+        .answer-input.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .answer-input.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-check:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-next {
+            background: #28a745;
+            color: white;
+            display: none;
+        }
+
+        .btn-next:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-next.show {
+            display: block;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 40px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            color: #28a745;
+        }
+
+        .feedback.wrong {
+            color: #dc3545;
+        }
+
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .final-screen.show {
+            display: flex;
+        }
+
+        .final-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .final-title {
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .final-grade {
+            color: white;
+            font-size: 5em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .final-message {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .history-box {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-width: 600px;
+        }
+
+        .history-title {
+            color: #667eea;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .history-list {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .history-item {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history-item.current {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .trend {
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .trend.improving {
+            color: #28a745;
+        }
+
+        .trend.declining {
+            color: #dc3545;
+        }
+
+        .trend.stable {
+            color: #ffc107;
+        }
+
+        .btn-restart {
+            background: #667eea;
+            color: white;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-restart:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset-history {
+            background: #dc3545;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-reset-history:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .tab:hover {
+            background: #d3d6db;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .help-container {
+            position: relative;
+            display: inline-block;
+            margin-left: 15px;
+            vertical-align: middle;
+        }
+
+        .help-icon {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: help;
+            transition: all 0.3s;
+        }
+
+        .help-icon:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .help-tooltip {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 90vw;
+        }
+
+        .help-container:hover .help-tooltip {
+            display: block;
+        }
+
+        .help-tooltip h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .help-content {
+            color: #333;
+            line-height: 1.8;
+            text-align: left;
+        }
+
+        .help-section {
+            margin-bottom: 15px;
+        }
+
+        .help-section-title {
+            color: #764ba2;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .help-example {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 5px;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            transition: all 0.3s;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span data-i18n="back">← Matematica</span>
+    </a>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it')">IT</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+    <div class="container">
+        <h1>
+            <span data-i18n="title">Quiz Operazioni</span>
+            <div class="help-container">
+                <div class="help-icon">?</div>
+                <div class="help-tooltip">
+                    <h3 data-i18n="help-title">Regole delle Operazioni</h3>
+                    <div class="help-content">
+                        <div class="help-section">
+                            <div class="help-section-title" data-i18n="addition-title">Addizione (+)</div>
+                            <div data-i18n="addition-desc">Somma due o più numeri insieme</div>
+                            <div class="help-example">7 + 5 = 12</div>
+                        </div>
+                        <div class="help-section">
+                            <div class="help-section-title" data-i18n="subtraction-title">Sottrazione (-)</div>
+                            <div data-i18n="subtraction-desc">Sottrae un numero da un altro</div>
+                            <div class="help-example">15 - 8 = 7</div>
+                        </div>
+                        <div class="help-section">
+                            <div class="help-section-title" data-i18n="multiplication-title">Moltiplicazione (×)</div>
+                            <div data-i18n="multiplication-desc">Moltiplica un numero per un altro</div>
+                            <div class="help-example">6 × 4 = 24</div>
+                        </div>
+                        <div class="help-section">
+                            <div class="help-section-title" data-i18n="division-title">Divisione (÷)</div>
+                            <div data-i18n="division-desc">Divide un numero per un altro</div>
+                            <div class="help-example">20 ÷ 4 = 5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h1>
+
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="score">Punteggio</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct">Corrette</div>
+                <div class="score-value correct" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong">Sbagliate</div>
+                <div class="score-value wrong" id="wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="questions">Domande</div>
+                <div class="score-value" id="total">0/10</div>
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="tab active" onclick="changeCategory('tutte')" data-i18n="all">Tutte</button>
+            <button class="tab" onclick="changeCategory('addition')" data-i18n="addition-only">Solo Addizioni</button>
+            <button class="tab" onclick="changeCategory('subtraction')" data-i18n="subtraction-only">Solo Sottrazioni</button>
+            <button class="tab" onclick="changeCategory('multiplication')" data-i18n="multiplication-only">Solo Moltiplicazioni</button>
+            <button class="tab" onclick="changeCategory('division')" data-i18n="division-only">Solo Divisioni</button>
+        </div>
+
+        <div class="quiz-area">
+            <div class="question-box">
+                <div class="question" id="question"></div>
+                <div class="category-label" id="categoryLabel"></div>
+            </div>
+
+            <div class="answer-box">
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" step="any" autofocus>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()" data-i18n="check">Verifica</button>
+                <button class="btn btn-next" id="btnNext" onclick="nextQuestion()" data-i18n="next">Prossima Domanda</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message"><span data-i18n="answered-correctly">Hai risposto correttamente a</span> <span id="finalCorrect">0</span> <span data-i18n="questions-out-of">domande su 10</span></div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+            </div>
+
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'it';
+
+        const translations = {
+            it: {
+                'back': '← Matematica',
+                'title': 'Quiz Operazioni',
+                'score': 'Punteggio',
+                'correct': 'Corrette',
+                'wrong': 'Sbagliate',
+                'questions': 'Domande',
+                'all': 'Tutte',
+                'addition-only': 'Solo Addizioni',
+                'subtraction-only': 'Solo Sottrazioni',
+                'multiplication-only': 'Solo Moltiplicazioni',
+                'division-only': 'Solo Divisioni',
+                'check': 'Verifica',
+                'next': 'Prossima Domanda',
+                'restart': 'Ricomincia Quiz',
+                'reset-history': 'Cancella Storico Voti',
+                'help-title': 'Regole delle Operazioni',
+                'addition-title': 'Addizione (+)',
+                'addition-desc': 'Somma due o più numeri insieme',
+                'subtraction-title': 'Sottrazione (-)',
+                'subtraction-desc': 'Sottrae un numero da un altro',
+                'multiplication-title': 'Moltiplicazione (×)',
+                'multiplication-desc': 'Moltiplica un numero per un altro',
+                'division-title': 'Divisione (÷)',
+                'division-desc': 'Divide un numero per un altro',
+                'addition': 'Addizione',
+                'subtraction': 'Sottrazione',
+                'multiplication': 'Moltiplicazione',
+                'division': 'Divisione',
+                'insert-value': 'Inserisci un valore!',
+                'correct-answer': 'Corretto!',
+                'wrong-answer': 'Sbagliato! La risposta corretta è',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti',
+                'improving': 'Stai migliorando!',
+                'declining': 'Stai peggiorando',
+                'same-result': 'Stesso risultato',
+                'overall-trend': 'Trend generale: miglioramento (media',
+                'vs': 'vs',
+                'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+                'history-deleted': 'Storico voti cancellato!'
+            },
+            en: {
+                'back': '← Mathematics',
+                'title': 'Operations Quiz',
+                'score': 'Score',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'questions': 'Questions',
+                'all': 'All',
+                'addition-only': 'Addition Only',
+                'subtraction-only': 'Subtraction Only',
+                'multiplication-only': 'Multiplication Only',
+                'division-only': 'Division Only',
+                'check': 'Check',
+                'next': 'Next Question',
+                'restart': 'Restart Quiz',
+                'reset-history': 'Clear History',
+                'help-title': 'Operation Rules',
+                'addition-title': 'Addition (+)',
+                'addition-desc': 'Add two or more numbers together',
+                'subtraction-title': 'Subtraction (-)',
+                'subtraction-desc': 'Subtract one number from another',
+                'multiplication-title': 'Multiplication (×)',
+                'multiplication-desc': 'Multiply one number by another',
+                'division-title': 'Division (÷)',
+                'division-desc': 'Divide one number by another',
+                'addition': 'Addition',
+                'subtraction': 'Subtraction',
+                'multiplication': 'Multiplication',
+                'division': 'Division',
+                'insert-value': 'Please insert a value!',
+                'correct-answer': 'Correct!',
+                'wrong-answer': 'Wrong! The correct answer is',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades',
+                'improving': 'You\'re improving!',
+                'declining': 'You\'re declining',
+                'same-result': 'Same result',
+                'overall-trend': 'Overall trend: improvement (average',
+                'vs': 'vs',
+                'confirm-reset': 'Are you sure you want to delete all saved grades?',
+                'history-deleted': 'History deleted!'
+            }
+        };
+
+        const categoryNames = {
+            addition: { it: 'Addizione', en: 'Addition' },
+            subtraction: { it: 'Sottrazione', en: 'Subtraction' },
+            multiplication: { it: 'Moltiplicazione', en: 'Multiplication' },
+            division: { it: 'Divisione', en: 'Division' }
+        };
+
+        const operationSymbols = {
+            addition: '+',
+            subtraction: '-',
+            multiplication: '×',
+            division: '÷'
+        };
+
+        function t(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('operazioniLanguage', lang);
+
+            // Update buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update static texts
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Regenerate current question if exists
+            if (currentQuestion) {
+                updateQuestionDisplay();
+            }
+        }
+
+        function updateQuestionDisplay() {
+            if (!currentQuestion) return;
+
+            const symbol = operationSymbols[currentQuestion.operation];
+            document.getElementById('question').textContent =
+                `${currentQuestion.num1} ${symbol} ${currentQuestion.num2} = ?`;
+            document.getElementById('categoryLabel').textContent =
+                categoryNames[currentQuestion.operation][currentLanguage];
+        }
+
+        let currentQuestion = null;
+        let score = 0;
+        let correct = 0;
+        let wrong = 0;
+        let total = 0;
+        let selectedCategory = 'tutte';
+        const MAX_QUESTIONS = 10;
+        let previousQuestions = [];
+
+        function changeCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Reset quiz if category changes
+            if (total > 0) {
+                score = 0;
+                correct = 0;
+                wrong = 0;
+                total = 0;
+                previousQuestions = [];
+                document.getElementById('score').textContent = score;
+                document.getElementById('correct').textContent = correct;
+                document.getElementById('wrong').textContent = wrong;
+                document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+            }
+
+            nextQuestion();
+        }
+
+        function generateQuestion() {
+            let attempts = 0;
+            const maxAttempts = 50;
+
+            while (attempts < maxAttempts) {
+                attempts++;
+
+                // Choose operation
+                let operation;
+                if (selectedCategory === 'tutte') {
+                    const operations = ['addition', 'subtraction', 'multiplication', 'division'];
+                    operation = operations[Math.floor(Math.random() * operations.length)];
+                } else {
+                    operation = selectedCategory;
+                }
+
+                let num1, num2, answer;
+
+                // Generate numbers based on operation type
+                if (operation === 'addition') {
+                    // Addition: numbers 1-100
+                    num1 = Math.floor(Math.random() * 100) + 1;
+                    num2 = Math.floor(Math.random() * 100) + 1;
+                    answer = num1 + num2;
+                } else if (operation === 'subtraction') {
+                    // Subtraction: ensure positive result
+                    num1 = Math.floor(Math.random() * 100) + 1;
+                    num2 = Math.floor(Math.random() * num1) + 1;
+                    answer = num1 - num2;
+                } else if (operation === 'multiplication') {
+                    // Multiplication: smaller numbers (1-20)
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * 20) + 1;
+                    answer = num1 * num2;
+                } else if (operation === 'division') {
+                    // Division: ensure whole number result
+                    num2 = Math.floor(Math.random() * 12) + 1;
+                    answer = Math.floor(Math.random() * 20) + 1;
+                    num1 = num2 * answer;
+                }
+
+                // Check for repetition
+                const questionKey = `${operation}-${num1}-${num2}`;
+                if (previousQuestions.includes(questionKey)) continue;
+
+                // Avoid consecutive similar operations
+                if (previousQuestions.length > 0) {
+                    const lastKey = previousQuestions[previousQuestions.length - 1];
+                    const reverseKey = `${operation}-${num2}-${num1}`;
+                    if (reverseKey === lastKey) continue;
+                }
+
+                // Save question to history
+                previousQuestions.push(questionKey);
+                if (previousQuestions.length > 3) {
+                    previousQuestions.shift();
+                }
+
+                return {
+                    operation,
+                    num1,
+                    num2,
+                    answer
+                };
+            }
+
+            // Fallback: simple question
+            const operation = selectedCategory === 'tutte' ?
+                ['addition', 'subtraction', 'multiplication', 'division'][Math.floor(Math.random() * 4)] :
+                selectedCategory;
+
+            let num1 = 10;
+            let num2 = 5;
+            let answer = 0;
+
+            if (operation === 'addition') {
+                answer = num1 + num2;
+            } else if (operation === 'subtraction') {
+                answer = num1 - num2;
+            } else if (operation === 'multiplication') {
+                answer = num1 * num2;
+            } else if (operation === 'division') {
+                answer = num1 / num2;
+            }
+
+            return { operation, num1, num2, answer };
+        }
+
+        function nextQuestion() {
+            currentQuestion = generateQuestion();
+
+            // Update question display
+            const symbol = operationSymbols[currentQuestion.operation];
+            document.getElementById('question').textContent =
+                `${currentQuestion.num1} ${symbol} ${currentQuestion.num2} = ?`;
+            document.getElementById('categoryLabel').textContent =
+                categoryNames[currentQuestion.operation][currentLanguage];
+
+            // Reset input and feedback
+            const input = document.getElementById('answerInput');
+            input.value = '';
+            input.className = 'answer-input';
+            input.disabled = false;
+            input.focus();
+
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+
+            // Reset buttons
+            document.getElementById('btnCheck').style.display = 'block';
+            document.getElementById('btnNext').classList.remove('show');
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseFloat(document.getElementById('answerInput').value);
+            const input = document.getElementById('answerInput');
+            const feedback = document.getElementById('feedback');
+
+            if (isNaN(userAnswer)) {
+                feedback.textContent = t('insert-value');
+                feedback.className = 'feedback wrong';
+                return;
+            }
+
+            // Check with tolerance for floating point errors
+            const tolerance = Math.abs(currentQuestion.answer) * 0.0001 + 0.0001;
+            const isCorrect = Math.abs(userAnswer - currentQuestion.answer) <= tolerance;
+
+            const symbol = operationSymbols[currentQuestion.operation];
+            total++;
+
+            if (isCorrect) {
+                correct++;
+                score += 10;
+                input.className = 'answer-input correct';
+                feedback.textContent = `${t('correct-answer')} ${currentQuestion.num1} ${symbol} ${currentQuestion.num2} = ${currentQuestion.answer}`;
+                feedback.className = 'feedback correct';
+            } else {
+                wrong++;
+                input.className = 'answer-input wrong';
+                feedback.textContent = `${t('wrong-answer')} ${currentQuestion.answer}`;
+                feedback.className = 'feedback wrong';
+            }
+
+            // Update scores
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+
+            // Disable input and show next button
+            input.disabled = true;
+            document.getElementById('btnCheck').style.display = 'none';
+
+            // Check if reached 10 questions
+            if (total >= MAX_QUESTIONS) {
+                setTimeout(showFinalResults, 1500);
+            } else {
+                document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        function showFinalResults() {
+            // Hide quiz area
+            document.querySelector('.quiz-area').style.display = 'none';
+
+            // Show final screen
+            const finalScreen = document.getElementById('finalScreen');
+            finalScreen.classList.add('show');
+
+            // Calculate grade (out of 10)
+            const grade = correct;
+
+            // Show results
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalGrade').textContent = `${grade}/10`;
+
+            // Comment based on grade
+            const comments = {
+                it: [
+                    'Devi esercitarti ancora un po\'!',
+                    'Sufficiente, continua a esercitarti!',
+                    'Discreto, ma puoi fare meglio!',
+                    'Bene! Stai migliorando!',
+                    'Molto bene! Continua così!',
+                    'Eccellente! Ottimo lavoro!',
+                    'Perfetto! Sei un campione!'
+                ],
+                en: [
+                    'You need more practice!',
+                    'Sufficient, keep practicing!',
+                    'Fair, but you can do better!',
+                    'Good! You\'re improving!',
+                    'Very good! Keep it up!',
+                    'Excellent! Great job!',
+                    'Perfect! You\'re a champion!'
+                ]
+            };
+
+            let commentIndex;
+            if (grade === 10) commentIndex = 6;
+            else if (grade >= 9) commentIndex = 5;
+            else if (grade >= 8) commentIndex = 4;
+            else if (grade >= 7) commentIndex = 3;
+            else if (grade >= 6) commentIndex = 2;
+            else if (grade >= 5) commentIndex = 1;
+            else commentIndex = 0;
+
+            document.getElementById('finalComment').textContent = comments[currentLanguage][commentIndex];
+
+            // Save grade to history
+            saveGrade(grade);
+
+            // Display history
+            displayHistory();
+        }
+
+        function saveGrade(grade) {
+            // Get history from localStorage
+            let history = JSON.parse(localStorage.getItem('operazioniHistory') || '[]');
+
+            // Add new grade
+            history.push(grade);
+
+            // Keep only last 10 grades
+            if (history.length > 10) {
+                history = history.slice(-10);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('operazioniHistory', JSON.stringify(history));
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('operazioniHistory') || '[]');
+
+            if (history.length === 0) {
+                document.getElementById('historyBox').style.display = 'none';
+                return;
+            }
+
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            // Show last grades (from oldest to newest)
+            history.forEach((grade, index) => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                if (index === history.length - 1) {
+                    item.classList.add('current');
+                }
+                item.textContent = `${grade}/10`;
+                historyList.appendChild(item);
+            });
+
+            // Calculate and show trend
+            if (history.length >= 2) {
+                const lastGrade = history[history.length - 1];
+                const previousGrade = history[history.length - 2];
+
+                const trendMessage = document.getElementById('trendMessage');
+
+                if (lastGrade > previousGrade) {
+                    trendMessage.textContent = `${t('improving')} (+${lastGrade - previousGrade})`;
+                    trendMessage.className = 'trend improving';
+                } else if (lastGrade < previousGrade) {
+                    trendMessage.textContent = `${t('declining')} (${lastGrade - previousGrade})`;
+                    trendMessage.className = 'trend declining';
+                } else {
+                    trendMessage.textContent = `${t('same-result')}`;
+                    trendMessage.className = 'trend stable';
+                }
+
+                // Calculate average of last 3 vs previous 3
+                if (history.length >= 6) {
+                    const recentAvg = (history.slice(-3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+                    const previousAvg = (history.slice(-6, -3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+
+                    if (recentAvg > previousAvg) {
+                        trendMessage.textContent += ` | ${t('overall-trend')} ${recentAvg} ${t('vs')} ${previousAvg})`;
+                    }
+                }
+            }
+        }
+
+        function restartQuiz() {
+            // Reset variables
+            score = 0;
+            correct = 0;
+            wrong = 0;
+            total = 0;
+            previousQuestions = [];
+
+            // Reset display
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+
+            // Hide final screen
+            document.getElementById('finalScreen').classList.remove('show');
+
+            // Show quiz area
+            document.querySelector('.quiz-area').style.display = 'flex';
+
+            // Start new question
+            nextQuestion();
+        }
+
+        function resetHistory() {
+            if (confirm(t('confirm-reset'))) {
+                localStorage.removeItem('operazioniHistory');
+                document.getElementById('historyBox').style.display = 'none';
+                alert(t('history-deleted'));
+            }
+        }
+
+        // Handle Enter key
+        document.getElementById('answerInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                if (document.getElementById('btnCheck').style.display !== 'none') {
+                    checkAnswer();
+                } else {
+                    nextQuestion();
+                }
+            }
+        });
+
+        // Load saved language or use Italian as default
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('operazioniLanguage') || 'it';
+            currentLanguage = savedLang;
+
+            if (savedLang === 'en') {
+                document.querySelector('.lang-btn.active').classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+
+                // Update static texts
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (translations['en'][key]) {
+                        element.textContent = translations['en'][key];
+                    }
+                });
+            }
+        });
+
+        // Initialize quiz
+        nextQuestion();
+    </script>
+</body>
+</html>
