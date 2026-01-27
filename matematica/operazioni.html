@@ -381,13 +381,28 @@
             justify-content: center;
             font-size: 20px;
             font-weight: bold;
-            cursor: help;
+            cursor: pointer;
             transition: all 0.3s;
         }
 
         .help-icon:hover {
             background: #5568d3;
             transform: scale(1.1);
+        }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .help-overlay.show {
+            display: block;
         }
 
         .help-tooltip {
@@ -400,13 +415,40 @@
             border: 3px solid #667eea;
             border-radius: 15px;
             padding: 25px;
+            padding-top: 45px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        .help-container:hover .help-tooltip {
+        .help-tooltip.show {
             display: block;
+        }
+
+        .help-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-close:hover {
+            background: #c82333;
+            transform: rotate(90deg);
         }
 
         .help-tooltip h3 {
@@ -513,34 +555,37 @@
         <h1>
             <span data-i18n="title">Quiz Operazioni</span>
             <div class="help-container">
-                <div class="help-icon">?</div>
-                <div class="help-tooltip">
-                    <h3 data-i18n="help-title">Regole delle Operazioni</h3>
-                    <div class="help-content">
-                        <div class="help-section">
-                            <div class="help-section-title" data-i18n="addition-title">Addizione (+)</div>
-                            <div data-i18n="addition-desc">Somma due o più numeri insieme</div>
-                            <div class="help-example">7 + 5 = 12</div>
-                        </div>
-                        <div class="help-section">
-                            <div class="help-section-title" data-i18n="subtraction-title">Sottrazione (-)</div>
-                            <div data-i18n="subtraction-desc">Sottrae un numero da un altro</div>
-                            <div class="help-example">15 - 8 = 7</div>
-                        </div>
-                        <div class="help-section">
-                            <div class="help-section-title" data-i18n="multiplication-title">Moltiplicazione (×)</div>
-                            <div data-i18n="multiplication-desc">Moltiplica un numero per un altro</div>
-                            <div class="help-example">6 × 4 = 24</div>
-                        </div>
-                        <div class="help-section">
-                            <div class="help-section-title" data-i18n="division-title">Divisione (÷)</div>
-                            <div data-i18n="division-desc">Divide un numero per un altro</div>
-                            <div class="help-example">20 ÷ 4 = 5</div>
-                        </div>
-                    </div>
-                </div>
+                <div class="help-icon" onclick="toggleHelp()">?</div>
             </div>
         </h1>
+
+        <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+        <div class="help-tooltip" id="helpTooltip">
+            <button class="help-close" onclick="toggleHelp()">&times;</button>
+            <h3 data-i18n="help-title">Regole delle Operazioni</h3>
+            <div class="help-content">
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="addition-title">Addizione (+)</div>
+                    <div data-i18n="addition-desc">Somma due o più numeri insieme</div>
+                    <div class="help-example">7 + 5 = 12</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="subtraction-title">Sottrazione (-)</div>
+                    <div data-i18n="subtraction-desc">Sottrae un numero da un altro</div>
+                    <div class="help-example">15 - 8 = 7</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="multiplication-title">Moltiplicazione (×)</div>
+                    <div data-i18n="multiplication-desc">Moltiplica un numero per un altro</div>
+                    <div class="help-example">6 × 4 = 24</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="division-title">Divisione (÷)</div>
+                    <div data-i18n="division-desc">Divide un numero per un altro</div>
+                    <div class="help-example">20 ÷ 4 = 5</div>
+                </div>
+            </div>
+        </div>
 
         <div class="score-section">
             <div class="score-item">
@@ -1128,6 +1173,14 @@
                 });
             }
         });
+
+        // Toggle help tooltip
+        function toggleHelp() {
+            const overlay = document.getElementById('helpOverlay');
+            const tooltip = document.getElementById('helpTooltip');
+            overlay.classList.toggle('show');
+            tooltip.classList.toggle('show');
+        }
 
         // Initialize quiz
         nextQuestion();
