@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Circonferenza e Cerchio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 12mm 14mm;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header .subtitle {
+            font-size: 12px;
+            margin-top: 3px;
+            opacity: 0.9;
+        }
+
+        .pi-note {
+            text-align: center;
+            font-size: 13px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 6px;
+            padding: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #664d00;
+        }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* CARD */
+        .card {
+            border-radius: 8px;
+            border: 2px solid;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-body {
+            padding: 8px 10px;
+        }
+
+        /* Color themes */
+        .blue  { border-color: #667eea; }
+        .blue .card-header  { background: #667eea; color: white; }
+
+        .green { border-color: #28a745; }
+        .green .card-header { background: #28a745; color: white; }
+
+        .orange { border-color: #fd7e14; }
+        .orange .card-header { background: #fd7e14; color: white; }
+
+        .purple { border-color: #764ba2; }
+        .purple .card-header { background: #764ba2; color: white; }
+
+        .red { border-color: #dc3545; }
+        .red .card-header { background: #dc3545; color: white; }
+
+        /* Formula rows */
+        .formula-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 4px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .formula-row:last-child { border-bottom: none; }
+
+        .formula-label {
+            font-size: 10px;
+            color: #888;
+            min-width: 100px;
+            flex-shrink: 0;
+        }
+
+        .formula {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .formula .result { color: #667eea; }
+        .formula .pi { color: #764ba2; }
+
+        /* Example box */
+        .example {
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            padding: 4px 7px;
+            margin-top: 4px;
+            border-radius: 0 4px 4px 0;
+            font-size: 11px;
+            color: #444;
+            line-height: 1.7;
+        }
+
+        .example .ex-title {
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+            margin-bottom: 1px;
+        }
+
+        .example .ex-ans {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        /* SVG diagram */
+        .diagram-section {
+            margin-bottom: 10px;
+        }
+
+        .diagram-section .card-body {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .diagram-svg {
+            flex-shrink: 0;
+        }
+
+        .diagram-labels {
+            flex: 1;
+            font-size: 11px;
+            line-height: 2;
+            padding-top: 4px;
+        }
+
+        .diagram-labels div {
+            padding: 2px 0;
+            border-bottom: 1px dotted #ddd;
+        }
+
+        .diagram-labels div:last-child { border-bottom: none; }
+
+        .lbl-color { font-weight: bold; }
+        .lbl-r { color: #dc3545; }
+        .lbl-d { color: #0d6efd; }
+        .lbl-c { color: #667eea; }
+        .lbl-arc { color: #fd7e14; }
+        .lbl-sector { color: #764ba2; }
+        .lbl-area { color: #28a745; }
+
+        /* Steps section */
+        .steps-card {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+
+        .steps-title {
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #667eea;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #667eea;
+            padding-bottom: 3px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 16px;
+        }
+
+        .step-item {
+            font-size: 11px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .step-item strong { color: #764ba2; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 9px;
+            color: #aaa;
+            margin-top: 8px;
+            border-top: 1px solid #eee;
+            padding-top: 6px;
+        }
+
+        /* Print */
+        @media print {
+            @page { size: A4; margin: 8mm 10mm; }
+            body { background: white; padding: 0; }
+            .page {
+                width: 100%;
+                min-height: auto;
+                box-shadow: none;
+                padding: 0;
+            }
+            .no-print { display: none !important; }
+            /* Prevent cards from splitting across pages */
+            .card, .steps-card { break-inside: avoid; }
+        }
+
+        /* Screen only: toolbar */
+        .print-bar {
+            width: 210mm;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .print-bar-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(102,126,234,0.4);
+            transition: opacity 0.2s;
+        }
+
+        .btn-print:hover { opacity: 0.85; }
+
+        .print-hint {
+            font-size: 11px;
+            color: #888;
+            text-align: right;
+        }
+
+        .btn-back {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-bar no-print">
+        <a href="circonferenza.html" class="btn-back">← Torna al quiz</a>
+        <div class="print-bar-right">
+            <button class="btn-print" onclick="scaricaPDF()">📥 Salva come PDF</button>
+            <div class="print-hint">Si apre il dialogo di stampa → scegli "Salva come PDF"</div>
+        </div>
+    </div>
+
+    <div class="page">
+
+        <div class="header">
+            <h1>📐 Formulario — Circonferenza e Cerchio</h1>
+            <div class="subtitle">Scuola Media &nbsp;|&nbsp; Bignami rapido da consultare</div>
+        </div>
+
+        <div class="pi-note">
+            π ≈ 3.14 &nbsp;&nbsp;|&nbsp;&nbsp; r = raggio &nbsp;&nbsp;|&nbsp;&nbsp; d = diametro &nbsp;&nbsp;|&nbsp;&nbsp; C = circonferenza &nbsp;&nbsp;|&nbsp;&nbsp; A = area &nbsp;&nbsp;|&nbsp;&nbsp; α = angolo in gradi
+        </div>
+
+        <!-- DIAGRAM -->
+        <div class="card blue diagram-section" style="margin-bottom:10px;">
+            <div class="card-header">🔵 Parti del cerchio</div>
+            <div class="card-body">
+                <div class="diagram-svg">
+                    <svg width="170" height="170" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Sector fill -->
+                        <path d="M 85 85 L 85 15 A 70 70 0 0 1 155 85 Z"
+                              fill="rgba(118,75,162,0.18)" stroke="#764ba2" stroke-width="2"/>
+                        <!-- Arc highlight -->
+                        <path d="M 85 15 A 70 70 0 0 1 155 85"
+                              fill="none" stroke="#fd7e14" stroke-width="3"/>
+                        <!-- Circle outline -->
+                        <circle cx="85" cy="85" r="70"
+                                fill="rgba(102,126,234,0.07)" stroke="#667eea" stroke-width="2.5"/>
+                        <!-- Diameter line -->
+                        <line x1="15" y1="85" x2="155" y2="85"
+                              stroke="#0d6efd" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <!-- Radius line -->
+                        <line x1="85" y1="85" x2="155" y2="85"
+                              stroke="#dc3545" stroke-width="2.5"/>
+                        <!-- Radius to sector -->
+                        <line x1="85" y1="85" x2="85" y2="15"
+                              stroke="#dc3545" stroke-width="2"/>
+                        <!-- Center dot -->
+                        <circle cx="85" cy="85" r="4" fill="#333"/>
+                        <!-- Labels -->
+                        <text x="120" y="79" font-size="12" font-weight="bold" fill="#dc3545">r</text>
+                        <text x="48" y="79" font-size="12" font-weight="bold" fill="#0d6efd">r</text>
+                        <text x="48" y="100" font-size="11" fill="#0d6efd">← d →</text>
+                        <!-- Arc label -->
+                        <text x="126" y="38" font-size="11" font-weight="bold" fill="#fd7e14">arco l</text>
+                        <!-- Sector label -->
+                        <text x="102" y="65" font-size="10" fill="#764ba2">settore</text>
+                        <!-- Angle label -->
+                        <text x="86" y="66" font-size="10" fill="#333">α</text>
+                        <!-- C label on circle -->
+                        <text x="10" y="148" font-size="11" font-weight="bold" fill="#667eea">C = circonferenza</text>
+                    </svg>
+                </div>
+                <div class="diagram-labels">
+                    <div><span class="lbl-color lbl-r">r (raggio)</span> — distanza dal centro al bordo</div>
+                    <div><span class="lbl-color lbl-d">d (diametro)</span> — corda che passa per il centro: <strong>d = 2r</strong></div>
+                    <div><span class="lbl-color lbl-c">C (circonferenza)</span> — lunghezza del bordo del cerchio</div>
+                    <div><span class="lbl-color lbl-arc">arco l</span> — parte della circonferenza delimitata dall'angolo α</div>
+                    <div><span class="lbl-color lbl-sector">settore</span> — "fetta di pizza" con angolo α</div>
+                    <div><span class="lbl-color lbl-area">A (area)</span> — superficie interna del cerchio</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+
+            <!-- CIRCONFERENZA -->
+            <div class="card blue">
+                <div class="card-header">📏 Circonferenza (C)</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Dato il raggio r:</span>
+                        <span class="formula"><span class="result">C</span> = 2 × π × r</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Dato il diametro d:</span>
+                        <span class="formula"><span class="result">C</span> = π × d</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Trovare il raggio:</span>
+                        <span class="formula"><span class="result">r</span> = C ÷ (2 × π)</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Trovare il diametro:</span>
+                        <span class="formula"><span class="result">d</span> = C ÷ π</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Esempio — r = 5 cm:</span>
+                        C = 2 × 3.14 × 5 = <span class="ex-ans">31.4 cm</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Esempio — C = 31.4 cm, trova r:</span>
+                        r = 31.4 ÷ (2 × 3.14) = 31.4 ÷ 6.28 = <span class="ex-ans">5 cm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AREA -->
+            <div class="card green">
+                <div class="card-header">🟢 Area del cerchio (A)</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Dato il raggio r:</span>
+                        <span class="formula"><span class="result">A</span> = π × r²</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Trovare il raggio:</span>
+                        <span class="formula"><span class="result">r</span> = √(A ÷ π)</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Esempio — r = 5 cm:</span>
+                        A = 3.14 × 5² = 3.14 × 25 = <span class="ex-ans">78.5 cm²</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Esempio — A = 78.5 cm², trova r:</span>
+                        r = √(78.5 ÷ 3.14) = √25 = <span class="ex-ans">5 cm</span>
+                    </div>
+                    <div class="example" style="background:#e8f5e9; border-color:#28a745;">
+                        <span class="ex-title" style="color:#28a745;">⚠️ Ricorda:</span>
+                        r² = r × r &nbsp; (es. 5² = 5 × 5 = 25)
+                    </div>
+                </div>
+            </div>
+
+            <!-- ARCO -->
+            <div class="card orange">
+                <div class="card-header">🟠 Arco (l) — parte della circonferenza</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Dato C e angolo α:</span>
+                        <span class="formula"><span class="result">l</span> = C × α ÷ 360</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Trovare C dall'arco:</span>
+                        <span class="formula"><span class="result">C</span> = l × 360 ÷ α</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Esempio — C = 31.4 cm, α = 90°:</span>
+                        l = 31.4 × 90 ÷ 360 = 31.4 × ¼ = <span class="ex-ans">7.85 cm</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Idea: l'arco è una parte della circonferenza.</span>
+                        α = 90° → arco = ¼ di C &nbsp;|&nbsp; α = 180° → arco = ½ di C
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTORE -->
+            <div class="card purple">
+                <div class="card-header">🟣 Area del settore (As) — la "fetta"</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Dato r e angolo α:</span>
+                        <span class="formula"><span class="result">As</span> = A × α ÷ 360</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">dove A = πr²</span>
+                        <span class="formula"><span class="result">As</span> = π × r² × α ÷ 360</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Esempio — r = 6 cm, α = 60°:</span>
+                        1) A = 3.14 × 6² = 3.14 × 36 = 113.04 cm²<br>
+                        2) As = 113.04 × 60 ÷ 360 = <span class="ex-ans">18.84 cm²</span>
+                    </div>
+                    <div class="example" style="background:#f3e8ff; border-color:#764ba2;">
+                        <span class="ex-title" style="color:#764ba2;">⚠️ Attenzione — errore comune:</span>
+                        L'arco usa la <strong>circonferenza C</strong>.<br>
+                        Il settore usa l'<strong>area A</strong>. Non confonderli!
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PROCEDURA PASSO-PASSO -->
+        <div class="steps-card">
+            <div class="steps-title">📋 Procedura passo per passo</div>
+            <div class="steps-grid">
+                <div class="step-item">
+                    <strong>Trovare C dal raggio:</strong><br>
+                    1. Moltiplica r × r (no! non serve)<br>
+                    2. C = 2 × 3.14 × r
+                </div>
+                <div class="step-item">
+                    <strong>Trovare l'area dal raggio:</strong><br>
+                    1. Calcola r² = r × r<br>
+                    2. A = 3.14 × r²
+                </div>
+                <div class="step-item">
+                    <strong>Trovare l'arco:</strong><br>
+                    1. Calcola C = 2 × 3.14 × r<br>
+                    2. l = C × α ÷ 360
+                </div>
+                <div class="step-item">
+                    <strong>Trovare l'area del settore:</strong><br>
+                    1. Calcola A = 3.14 × r²<br>
+                    2. As = A × α ÷ 360
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELLA ANGOLI UTILI -->
+        <div class="card red" style="margin-bottom:10px;">
+            <div class="card-header">📐 Frazioni utili degli angoli</div>
+            <div class="card-body" style="display:grid; grid-template-columns: repeat(6,1fr); gap:4px; text-align:center; padding: 8px;">
+                <div style="background:#fff0f0; border-radius:6px; padding:5px 3px;">
+                    <div style="font-size:16px; font-weight:bold; color:#dc3545;">30°</div>
+                    <div style="font-size:11px; color:#666;">= 1/12 del cerchio</div>
+                </div>
+                <div style="background:#fff0f0; border-radius:6px; padding:5px 3px;">
+                    <div style="font-size:16px; font-weight:bold; color:#dc3545;">45°</div>
+                    <div style="font-size:11px; color:#666;">= 1/8 del cerchio</div>
+                </div>
+                <div style="background:#fff0f0; border-radius:6px; padding:5px 3px;">
+                    <div style="font-size:16px; font-weight:bold; color:#dc3545;">60°</div>
+                    <div style="font-size:11px; color:#666;">= 1/6 del cerchio</div>
+                </div>
+                <div style="background:#fff0f0; border-radius:6px; padding:5px 3px;">
+                    <div style="font-size:16px; font-weight:bold; color:#dc3545;">90°</div>
+                    <div style="font-size:11px; color:#666;">= 1/4 del cerchio</div>
+                </div>
+                <div style="background:#fff0f0; border-radius:6px; padding:5px 3px;">
+                    <div style="font-size:16px; font-weight:bold; color:#dc3545;">120°</div>
+                    <div style="font-size:11px; color:#666;">= 1/3 del cerchio</div>
+                </div>
+                <div style="background:#fff0f0; border-radius:6px; padding:5px 3px;">
+                    <div style="font-size:16px; font-weight:bold; color:#dc3545;">180°</div>
+                    <div style="font-size:11px; color:#666;">= 1/2 del cerchio</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Quiz Didattici — quiz-didattici &nbsp;|&nbsp; π ≈ 3.14 per la scuola media &nbsp;|&nbsp; Tutte le misure in cm e cm²
+        </div>
+
+    </div>
+
+    <script>
+        function scaricaPDF() {
+            // Set title for PDF filename suggestion, then open print dialog
+            const originalTitle = document.title;
+            document.title = 'Formulario-Circonferenza-Cerchio';
+            window.print();
+            // Restore title after dialog closes
+            setTimeout(() => { document.title = originalTitle; }, 1000);
+        }
+    </script>
+</body>
+</html>
