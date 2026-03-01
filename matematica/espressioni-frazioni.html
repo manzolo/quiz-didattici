@@ -85,6 +85,21 @@
         .answer-input.correct { border-color: #28a745; background: #d4edda; }
         .answer-input.wrong   { border-color: #dc3545; background: #f8d7da; }
 
+        .sign-btn {
+            padding: 18px 14px; font-size: 2em;
+            border: 4px solid #667eea; border-radius: 15px;
+            background: white; color: #667eea;
+            font-weight: bold; cursor: pointer; transition: all 0.3s;
+            width: 60px; line-height: 1; flex-shrink: 0;
+        }
+        .sign-btn:hover:not(:disabled) { background: rgba(102,126,234,0.1); }
+        .sign-btn.negative { background: #667eea; color: white; }
+        .sign-btn:disabled { opacity: 0.7; cursor: default; }
+        .sign-btn.correct { border-color: #28a745; }
+        .sign-btn.negative.correct { background: #28a745; }
+        .sign-btn.wrong { border-color: #dc3545; }
+        .sign-btn.negative.wrong { background: #dc3545; }
+
         .frac-sep {
             font-size: 3em; font-weight: bold; color: #667eea; line-height: 1;
         }
@@ -211,6 +226,7 @@
             .question-box { padding: 20px 15px; min-width: auto; width: 100%; margin-bottom: 20px; }
             .question { font-size: 1.4em; }
             .answer-input { font-size: 1.8em; width: 100px; padding: 12px 10px; }
+            .sign-btn { font-size: 1.8em; width: 52px; padding: 12px 8px; }
             .frac-sep { font-size: 2.2em; }
             .button-group { flex-direction: column; gap: 12px; margin-top: 15px; width: 100%; align-items: center; }
             .btn { padding: 12px 30px; font-size: 1.1em; width: 100%; max-width: 280px; }
@@ -429,8 +445,10 @@
                 'rule-pow-add': 'Prima la potenza, poi sommare',
                 'rule-pow-sum': 'Prima sommare nelle parentesi, poi elevare al quadrato',
                 'rule-pow-neg': 'Esponente pari → la base negativa diventa positiva',
+                'rule-pow-neg-odd': 'Esponente dispari → la base negativa rimane negativa',
                 'rule-pow-pow-div': 'Potenza di potenza: [(a/b)^p]^q = (a/b)^(p×q), poi dividi',
                 'rule-pow-mixed': 'Calcola ogni potenza (neg. con esp. pari → pos.), poi moltiplica',
+                'rule-pow-mixed-odd': 'Calcola ogni potenza (neg. con esp. dispari → neg.), poi moltiplica',
                 'help-neg-title': 'Basi Negative',
                 'help-neg-desc': '(-a/b)^n: negativo se n dispari, positivo se n pari',
                 'help-powpow-title': 'Potenza di Potenza',
@@ -491,8 +509,10 @@
                 'rule-pow-add': 'First the power, then add',
                 'rule-pow-sum': 'First add inside parentheses, then square',
                 'rule-pow-neg': 'Even exponent → negative base becomes positive',
+                'rule-pow-neg-odd': 'Odd exponent → negative base stays negative',
                 'rule-pow-pow-div': 'Power of power: [(a/b)^p]^q = (a/b)^(p×q), then divide',
                 'rule-pow-mixed': 'Calculate each power (neg. with even exp. → pos.), then multiply',
+                'rule-pow-mixed-odd': 'Calculate each power (neg. with odd exp. → neg.), then multiply',
                 'help-neg-title': 'Negative Bases',
                 'help-neg-desc': '(-a/b)^n: negative if n odd, positive if n even',
                 'help-powpow-title': 'Power of a Power',
@@ -529,6 +549,8 @@
 
         // Is result valid? (positive, manageable)
         function ok(f) { return f && f.n > 0 && f.d > 0 && f.d <= 60 && f.n <= 200; }
+        // Like ok() but also allows negative numerator (for odd-exponent negative bases)
+        function okSigned(f) { return f && f.n !== 0 && f.d > 0 && f.d <= 60 && Math.abs(f.n) <= 200; }
 
         // ── Display helpers ──────────────────────────────────────────
         // HTML for fraction inside question box (white text on gradient)
@@ -948,23 +970,27 @@
             },
 
             POW5() {
-                // (-a/b)^n con n pari → risultato positivo
+                // (-a/b)^n: n pari → positivo, n dispari → negativo
                 let f, n, r, tries = 0;
                 do {
                     f = rFs();
-                    n = Math.random() < 0.7 ? 2 : 4;
-                    r = Fpow(f, n);
+                    n = [2, 3, 4][Math.floor(Math.random() * 3)];
+                    const rawPow = Fpow(f, n);
+                    r = (rawPow && n % 2 === 1) ? F(-rawPow.n, rawPow.d) : rawPow;
                     tries++;
-                } while (!ok(r) && tries < 40);
-                if (!ok(r)) return null;
+                } while (!okSigned(r) && tries < 40);
+                if (!okSigned(r)) return null;
                 const rawN = Math.pow(f.n, n), rawD = Math.pow(f.d, n);
+                const isOdd = n % 2 === 1;
                 return {
                     category: 'pot-base',
                     html: fHneg(f, n),
-                    answer: r, ruleKey: 'rule-pow-neg',
+                    answer: r, ruleKey: isOdd ? 'rule-pow-neg-odd' : 'rule-pow-neg',
                     steps: [
-                        `Esponente ${n} è pari → la base negativa diventa positiva`,
-                        `${fTneg(f, n)} = ${fTpow(f, n)} = ${fU(rawN, rawD)} = ${fB(r)}`
+                        isOdd
+                            ? `Esponente ${n} è dispari → la base negativa rimane negativa`
+                            : `Esponente ${n} è pari → la base negativa diventa positiva`,
+                        `${fTneg(f, n)} = ${isOdd ? '-' : ''}${fU(rawN, rawD)} = ${fB(r)}`
                     ]
                 };
             },
@@ -1009,22 +1035,31 @@
             },
 
             POW7() {
-                // [(-a/b)^2] × [(c/d)^2]  parentesi quadre
-                let f1, f2, r, tries = 0;
+                // [(-a/b)^p] × [(c/d)^2]  parentesi quadre, p ∈ {2, 3}
+                let f1, f2, r, p, pw1, pw2, tries = 0;
                 do {
                     f1 = rFs(); f2 = rFs();
-                    const pw1 = Fpow(f1, 2), pw2 = Fpow(f2, 2);
-                    r = Fmul(pw1, pw2);
+                    p = Math.random() < 0.5 ? 2 : 3;
+                    const pw1base = Fpow(f1, p);
+                    pw1 = (pw1base && p % 2 === 1) ? F(-pw1base.n, pw1base.d) : pw1base;
+                    pw2 = Fpow(f2, 2);
+                    r = (pw1 && pw2) ? Fmul(pw1, pw2) : null;
                     tries++;
-                } while (!ok(r) && tries < 40);
-                if (!ok(r)) return null;
-                const pw1 = Fpow(f1, 2), pw2 = Fpow(f2, 2);
+                } while (!okSigned(r) && tries < 40);
+                if (!okSigned(r)) return null;
+                const pw1base = Fpow(f1, p);
+                pw1 = (pw1base && p % 2 === 1) ? F(-pw1base.n, pw1base.d) : pw1base;
+                pw2 = Fpow(f2, 2);
+                const isOdd = p % 2 === 1;
+                const rawP1n = Math.pow(f1.n, p), rawP1d = Math.pow(f1.d, p);
                 return {
                     category: 'pot-avanz',
-                    html: `[${fHneg(f1, 2)}] × [${fHpow(f2, 2)}]`,
-                    answer: r, ruleKey: 'rule-pow-mixed',
+                    html: `[${fHneg(f1, p)}] × [${fHpow(f2, 2)}]`,
+                    answer: r, ruleKey: isOdd ? 'rule-pow-mixed-odd' : 'rule-pow-mixed',
                     steps: [
-                        `(-${fT(f1)})² = ${fU(f1.n * f1.n, f1.d * f1.d)} = ${fT(pw1)}  (esp. pari)`,
+                        isOdd
+                            ? `(-${fT(f1)})^${p} = -${fU(rawP1n, rawP1d)} = ${fT(pw1)}  (esp. dispari)`
+                            : `(-${fT(f1)})^${p} = ${fU(rawP1n, rawP1d)} = ${fT(pw1)}  (esp. pari)`,
                         `(${fT(f2)})² = ${fU(f2.n * f2.n, f2.d * f2.d)} = ${fT(pw2)}`,
                         `${fT(pw1)} × ${fT(pw2)} = ${fU(pw1.n * pw2.n, pw1.d * pw2.d)} = ${fB(r)}`
                     ]
@@ -1117,12 +1152,14 @@
 
             const isInt = q.answer.d === 1;
             document.getElementById('answerBox').innerHTML = isInt
-                ? `<input type="number" class="answer-input" id="answerNum" placeholder="?" step="1">
+                ? `<button id="signBtn" onclick="toggleSign()" class="sign-btn" title="Cambia segno">+</button>
+                   <input type="number" class="answer-input" id="answerNum" placeholder="?" step="1" min="0">
                    <span class="frac-sep">/</span>
-                   <input type="number" class="answer-input" id="answerDen" placeholder="1" step="1" value="1">`
-                : `<input type="number" class="answer-input" id="answerNum" placeholder="?" step="1">
+                   <input type="number" class="answer-input" id="answerDen" placeholder="1" step="1" value="1" min="1">`
+                : `<button id="signBtn" onclick="toggleSign()" class="sign-btn" title="Cambia segno">+</button>
+                   <input type="number" class="answer-input" id="answerNum" placeholder="?" step="1" min="0">
                    <span class="frac-sep">/</span>
-                   <input type="number" class="answer-input" id="answerDen" placeholder="?" step="1">`;
+                   <input type="number" class="answer-input" id="answerDen" placeholder="?" step="1" min="1">`;
 
             document.getElementById('ansHint').textContent = isInt
                 ? t('hint-int') : t('hint-frac');
@@ -1151,13 +1188,27 @@
             </div>`;
         }
 
+        function toggleSign() {
+            const btn = document.getElementById('signBtn');
+            if (!btn || btn.disabled) return;
+            if (btn.classList.contains('negative')) {
+                btn.textContent = '+';
+                btn.classList.remove('negative');
+            } else {
+                btn.textContent = '−';
+                btn.classList.add('negative');
+            }
+        }
+
         // ── Check answer ─────────────────────────────────────────────
         function checkAnswer() {
             const feedback = document.getElementById('feedback');
             const numEl = document.getElementById('answerNum');
             const denEl = document.getElementById('answerDen');
 
-            const rawN = numEl ? parseInt(numEl.value, 10) : NaN;
+            const signBtn = document.getElementById('signBtn');
+            const sign = signBtn && signBtn.classList.contains('negative') ? -1 : 1;
+            const rawN = numEl ? parseInt(numEl.value, 10) * sign : NaN;
             const rawD = denEl ? parseInt(denEl.value, 10) : NaN;
 
             if (isNaN(rawN) || isNaN(rawD)) {
@@ -1177,6 +1228,10 @@
             const isCorrect = userF && userF.n === corrF.n && userF.d === corrF.d;
 
             [numEl, denEl].forEach(el => { if (el) el.classList.add(isCorrect ? 'correct' : 'wrong'); el && (el.disabled = true); });
+            if (signBtn) {
+                signBtn.classList.add(isCorrect ? 'correct' : 'wrong');
+                signBtn.disabled = true;
+            }
 
             total++;
             if (isCorrect) {
