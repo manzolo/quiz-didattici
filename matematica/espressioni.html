@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Espressioni</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            background: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-item { text-align: center; }
+        .score-label { font-size: 14px; color: #666; margin-bottom: 5px; }
+        .score-value { font-size: 32px; font-weight: bold; color: #667eea; }
+        .score-value.correct { color: #28a745; }
+        .score-value.wrong { color: #dc3545; }
+
+        .quiz-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .question {
+            color: white;
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            letter-spacing: 0.02em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .category-label { color: rgba(255,255,255,0.8); font-size: 1.1em; margin-top: 8px; }
+
+        .answer-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .answer-input {
+            padding: 20px 30px;
+            font-size: 2.5em;
+            border: 4px solid #667eea;
+            border-radius: 15px;
+            text-align: center;
+            width: 200px;
+            font-weight: bold;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #f093fb;
+            box-shadow: 0 0 20px rgba(240,147,251,0.5);
+        }
+
+        .answer-input.correct { border-color: #28a745; background: #d4edda; }
+        .answer-input.wrong   { border-color: #dc3545; background: #f8d7da; }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check { background: #667eea; color: white; }
+        .btn-check:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-next { background: #28a745; color: white; display: none; }
+        .btn-next:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(40,167,69,0.4); }
+        .btn-next.show { display: block; }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 40px;
+            max-width: 800px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feedback.correct { color: #28a745; }
+        .feedback.wrong   { color: #dc3545; }
+
+        .explanation {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 14px;
+            text-align: left;
+            max-width: 540px;
+            width: 100%;
+        }
+
+        .expl-title { font-weight: bold; color: #664d00; margin-bottom: 8px; font-size: 1em; }
+
+        .expl-formula {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .expl-step { color: #444; font-size: 0.95em; padding: 3px 0; line-height: 1.6; }
+        .expl-step b { color: #28a745; font-size: 1.1em; }
+
+        .btn-show-solution {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #664d00;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-show-solution:hover { background: #ffc107; transform: translateY(-1px); }
+
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .final-screen.show { display: flex; }
+
+        .final-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .final-title   { color: white; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
+        .final-grade   { color: white; font-size: 5em; font-weight: bold; margin: 20px 0; }
+        .final-message { color: white; font-size: 1.5em; margin-bottom: 10px; }
+
+        .history-box {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-width: 600px;
+        }
+
+        .history-title { color: #667eea; font-size: 1.5em; font-weight: bold; margin-bottom: 20px; text-align: center; }
+        .history-list  { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+
+        .history-item {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history-item.current { background: #667eea; color: white; transform: scale(1.1); }
+
+        .trend { margin-top: 15px; font-size: 1.3em; font-weight: bold; text-align: center; }
+        .trend.improving { color: #28a745; }
+        .trend.declining { color: #dc3545; }
+        .trend.stable    { color: #ffc107; }
+
+        .btn-restart {
+            background: #667eea; color: white;
+            padding: 20px 60px; font-size: 1.5em; font-weight: bold;
+            border: none; border-radius: 15px; cursor: pointer; transition: all 0.3s;
+        }
+
+        .btn-restart:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-reset-history {
+            background: #dc3545; color: white;
+            padding: 15px 40px; font-size: 1.2em; font-weight: bold;
+            border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; margin-top: 20px;
+        }
+
+        .btn-reset-history:hover { background: #c82333; transform: translateY(-2px); }
+
+        .category-tabs {
+            display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .tab:hover { background: #d3d6db; transform: translateY(-2px); }
+        .tab.active { background: #667eea; color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+
+        .help-container { position: relative; display: inline-block; margin-left: 15px; vertical-align: middle; }
+
+        .help-icon {
+            width: 35px; height: 35px;
+            background: #667eea; color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s;
+        }
+
+        .help-icon:hover { background: #5568d3; transform: scale(1.1); }
+
+        .help-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 999;
+        }
+
+        .help-overlay.show { display: block; }
+
+        .help-tooltip {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            padding-top: 45px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            min-width: 340px;
+        }
+
+        .help-tooltip.show { display: block; }
+
+        .help-close {
+            position: absolute; top: 10px; right: 10px;
+            width: 30px; height: 30px;
+            background: #dc3545; color: white;
+            border: none; border-radius: 50%;
+            font-size: 18px; font-weight: bold;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-close:hover { background: #c82333; transform: rotate(90deg); }
+
+        .help-tooltip h3 { color: #667eea; margin-bottom: 20px; font-size: 1.3em; text-align: center; }
+        .help-content { color: #333; line-height: 1.8; text-align: left; }
+        .help-section { margin-bottom: 15px; }
+        .help-section-title { color: #764ba2; font-weight: bold; font-size: 1.1em; margin-bottom: 8px; }
+        .help-example {
+            background: #f8f9fa; padding: 8px 12px; border-radius: 8px;
+            margin-top: 5px; font-family: monospace; font-size: 0.95em;
+        }
+
+        .back-button {
+            display: inline-flex; align-items: center; gap: 10px;
+            color: #667eea; text-decoration: none;
+            font-size: 1em; font-weight: bold;
+            padding: 10px 20px;
+            background: white; border: 2px solid #667eea;
+            border-radius: 10px; transition: all 0.3s;
+            position: absolute; top: 20px; left: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .back-button:hover { background: #667eea; color: white; transform: translateX(-5px); }
+
+        .language-selector {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; gap: 10px;
+            background: white; padding: 10px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn {
+            background: transparent; border: 2px solid #667eea;
+            color: #667eea; padding: 8px 15px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; transition: all 0.3s;
+        }
+
+        .lang-btn:hover { background: rgba(102,126,234,0.1); }
+        .lang-btn.active { background: #667eea; color: white; }
+
+        .buy-me-coffee {
+            position: fixed; bottom: 20px; right: 20px;
+            z-index: 1000; transition: transform 0.3s ease;
+        }
+
+        .buy-me-coffee:hover { transform: translateY(-5px); }
+        .buy-me-coffee img { height: 50px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        /* ── Responsive ─────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+
+            h1 { font-size: 1.6em; margin-bottom: 15px; }
+
+            .back-button {
+                position: relative; top: auto; left: auto;
+                margin-bottom: 10px; font-size: 0.9em; padding: 8px 15px;
+            }
+
+            .language-selector {
+                position: relative; top: auto; right: auto;
+                margin-bottom: 15px; justify-content: center;
+            }
+
+            .score-section { flex-wrap: wrap; padding: 15px; gap: 15px; }
+            .score-item    { flex: 1 1 40%; min-width: 120px; }
+            .score-label   { font-size: 12px; }
+            .score-value   { font-size: 24px; }
+
+            .category-tabs { flex-wrap: wrap; gap: 10px; }
+            .tab           { flex: 1 1 45%; padding: 12px 15px; font-size: 13px; }
+
+            .quiz-area     { padding: 15px 10px; justify-content: flex-start; }
+
+            .question-box  {
+                padding: 20px 15px; border-radius: 15px;
+                margin-bottom: 20px; min-width: auto; width: 100%;
+            }
+
+            .question { font-size: 1.3em; word-break: break-word; }
+
+            .answer-box    { flex-direction: column; gap: 12px; align-items: center; }
+            .answer-input  { padding: 12px 15px; font-size: 1.8em; width: 160px; }
+
+            .button-group  { flex-direction: column; gap: 12px; margin-top: 15px; width: 100%; align-items: center; }
+            .btn           { padding: 12px 30px; font-size: 1.1em; width: 100%; max-width: 280px; }
+
+            .feedback { font-size: 1em; padding: 15px 10px; margin-top: 10px; min-height: 60px; }
+
+            .final-box     { padding: 30px 20px; min-width: auto; width: 100%; }
+            .final-title   { font-size: 1.8em; }
+            .final-grade   { font-size: 3.5em; }
+            .final-message { font-size: 1.2em; }
+
+            .history-box   { padding: 20px; min-width: auto; width: 100%; }
+            .history-title { font-size: 1.2em; }
+            .history-item  { padding: 10px 15px; font-size: 1.1em; }
+
+            .btn-restart       { padding: 15px 40px; font-size: 1.2em; width: 100%; max-width: 300px; }
+            .btn-reset-history { padding: 12px 30px; font-size: 1em; width: 100%; max-width: 300px; }
+
+            .help-container { display: block; margin-left: 0; margin-top: 10px; }
+            .help-icon      { width: 30px; height: 30px; font-size: 18px; }
+            .help-tooltip   { max-width: 95vw; width: 95vw; padding: 10px; padding-top: 40px; max-height: 85vh; min-width: auto; }
+            .help-tooltip h3{ font-size: 1.1em; margin-bottom: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.3em; }
+            .question { font-size: 1.1em; }
+            .answer-input { font-size: 1.5em; width: 140px; }
+            .tab { flex: 1 1 100%; font-size: 12px; padding: 10px 12px; }
+            .final-grade { font-size: 2.5em; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span data-i18n="back">← Matematica</span>
+    </a>
+
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it')">IT</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+
+    <div class="container">
+        <h1>
+            <span data-i18n="title">Quiz Espressioni</span>
+            <div class="help-container">
+                <div class="help-icon" onclick="toggleHelp()">?</div>
+            </div>
+        </h1>
+
+        <!-- Help overlay -->
+        <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+        <div class="help-tooltip" id="helpTooltip">
+            <button class="help-close" onclick="toggleHelp()">&times;</button>
+            <h3 data-i18n="help-title">Regole per le Espressioni</h3>
+            <div class="help-content">
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-order-title">Ordine delle parentesi</div>
+                    <div data-i18n="help-order-desc">Calcola dall'interno verso l'esterno:</div>
+                    <div class="help-example">prima &nbsp;( )&nbsp; poi &nbsp;[ ]&nbsp; poi &nbsp;{ }</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-rel-title">Numeri relativi</div>
+                    <div data-i18n="help-rel-add">Addizione: segni uguali → somma &nbsp;|&nbsp; segni diversi → differenza</div>
+                    <div class="help-example">(+3) + (-5) = -2 &nbsp;&nbsp; (-3) + (-4) = -7</div>
+                    <div data-i18n="help-rel-mul" style="margin-top:6px">Moltiplicazione: segni uguali → + &nbsp;|&nbsp; segni diversi → −</div>
+                    <div class="help-example">(-3) × (-4) = +12 &nbsp;&nbsp; (-3) × 4 = -12</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-pow-title">Potenze con base negativa</div>
+                    <div data-i18n="help-pow-even">Esponente <b>pari</b> → risultato sempre <b>positivo</b></div>
+                    <div class="help-example">(-3)² = +9 &nbsp;&nbsp; (-5)² = +25</div>
+                    <div data-i18n="help-pow-odd" style="margin-top:6px">Esponente <b>dispari</b> → mantiene il segno della base</div>
+                    <div class="help-example">(-2)³ = -8 &nbsp;&nbsp; (-1)³ = -1</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-priority-title">Priorità delle operazioni</div>
+                    <div data-i18n="help-priority-desc">Dentro le parentesi: prima potenze, poi × e ÷, poi + e −</div>
+                    <div class="help-example">2 + 3 × (-4) = 2 + (-12) = -10</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score -->
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="score">Punteggio</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct">Corrette</div>
+                <div class="score-value correct" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong">Sbagliate</div>
+                <div class="score-value wrong" id="wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="questions">Domande</div>
+                <div class="score-value" id="total">0/10</div>
+            </div>
+        </div>
+
+        <!-- Category tabs -->
+        <div class="category-tabs">
+            <button class="tab active" onclick="changeCategory('tutte')"   data-i18n="all">Tutte</button>
+            <button class="tab" onclick="changeCategory('relativo')" data-i18n="rel-tab">Numeri Relativi</button>
+            <button class="tab" onclick="changeCategory('potenze')"  data-i18n="pow-tab">Potenze</button>
+            <button class="tab" onclick="changeCategory('misto')"    data-i18n="mix-tab">Miste</button>
+        </div>
+
+        <!-- Quiz area -->
+        <div class="quiz-area" id="quizArea">
+            <div class="question-box">
+                <div class="question" id="question"></div>
+                <div class="category-label" id="categoryLabel"></div>
+            </div>
+
+            <div class="answer-box" id="answerBox">
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" step="1">
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()" data-i18n="check">Verifica</button>
+                <button class="btn btn-next"  id="btnNext"  onclick="nextQuestion()" data-i18n="next">Prossima Domanda</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- Final screen -->
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message">
+                    <span data-i18n="answered-correctly">Hai risposto correttamente a</span>
+                    <span id="finalCorrect">0</span>
+                    <span data-i18n="questions-out-of">domande su 10</span>
+                </div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+            </div>
+
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee">
+    </a>
+
+    <script>
+        let currentLanguage = 'it';
+
+        const translations = {
+            it: {
+                'back': '← Matematica',
+                'title': 'Quiz Espressioni',
+                'score': 'Punteggio',
+                'correct': 'Corrette',
+                'wrong': 'Sbagliate',
+                'questions': 'Domande',
+                'all': 'Tutte',
+                'rel-tab': 'Numeri Relativi',
+                'pow-tab': 'Potenze',
+                'mix-tab': 'Miste',
+                'check': 'Verifica',
+                'next': 'Prossima Domanda',
+                'restart': 'Ricomincia Quiz',
+                'reset-history': 'Cancella Storico Voti',
+                'help-title': 'Regole per le Espressioni',
+                'help-order-title': 'Ordine delle parentesi',
+                'help-order-desc': 'Calcola dall\'interno verso l\'esterno:',
+                'help-rel-title': 'Numeri relativi',
+                'help-rel-add': 'Addizione: segni uguali → somma | segni diversi → differenza',
+                'help-rel-mul': 'Moltiplicazione: segni uguali → + | segni diversi → −',
+                'help-pow-title': 'Potenze con base negativa',
+                'help-pow-even': 'Esponente pari → risultato sempre positivo',
+                'help-pow-odd': 'Esponente dispari → mantiene il segno della base',
+                'help-priority-title': 'Priorità delle operazioni',
+                'help-priority-desc': 'Dentro le parentesi: prima potenze, poi × e ÷, poi + e −',
+                'insert-value': 'Inserisci un numero!',
+                'correct-answer': 'Corretto! 🎉',
+                'wrong-answer': 'Sbagliato! La risposta corretta è',
+                'show-solution': '🔍 Mostra come si risolve',
+                'how-to-solve': 'Come si risolve:',
+                'rule-label': 'Regola:',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti',
+                'improving': '📈 Stai migliorando!',
+                'declining': '📉 Stai peggiorando',
+                'same-result': '➡️ Stesso risultato',
+                'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+                'history-deleted': 'Storico voti cancellato!',
+                'cat-rel': 'Numeri Relativi',
+                'cat-pow': 'Potenze',
+                'cat-mix': 'Miste',
+                'step': 'Passo',
+                'rule-order-parens': 'Prima le parentesi tonde, poi la moltiplicazione',
+                'rule-mul-parens': 'Prima le parentesi, poi la moltiplicazione',
+                'rule-sq-bracket': 'Prima le parentesi quadre, poi le operazioni esterne',
+                'rule-sq-inner': 'Dentro le [ ]: prima × poi +/−. Poi le operazioni esterne',
+                'rule-nested-round-curly': 'Ordine: ( ) poi { }',
+                'rule-power-then-add': 'Prima la potenza, poi addiziona/sottrai',
+                'rule-parens-then-square': 'Prima parentesi, poi eleva al quadrato',
+                'rule-two-squares': 'Calcola ogni potenza separatamente, poi sottrai',
+                'rule-cube-then-add': 'Prima il cubo, poi addiziona/sottrai',
+                'rule-pow-and-mul': 'Prima potenza e moltiplicazione, poi addiziona',
+                'rule-pow-then-sq-bracket': 'Prima la potenza, poi le parentesi quadre, poi ×',
+                'rule-parens-sq-plus-mul': 'Prima ( ), poi ², poi ×, poi addiziona',
+                'rule-pow-minus-parens': 'Prima la potenza e le parentesi, poi sottrai',
+                'rule-nested-3': 'Ordine: ² → [ ] → { }',
+                'rule-parens-sq-mul': 'Prima ( ), poi ², poi ×, poi sottrai'
+            },
+            en: {
+                'back': '← Mathematics',
+                'title': 'Expressions Quiz',
+                'score': 'Score',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'questions': 'Questions',
+                'all': 'All',
+                'rel-tab': 'Relative Numbers',
+                'pow-tab': 'Powers',
+                'mix-tab': 'Mixed',
+                'check': 'Check',
+                'next': 'Next Question',
+                'restart': 'Restart Quiz',
+                'reset-history': 'Clear History',
+                'help-title': 'Expression Rules',
+                'help-order-title': 'Order of brackets',
+                'help-order-desc': 'Evaluate from inside out:',
+                'help-rel-title': 'Relative numbers',
+                'help-rel-add': 'Addition: same sign → sum | different signs → difference',
+                'help-rel-mul': 'Multiplication: same signs → + | different signs → −',
+                'help-pow-title': 'Powers with negative base',
+                'help-pow-even': 'Even exponent → result always positive',
+                'help-pow-odd': 'Odd exponent → keeps the sign of the base',
+                'help-priority-title': 'Order of operations',
+                'help-priority-desc': 'Inside brackets: first powers, then × and ÷, then + and −',
+                'insert-value': 'Please enter a number!',
+                'correct-answer': 'Correct! 🎉',
+                'wrong-answer': 'Wrong! The correct answer is',
+                'show-solution': '🔍 Show solution',
+                'how-to-solve': 'How to solve:',
+                'rule-label': 'Rule:',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades',
+                'improving': '📈 You\'re improving!',
+                'declining': '📉 You\'re declining',
+                'same-result': '➡️ Same result',
+                'confirm-reset': 'Are you sure you want to delete all saved grades?',
+                'history-deleted': 'History deleted!',
+                'cat-rel': 'Relative Numbers',
+                'cat-pow': 'Powers',
+                'cat-mix': 'Mixed',
+                'step': 'Step',
+                'rule-order-parens': 'First parentheses, then multiplication',
+                'rule-mul-parens': 'First parentheses, then multiplication',
+                'rule-sq-bracket': 'First square brackets, then outer operations',
+                'rule-sq-inner': 'Inside [ ]: first × then +/−. Then outer operations',
+                'rule-nested-round-curly': 'Order: ( ) then { }',
+                'rule-power-then-add': 'First power, then add/subtract',
+                'rule-parens-then-square': 'First parentheses, then square',
+                'rule-two-squares': 'Calculate each power separately, then subtract',
+                'rule-cube-then-add': 'First cube, then add/subtract',
+                'rule-pow-and-mul': 'First power and multiplication, then add',
+                'rule-pow-then-sq-bracket': 'First power, then square brackets, then ×',
+                'rule-parens-sq-plus-mul': 'First ( ), then ², then ×, then add',
+                'rule-pow-minus-parens': 'First power and parentheses, then subtract',
+                'rule-nested-3': 'Order: ² → [ ] → { }',
+                'rule-parens-sq-mul': 'First ( ), then ², then ×, then subtract'
+            }
+        };
+
+        function t(key) { return translations[currentLanguage][key] || key; }
+
+        // ── Number formatting ────────────────────────────────────────
+        // p(n): standalone – negative gets parentheses: (-3)
+        function p(n) { return n < 0 ? '(' + n + ')' : String(n); }
+        // q(n): first term inside a bracket – just the number: -3
+        function q(n) { return String(n); }
+
+        // ── Random helpers ───────────────────────────────────────────
+        function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function rz(min, max) { let v; do { v = ri(min, max); } while (v === 0); return v; }
+
+        // ── Question generators ──────────────────────────────────────
+        // Each returns a question object or null (if constraints not met)
+
+        const generators = {
+
+            /* ══════════════ NUMERI RELATIVI ══════════════ */
+
+            R1() {
+                // (a + b) × c
+                const a = ri(-6, 6), b = ri(-6, 6), c = rz(-4, 4);
+                const inner = a + b, result = inner * c;
+                if (Math.abs(result) > 50) return null;
+                return {
+                    category: 'relativo',
+                    html: `(${q(a)} + ${p(b)}) × ${p(c)}`,
+                    answer: result,
+                    ruleKey: 'rule-order-parens',
+                    steps: [
+                        `(${q(a)} + ${p(b)}) = <b>${inner}</b>`,
+                        `${p(inner)} × ${p(c)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            R2() {
+                // a × (b - c)  — subtraction inside parens
+                const a = rz(-5, 5), b = ri(-5, 5), c = ri(-5, 5);
+                if (b === c) return null;
+                const inner = b - c, result = a * inner;
+                if (Math.abs(result) > 50) return null;
+                return {
+                    category: 'relativo',
+                    html: `${p(a)} × (${q(b)} - ${p(c)})`,
+                    answer: result,
+                    ruleKey: 'rule-mul-parens',
+                    steps: [
+                        `(${q(b)} - ${p(c)}) = <b>${inner}</b>`,
+                        `${p(a)} × ${p(inner)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            R3() {
+                // [a + b] × c + d  — square brackets
+                const a = ri(-5, 5), b = ri(-5, 5), c = rz(-3, 3), d = ri(-8, 8);
+                const inner = a + b, result = inner * c + d;
+                if (Math.abs(result) > 60) return null;
+                return {
+                    category: 'relativo',
+                    html: `[${q(a)} + ${p(b)}] × ${p(c)} + ${p(d)}`,
+                    answer: result,
+                    ruleKey: 'rule-sq-bracket',
+                    steps: [
+                        `[${q(a)} + ${p(b)}] = <b>${inner}</b>`,
+                        `${p(inner)} × ${p(c)} = <b>${inner * c}</b>`,
+                        `${p(inner * c)} + ${p(d)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            R4() {
+                // a - [b + c × d]  — multiply inside square brackets
+                const a = ri(-8, 8), b = ri(-4, 4), c = rz(-3, 3), d = rz(-3, 3);
+                const cd = c * d, inner = b + cd, result = a - inner;
+                if (Math.abs(result) > 55) return null;
+                return {
+                    category: 'relativo',
+                    html: `${p(a)} - [${q(b)} + ${p(c)} × ${p(d)}]`,
+                    answer: result,
+                    ruleKey: 'rule-sq-inner',
+                    steps: [
+                        `${p(c)} × ${p(d)} = <b>${cd}</b>`,
+                        `[${q(b)} + ${p(cd)}] = <b>${inner}</b>`,
+                        `${p(a)} - ${p(inner)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            R5() {
+                // {(a + b) × c} - d  — nested: round inside curly
+                const a = ri(-4, 4), b = ri(-4, 4), c = rz(-3, 3), d = ri(-8, 8);
+                const inner = a + b, mid = inner * c, result = mid - d;
+                if (Math.abs(result) > 55) return null;
+                return {
+                    category: 'relativo',
+                    html: `{(${q(a)} + ${p(b)}) × ${p(c)}} - ${p(d)}`,
+                    answer: result,
+                    ruleKey: 'rule-nested-round-curly',
+                    steps: [
+                        `Parentesi tonde: (${q(a)} + ${p(b)}) = <b>${inner}</b>`,
+                        `Parentesi graffe: {${p(inner)} × ${p(c)}} = <b>${mid}</b>`,
+                        `${p(mid)} - ${p(d)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            /* ══════════════ POTENZE ══════════════ */
+
+            P1() {
+                // a² + b
+                const a = rz(-5, 5), b = ri(-9, 9);
+                const a2 = a * a, result = a2 + b;
+                return {
+                    category: 'potenze',
+                    html: `${p(a)}² + ${p(b)}`,
+                    answer: result,
+                    ruleKey: 'rule-power-then-add',
+                    steps: [
+                        `${p(a)}² = ${a} × ${a} = <b>${a2}</b>`,
+                        `${a2} + ${p(b)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            P2() {
+                // (a + b)²
+                const a = ri(-4, 4), b = ri(-4, 4);
+                const inner = a + b;
+                if (inner === 0) return null;
+                const result = inner * inner;
+                return {
+                    category: 'potenze',
+                    html: `(${q(a)} + ${p(b)})²`,
+                    answer: result,
+                    ruleKey: 'rule-parens-then-square',
+                    steps: [
+                        `(${q(a)} + ${p(b)}) = <b>${inner}</b>`,
+                        `${p(inner)}² = ${inner} × ${inner} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            P3() {
+                // a² - b²
+                const a = rz(-5, 5), b = rz(-5, 5);
+                if (Math.abs(a) === Math.abs(b)) return null;
+                const a2 = a * a, b2 = b * b, result = a2 - b2;
+                return {
+                    category: 'potenze',
+                    html: `${p(a)}² - ${p(b)}²`,
+                    answer: result,
+                    ruleKey: 'rule-two-squares',
+                    steps: [
+                        `${p(a)}² = <b>${a2}</b>`,
+                        `${p(b)}² = <b>${b2}</b>`,
+                        `${a2} - ${b2} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            P4() {
+                // a³ + b
+                const a = rz(-3, 3), b = ri(-9, 9);
+                const a3 = a * a * a, result = a3 + b;
+                if (Math.abs(result) > 60) return null;
+                return {
+                    category: 'potenze',
+                    html: `${p(a)}³ + ${p(b)}`,
+                    answer: result,
+                    ruleKey: 'rule-cube-then-add',
+                    steps: [
+                        `${p(a)}³ = ${a} × ${a} × ${a} = <b>${a3}</b>`,
+                        `${a3} + ${p(b)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            P5() {
+                // a² + b × c
+                const a = rz(-4, 4), b = rz(-4, 4), c = rz(-4, 4);
+                const a2 = a * a, bc = b * c, result = a2 + bc;
+                if (Math.abs(result) > 55) return null;
+                return {
+                    category: 'potenze',
+                    html: `${p(a)}² + ${p(b)} × ${p(c)}`,
+                    answer: result,
+                    ruleKey: 'rule-pow-and-mul',
+                    steps: [
+                        `${p(a)}² = <b>${a2}</b>`,
+                        `${p(b)} × ${p(c)} = <b>${bc}</b>`,
+                        `${a2} + ${p(bc)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            /* ══════════════ MISTE ══════════════ */
+
+            M1() {
+                // [a² + b] × c
+                const a = rz(-3, 3), b = ri(-6, 6), c = rz(-3, 3);
+                const a2 = a * a, inner = a2 + b;
+                if (inner === 0) return null;
+                const result = inner * c;
+                if (Math.abs(result) > 65) return null;
+                return {
+                    category: 'misto',
+                    html: `[${p(a)}² + ${p(b)}] × ${p(c)}`,
+                    answer: result,
+                    ruleKey: 'rule-pow-then-sq-bracket',
+                    steps: [
+                        `${p(a)}² = <b>${a2}</b>`,
+                        `[${a2} + ${p(b)}] = <b>${inner}</b>`,
+                        `${p(inner)} × ${p(c)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            M2() {
+                // (a + b)² + c × d
+                const a = ri(-3, 3), b = ri(-3, 3), c = rz(-4, 4), d = rz(-4, 4);
+                const inner = a + b;
+                if (inner === 0) return null;
+                const i2 = inner * inner, cd = c * d, result = i2 + cd;
+                if (Math.abs(result) > 65) return null;
+                return {
+                    category: 'misto',
+                    html: `(${q(a)} + ${p(b)})² + ${p(c)} × ${p(d)}`,
+                    answer: result,
+                    ruleKey: 'rule-parens-sq-plus-mul',
+                    steps: [
+                        `(${q(a)} + ${p(b)}) = <b>${inner}</b>`,
+                        `${p(inner)}² = <b>${i2}</b>`,
+                        `${p(c)} × ${p(d)} = <b>${cd}</b>`,
+                        `${i2} + ${p(cd)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            M3() {
+                // a² - (b + c)
+                const a = rz(-5, 5), b = ri(-6, 6), c = ri(-6, 6);
+                const a2 = a * a, inner = b + c, result = a2 - inner;
+                if (Math.abs(result) > 60) return null;
+                return {
+                    category: 'misto',
+                    html: `${p(a)}² - (${q(b)} + ${p(c)})`,
+                    answer: result,
+                    ruleKey: 'rule-pow-minus-parens',
+                    steps: [
+                        `${p(a)}² = <b>${a2}</b>`,
+                        `(${q(b)} + ${p(c)}) = <b>${inner}</b>`,
+                        `${a2} - ${p(inner)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            M4() {
+                // {[a² + b] × c} - d
+                const a = rz(-3, 3), b = ri(-5, 5), c = rz(-3, 3), d = ri(-8, 8);
+                const a2 = a * a, bkt = a2 + b;
+                if (bkt === 0) return null;
+                const mid = bkt * c, result = mid - d;
+                if (Math.abs(result) > 70) return null;
+                return {
+                    category: 'misto',
+                    html: `{[${p(a)}² + ${p(b)}] × ${p(c)}} - ${p(d)}`,
+                    answer: result,
+                    ruleKey: 'rule-nested-3',
+                    steps: [
+                        `${p(a)}² = <b>${a2}</b>`,
+                        `[${a2} + ${p(b)}] = <b>${bkt}</b>`,
+                        `{${p(bkt)} × ${p(c)}} = <b>${mid}</b>`,
+                        `${p(mid)} - ${p(d)} = <b>${result}</b>`
+                    ]
+                };
+            },
+
+            M5() {
+                // (a + b)² × c - d
+                const a = ri(-3, 3), b = ri(-3, 3), c = rz(-3, 3), d = ri(-8, 8);
+                const inner = a + b;
+                if (inner === 0) return null;
+                const i2 = inner * inner, prod = i2 * c, result = prod - d;
+                if (Math.abs(result) > 70) return null;
+                return {
+                    category: 'misto',
+                    html: `(${q(a)} + ${p(b)})² × ${p(c)} - ${p(d)}`,
+                    answer: result,
+                    ruleKey: 'rule-parens-sq-mul',
+                    steps: [
+                        `(${q(a)} + ${p(b)}) = <b>${inner}</b>`,
+                        `${p(inner)}² = <b>${i2}</b>`,
+                        `${p(i2)} × ${p(c)} = <b>${prod}</b>`,
+                        `${p(prod)} - ${p(d)} = <b>${result}</b>`
+                    ]
+                };
+            }
+        };
+
+        const typesByCategory = {
+            relativo: ['R1', 'R2', 'R3', 'R4', 'R5'],
+            potenze:  ['P1', 'P2', 'P3', 'P4', 'P5'],
+            misto:    ['M1', 'M2', 'M3', 'M4', 'M5']
+        };
+
+        const catLabels = {
+            relativo: { it: 'Numeri Relativi', en: 'Relative Numbers' },
+            potenze:  { it: 'Potenze',         en: 'Powers' },
+            misto:    { it: 'Miste',            en: 'Mixed' }
+        };
+
+        // ── State ────────────────────────────────────────────────────
+        let currentQuestion = null;
+        let score = 0, correct = 0, wrong = 0, total = 0;
+        let selectedCategory = 'tutte';
+        const MAX_QUESTIONS = 10;
+        let previousKeys = [];
+
+        // ── Generate question ────────────────────────────────────────
+        function generateQuestion() {
+            for (let attempt = 0; attempt < 80; attempt++) {
+                let cat;
+                if (selectedCategory === 'tutte') {
+                    const cats = ['relativo', 'potenze', 'misto'];
+                    cat = cats[Math.floor(Math.random() * cats.length)];
+                } else {
+                    cat = selectedCategory;
+                }
+
+                const typeList = typesByCategory[cat];
+                const type = typeList[Math.floor(Math.random() * typeList.length)];
+                const q = generators[type]();
+                if (!q) continue;
+
+                // Avoid repeating same expression
+                const key = type + ':' + q.answer;
+                if (previousKeys.includes(key)) continue;
+
+                previousKeys.push(key);
+                if (previousKeys.length > 5) previousKeys.shift();
+
+                return q;
+            }
+
+            // Fallback
+            return {
+                category: 'relativo',
+                html: '(3 + (-5)) × (-2)',
+                answer: 4,
+                ruleKey: 'rule-order-parens',
+                steps: ['(3 + (-5)) = <b>-2</b>', '(-2) × (-2) = <b>4</b>']
+            };
+        }
+
+        // ── Display question ─────────────────────────────────────────
+        function displayQuestion(q) {
+            document.getElementById('question').innerHTML = q.html;
+            const lbl = catLabels[q.category];
+            document.getElementById('categoryLabel').textContent = lbl ? lbl[currentLanguage] : '';
+
+            document.getElementById('answerBox').innerHTML =
+                `<input type="number" class="answer-input" id="answerInput" placeholder="?" step="1">`;
+
+            document.getElementById('answerInput').addEventListener('keydown', e => {
+                if (e.key === 'Enter') checkAnswer();
+            });
+
+            setTimeout(() => {
+                const inp = document.getElementById('answerInput');
+                if (inp) inp.focus();
+            }, 60);
+        }
+
+        // ── Explanation box ──────────────────────────────────────────
+        function getExplanation(q) {
+            const rule = t(q.ruleKey);
+            const how  = t('how-to-solve');
+            const rl   = t('rule-label');
+
+            const stepsHtml = q.steps.map((s, i) =>
+                `<div class="expl-step">${i + 1}) ${s}</div>`
+            ).join('');
+
+            return `<div class="explanation">
+                <div class="expl-title">${how}</div>
+                <div class="expl-formula">${rl} ${rule}</div>
+                ${stepsHtml}
+            </div>`;
+        }
+
+        // ── Check answer ─────────────────────────────────────────────
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            const input    = document.getElementById('answerInput');
+            const val      = input.value.trim();
+
+            if (val === '' || isNaN(parseInt(val, 10))) {
+                feedback.textContent = t('insert-value');
+                feedback.className = 'feedback wrong';
+                return;
+            }
+
+            const userAns = parseInt(val, 10);
+            const isCorrect = userAns === currentQuestion.answer;
+
+            input.classList.add(isCorrect ? 'correct' : 'wrong');
+            input.disabled = true;
+            total++;
+
+            if (isCorrect) {
+                correct++;
+                score += 10;
+                feedback.textContent = t('correct-answer');
+                feedback.className = 'feedback correct';
+            } else {
+                wrong++;
+                const expl = getExplanation(currentQuestion);
+                const showLbl = t('show-solution');
+                feedback.innerHTML = `
+                    <span>${t('wrong-answer')} <b>${currentQuestion.answer}</b></span>
+                    <button class="btn-show-solution" onclick="
+                        this.style.display='none';
+                        document.getElementById('expl-block').style.display='block';
+                    ">${showLbl}</button>
+                    <div id="expl-block" style="display:none">${expl}</div>
+                `;
+                feedback.className = 'feedback wrong';
+            }
+
+            document.getElementById('score').textContent   = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent   = wrong;
+            document.getElementById('total').textContent   = `${total}/${MAX_QUESTIONS}`;
+
+            document.getElementById('btnCheck').style.display = 'none';
+
+            if (total >= MAX_QUESTIONS) {
+                setTimeout(showFinalResults, 1500);
+            } else {
+                document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        // ── Next question ────────────────────────────────────────────
+        function nextQuestion() {
+            currentQuestion = generateQuestion();
+            displayQuestion(currentQuestion);
+
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('btnCheck').style.display = 'block';
+            document.getElementById('btnNext').classList.remove('show');
+        }
+
+        // ── Category change ──────────────────────────────────────────
+        function changeCategory(cat) {
+            selectedCategory = cat;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (total > 0) {
+                score = correct = wrong = total = 0;
+                previousKeys = [];
+                document.getElementById('score').textContent   = 0;
+                document.getElementById('correct').textContent = 0;
+                document.getElementById('wrong').textContent   = 0;
+                document.getElementById('total').textContent   = `0/${MAX_QUESTIONS}`;
+            }
+
+            nextQuestion();
+        }
+
+        // ── Final results ────────────────────────────────────────────
+        function showFinalResults() {
+            document.getElementById('quizArea').style.display = 'none';
+            const finalScreen = document.getElementById('finalScreen');
+            finalScreen.classList.add('show');
+
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalGrade').textContent   = `${correct}/10`;
+
+            const comments = {
+                it: ['Continua ad allenarti!', 'Quasi! Riprova.', 'Discreto!', 'Bravo!', 'Eccellente! 🌟'],
+                en: ['Keep practicing!', 'Almost! Try again.', 'Fair!', 'Good job!', 'Excellent! 🌟']
+            };
+            const idx = correct <= 3 ? 0 : correct <= 5 ? 1 : correct <= 7 ? 2 : correct <= 9 ? 3 : 4;
+            document.getElementById('finalComment').textContent = comments[currentLanguage][idx];
+
+            // History
+            const key = 'expressioniHistory';
+            let history = JSON.parse(localStorage.getItem(key) || '[]');
+            history.push(correct);
+            if (history.length > 10) history = history.slice(-10);
+            localStorage.setItem(key, JSON.stringify(history));
+
+            const list = document.getElementById('historyList');
+            list.innerHTML = history.map((g, i) =>
+                `<div class="history-item${i === history.length - 1 ? ' current' : ''}">${g}/10</div>`
+            ).join('');
+
+            const trend = document.getElementById('trendMessage');
+            if (history.length >= 2) {
+                const last = history[history.length - 1];
+                const prev = history[history.length - 2];
+                if (last > prev)      { trend.textContent = t('improving'); trend.className = 'trend improving'; }
+                else if (last < prev) { trend.textContent = t('declining'); trend.className = 'trend declining'; }
+                else                  { trend.textContent = t('same-result'); trend.className = 'trend stable'; }
+            } else {
+                trend.textContent = '';
+            }
+        }
+
+        // ── Restart ──────────────────────────────────────────────────
+        function restartQuiz() {
+            score = correct = wrong = total = 0;
+            previousKeys = [];
+
+            document.getElementById('score').textContent   = 0;
+            document.getElementById('correct').textContent = 0;
+            document.getElementById('wrong').textContent   = 0;
+            document.getElementById('total').textContent   = `0/${MAX_QUESTIONS}`;
+
+            document.getElementById('finalScreen').classList.remove('show');
+            document.getElementById('quizArea').style.display = 'flex';
+
+            nextQuestion();
+        }
+
+        // ── Reset history ────────────────────────────────────────────
+        function resetHistory() {
+            if (confirm(t('confirm-reset'))) {
+                localStorage.removeItem('expressioniHistory');
+                alert(t('history-deleted'));
+                document.getElementById('historyList').innerHTML = '';
+                document.getElementById('trendMessage').textContent = '';
+            }
+        }
+
+        // ── Help tooltip ─────────────────────────────────────────────
+        function toggleHelp() {
+            document.getElementById('helpOverlay').classList.toggle('show');
+            document.getElementById('helpTooltip').classList.toggle('show');
+        }
+
+        // ── Language ─────────────────────────────────────────────────
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('expressioniLanguage', lang);
+
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.textContent = translations[lang][key];
+            });
+
+            if (currentQuestion) {
+                const lbl = catLabels[currentQuestion.category];
+                document.getElementById('categoryLabel').textContent = lbl ? lbl[lang] : '';
+            }
+        }
+
+        // ── Init ──────────────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('expressioniLanguage') || 'it';
+            if (saved === 'en') {
+                document.querySelector('.lang-btn.active').classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+                currentLanguage = 'en';
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations['en'][key]) el.textContent = translations['en'][key];
+                });
+            }
+            nextQuestion();
+        });
+    </script>
+</body>
+</html>
