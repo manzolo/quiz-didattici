@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Tempi dei Verbi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            background: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-item { text-align: center; }
+
+        .score-label { font-size: 13px; color: #666; margin-bottom: 4px; }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score-value.correct { color: #28a745; }
+        .score-value.wrong   { color: #dc3545; }
+
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 15px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 110px;
+        }
+
+        .tab:hover { background: #d3d6db; transform: translateY(-2px); }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .quiz-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 30px;
+            min-width: 500px;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .question-label {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 1em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .verb-name {
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .question-persona {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3em;
+            margin-bottom: 6px;
+        }
+
+        .question-tense {
+            color: #ffd700;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .essere-hint {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .answer-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .persona-prefix {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        .answer-input {
+            padding: 15px 25px;
+            font-size: 1.3em;
+            border: 3px solid #e9ecef;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .answer-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .answer-input.correct-input {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .answer-input.wrong-input {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 35px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-check:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            font-size: 1.3em;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            min-width: 350px;
+            display: none;
+        }
+
+        .feedback.show { display: block; }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .feedback.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .correct-answer {
+            display: block;
+            font-size: 0.85em;
+            margin-top: 8px;
+            font-weight: normal;
+        }
+
+        .btn-next {
+            background: #28a745;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+
+        .btn-next.show { display: block; }
+
+        .btn-next:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            align-self: flex-start;
+        }
+
+        .back-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(-3px);
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+        .lang-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .buy-me-coffee {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .buy-me-coffee:hover { transform: translateY(-5px); }
+
+        .buy-me-coffee img {
+            height: 45px;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .quiz-area { padding: 10px 15px; }
+            .question-box { min-width: unset; padding: 25px 20px; }
+            .verb-name { font-size: 2.2em; }
+            .answer-section { flex-direction: column; gap: 10px; }
+            .persona-prefix { text-align: center; min-width: unset; }
+            .answer-input { min-width: unset; width: 100%; }
+            .feedback { min-width: unset; width: 100%; }
+            .category-tabs { gap: 6px; }
+            .tab { font-size: 13px; padding: 10px 8px; min-width: 80px; }
+            .language-selector {
+                position: relative;
+                top: 0; right: 0;
+                justify-content: center;
+                margin-bottom: 10px;
+                background: rgba(102, 126, 234, 0.15);
+            }
+            .lang-btn { border-color: #667eea; color: #667eea; }
+            .lang-btn.active { background: #667eea; color: white; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it', event)">🇮🇹 IT</button>
+        <button class="lang-btn" onclick="setLanguage('en', event)">🇬🇧 EN</button>
+    </div>
+
+    <div class="container">
+        <a href="index.html" class="back-button">
+            <span data-i18n="back">← Italiano</span>
+        </a>
+
+        <h1 data-i18n="title">✍️ Tempi dei Verbi</h1>
+
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct-label">Corrette</div>
+                <div class="score-value correct" id="score-correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong-label">Sbagliate</div>
+                <div class="score-value wrong" id="score-wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="total-label">Totale</div>
+                <div class="score-value" id="score-total">0</div>
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="tab" onclick="changeTab('indicativo', event)" data-i18n="tab-indicativo">Indicativo</button>
+            <button class="tab" onclick="changeTab('congiuntivo', event)" data-i18n="tab-congiuntivo">Congiuntivo</button>
+            <button class="tab" onclick="changeTab('condizionale', event)" data-i18n="tab-condizionale">Condizionale</button>
+            <button class="tab" onclick="changeTab('imperativo', event)" data-i18n="tab-imperativo">Imperativo</button>
+            <button class="tab active" onclick="changeTab('tutto', event)" data-i18n="tab-tutto">Tutto</button>
+        </div>
+
+        <div class="quiz-area">
+            <div class="question-box">
+                <div class="question-label" data-i18n="question-label">Coniuga il verbo:</div>
+                <div class="verb-name" id="q-verb">—</div>
+                <div class="question-persona" id="q-persona">—</div>
+                <div class="question-tense" id="q-tense">—</div>
+                <div class="essere-hint" id="q-essere-hint" style="display:none;" data-i18n="essere-hint">
+                    ausiliare: essere — scrivi la forma maschile o femminile
+                </div>
+            </div>
+
+            <div class="answer-section">
+                <div class="persona-prefix" id="q-persona-prefix">io</div>
+                <input
+                    type="text"
+                    class="answer-input"
+                    id="answer-input"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder="..."
+                    onkeydown="handleKey(event)"
+                />
+                <button class="btn-check" id="btn-check" onclick="checkAnswer()" data-i18n="btn-check">Conferma</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <button class="btn-next" id="btn-next" onclick="nextQuestion()" data-i18n="btn-next">
+                Prossima domanda →
+            </button>
+        </div>
+    </div>
+
+    <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee">
+    </a>
+
+    <script>
+    /* =====================================================================
+       ARCHIVIO DEI VERBI
+       Struttura: ogni verbo contiene 11 tempi, ognuno con 6 forme (io/tu/lui-lei/noi/voi/loro).
+       - null = forma non disponibile (es. imperativo io)
+       - array = forme alternative accettate (es. ["va'","vai"])
+       - "forma/alt" = variante di genere (es. "andato/a" = "andato" o "andata")
+       ===================================================================== */
+
+    const PERSONE = ["io", "tu", "egli", "noi", "voi", "essi"];
+
+    const verbi = {
+
+        // ── ESSERE ──────────────────────────────────────────────────────────
+        "essere": {
+            ausiliare: "essere",
+            indicativo_presente:         ["sono", "sei", "è", "siamo", "siete", "sono"],
+            indicativo_imperfetto:       ["ero", "eri", "era", "eravamo", "eravate", "erano"],
+            indicativo_passato_prossimo: ["sono stato/a", "sei stato/a", "è stato/a", "siamo stati/e", "siete stati/e", "sono stati/e"],
+            indicativo_passato_remoto:   ["fui", "fosti", "fu", "fummo", "foste", "furono"],
+            indicativo_futuro_semplice:  ["sarò", "sarai", "sarà", "saremo", "sarete", "saranno"],
+            indicativo_trapassato:       ["ero stato/a", "eri stato/a", "era stato/a", "eravamo stati/e", "eravate stati/e", "erano stati/e"],
+            congiuntivo_presente:        ["sia", "sia", "sia", "siamo", "siate", "siano"],
+            congiuntivo_imperfetto:      ["fossi", "fossi", "fosse", "fossimo", "foste", "fossero"],
+            condizionale_presente:       ["sarei", "saresti", "sarebbe", "saremmo", "sareste", "sarebbero"],
+            condizionale_passato:        ["sarei stato/a", "saresti stato/a", "sarebbe stato/a", "saremmo stati/e", "sareste stati/e", "sarebbero stati/e"],
+            imperativo_presente:         [null, "sii", "sia", "siamo", "siate", "siano"],
+        },
+
+        // ── AVERE ────────────────────────────────────────────────────────────
+        "avere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["ho", "hai", "ha", "abbiamo", "avete", "hanno"],
+            indicativo_imperfetto:       ["avevo", "avevi", "aveva", "avevamo", "avevate", "avevano"],
+            indicativo_passato_prossimo: ["ho avuto", "hai avuto", "ha avuto", "abbiamo avuto", "avete avuto", "hanno avuto"],
+            indicativo_passato_remoto:   ["ebbi", "avesti", "ebbe", "avemmo", "aveste", "ebbero"],
+            indicativo_futuro_semplice:  ["avrò", "avrai", "avrà", "avremo", "avrete", "avranno"],
+            indicativo_trapassato:       ["avevo avuto", "avevi avuto", "aveva avuto", "avevamo avuto", "avevate avuto", "avevano avuto"],
+            congiuntivo_presente:        ["abbia", "abbia", "abbia", "abbiamo", "abbiate", "abbiano"],
+            congiuntivo_imperfetto:      ["avessi", "avessi", "avesse", "avessimo", "aveste", "avessero"],
+            condizionale_presente:       ["avrei", "avresti", "avrebbe", "avremmo", "avreste", "avrebbero"],
+            condizionale_passato:        ["avrei avuto", "avresti avuto", "avrebbe avuto", "avremmo avuto", "avreste avuto", "avrebbero avuto"],
+            imperativo_presente:         [null, "abbi", "abbia", "abbiamo", "abbiate", "abbiano"],
+        },
+
+        // ── ANDARE ───────────────────────────────────────────────────────────
+        "andare": {
+            ausiliare: "essere",
+            indicativo_presente:         ["vado", "vai", "va", "andiamo", "andate", "vanno"],
+            indicativo_imperfetto:       ["andavo", "andavi", "andava", "andavamo", "andavate", "andavano"],
+            indicativo_passato_prossimo: ["sono andato/a", "sei andato/a", "è andato/a", "siamo andati/e", "siete andati/e", "sono andati/e"],
+            indicativo_passato_remoto:   ["andai", "andasti", "andò", "andammo", "andaste", "andarono"],
+            indicativo_futuro_semplice:  ["andrò", "andrai", "andrà", "andremo", "andrete", "andranno"],
+            indicativo_trapassato:       ["ero andato/a", "eri andato/a", "era andato/a", "eravamo andati/e", "eravate andati/e", "erano andati/e"],
+            congiuntivo_presente:        ["vada", "vada", "vada", "andiamo", "andiate", "vadano"],
+            congiuntivo_imperfetto:      ["andassi", "andassi", "andasse", "andassimo", "andaste", "andassero"],
+            condizionale_presente:       ["andrei", "andresti", "andrebbe", "andremmo", "andreste", "andrebbero"],
+            condizionale_passato:        ["sarei andato/a", "saresti andato/a", "sarebbe andato/a", "saremmo andati/e", "sareste andati/e", "sarebbero andati/e"],
+            imperativo_presente:         [null, ["va'", "vai"], "vada", "andiamo", "andate", "vadano"],
+        },
+
+        // ── FARE ─────────────────────────────────────────────────────────────
+        "fare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["faccio", "fai", "fa", "facciamo", "fate", "fanno"],
+            indicativo_imperfetto:       ["facevo", "facevi", "faceva", "facevamo", "facevate", "facevano"],
+            indicativo_passato_prossimo: ["ho fatto", "hai fatto", "ha fatto", "abbiamo fatto", "avete fatto", "hanno fatto"],
+            indicativo_passato_remoto:   ["feci", "facesti", "fece", "facemmo", "faceste", "fecero"],
+            indicativo_futuro_semplice:  ["farò", "farai", "farà", "faremo", "farete", "faranno"],
+            indicativo_trapassato:       ["avevo fatto", "avevi fatto", "aveva fatto", "avevamo fatto", "avevate fatto", "avevano fatto"],
+            congiuntivo_presente:        ["faccia", "faccia", "faccia", "facciamo", "facciate", "facciano"],
+            congiuntivo_imperfetto:      ["facessi", "facessi", "facesse", "facessimo", "faceste", "facessero"],
+            condizionale_presente:       ["farei", "faresti", "farebbe", "faremmo", "fareste", "farebbero"],
+            condizionale_passato:        ["avrei fatto", "avresti fatto", "avrebbe fatto", "avremmo fatto", "avreste fatto", "avrebbero fatto"],
+            imperativo_presente:         [null, ["fa'", "fai"], "faccia", "facciamo", "fate", "facciano"],
+        },
+
+        // ── DIRE ─────────────────────────────────────────────────────────────
+        "dire": {
+            ausiliare: "avere",
+            indicativo_presente:         ["dico", "dici", "dice", "diciamo", "dite", "dicono"],
+            indicativo_imperfetto:       ["dicevo", "dicevi", "diceva", "dicevamo", "dicevate", "dicevano"],
+            indicativo_passato_prossimo: ["ho detto", "hai detto", "ha detto", "abbiamo detto", "avete detto", "hanno detto"],
+            indicativo_passato_remoto:   ["dissi", "dicesti", "disse", "dicemmo", "diceste", "dissero"],
+            indicativo_futuro_semplice:  ["dirò", "dirai", "dirà", "diremo", "direte", "diranno"],
+            indicativo_trapassato:       ["avevo detto", "avevi detto", "aveva detto", "avevamo detto", "avevate detto", "avevano detto"],
+            congiuntivo_presente:        ["dica", "dica", "dica", "diciamo", "diciate", "dicano"],
+            congiuntivo_imperfetto:      ["dicessi", "dicessi", "dicesse", "dicessimo", "diceste", "dicessero"],
+            condizionale_presente:       ["direi", "diresti", "direbbe", "diremmo", "direste", "direbbero"],
+            condizionale_passato:        ["avrei detto", "avresti detto", "avrebbe detto", "avremmo detto", "avreste detto", "avrebbero detto"],
+            imperativo_presente:         [null, ["di'", "di"], "dica", "diciamo", "dite", "dicano"],
+        },
+
+        // ── VENIRE ───────────────────────────────────────────────────────────
+        "venire": {
+            ausiliare: "essere",
+            indicativo_presente:         ["vengo", "vieni", "viene", "veniamo", "venite", "vengono"],
+            indicativo_imperfetto:       ["venivo", "venivi", "veniva", "venivamo", "venivate", "venivano"],
+            indicativo_passato_prossimo: ["sono venuto/a", "sei venuto/a", "è venuto/a", "siamo venuti/e", "siete venuti/e", "sono venuti/e"],
+            indicativo_passato_remoto:   ["venni", "venisti", "venne", "venimmo", "veniste", "vennero"],
+            indicativo_futuro_semplice:  ["verrò", "verrai", "verrà", "verremo", "verrete", "verranno"],
+            indicativo_trapassato:       ["ero venuto/a", "eri venuto/a", "era venuto/a", "eravamo venuti/e", "eravate venuti/e", "erano venuti/e"],
+            congiuntivo_presente:        ["venga", "venga", "venga", "veniamo", "veniate", "vengano"],
+            congiuntivo_imperfetto:      ["venissi", "venissi", "venisse", "venissimo", "veniste", "venissero"],
+            condizionale_presente:       ["verrei", "verresti", "verrebbe", "verremmo", "verreste", "verrebbero"],
+            condizionale_passato:        ["sarei venuto/a", "saresti venuto/a", "sarebbe venuto/a", "saremmo venuti/e", "sareste venuti/e", "sarebbero venuti/e"],
+            imperativo_presente:         [null, "vieni", "venga", "veniamo", "venite", "vengano"],
+        },
+
+        // ── STARE ────────────────────────────────────────────────────────────
+        "stare": {
+            ausiliare: "essere",
+            indicativo_presente:         ["sto", "stai", "sta", "stiamo", "state", "stanno"],
+            indicativo_imperfetto:       ["stavo", "stavi", "stava", "stavamo", "stavate", "stavano"],
+            indicativo_passato_prossimo: ["sono stato/a", "sei stato/a", "è stato/a", "siamo stati/e", "siete stati/e", "sono stati/e"],
+            indicativo_passato_remoto:   ["stetti", "stesti", "stette", "stemmo", "steste", "stettero"],
+            indicativo_futuro_semplice:  ["starò", "starai", "starà", "staremo", "starete", "staranno"],
+            indicativo_trapassato:       ["ero stato/a", "eri stato/a", "era stato/a", "eravamo stati/e", "eravate stati/e", "erano stati/e"],
+            congiuntivo_presente:        ["stia", "stia", "stia", "stiamo", "stiate", "stiano"],
+            congiuntivo_imperfetto:      ["stessi", "stessi", "stesse", "stessimo", "steste", "stessero"],
+            condizionale_presente:       ["starei", "staresti", "starebbe", "staremmo", "stareste", "starebbero"],
+            condizionale_passato:        ["sarei stato/a", "saresti stato/a", "sarebbe stato/a", "saremmo stati/e", "sareste stati/e", "sarebbero stati/e"],
+            imperativo_presente:         [null, ["sta'", "stai"], "stia", "stiamo", "state", "stiano"],
+        },
+
+        // ── DARE ─────────────────────────────────────────────────────────────
+        "dare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["do", "dai", "dà", "diamo", "date", "danno"],
+            indicativo_imperfetto:       ["davo", "davi", "dava", "davamo", "davate", "davano"],
+            indicativo_passato_prossimo: ["ho dato", "hai dato", "ha dato", "abbiamo dato", "avete dato", "hanno dato"],
+            indicativo_passato_remoto:   ["diedi", "desti", "diede", "demmo", "deste", "diedero"],
+            indicativo_futuro_semplice:  ["darò", "darai", "darà", "daremo", "darete", "daranno"],
+            indicativo_trapassato:       ["avevo dato", "avevi dato", "aveva dato", "avevamo dato", "avevate dato", "avevano dato"],
+            congiuntivo_presente:        ["dia", "dia", "dia", "diamo", "diate", "diano"],
+            congiuntivo_imperfetto:      ["dassi", "dassi", "dasse", "dassimo", "daste", "dassero"],
+            condizionale_presente:       ["darei", "daresti", "darebbe", "daremmo", "dareste", "darebbero"],
+            condizionale_passato:        ["avrei dato", "avresti dato", "avrebbe dato", "avremmo dato", "avreste dato", "avrebbero dato"],
+            imperativo_presente:         [null, ["da'", "dai"], "dia", "diamo", "date", "diano"],
+        },
+
+        // ── SAPERE ───────────────────────────────────────────────────────────
+        "sapere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["so", "sai", "sa", "sappiamo", "sapete", "sanno"],
+            indicativo_imperfetto:       ["sapevo", "sapevi", "sapeva", "sapevamo", "sapevate", "sapevano"],
+            indicativo_passato_prossimo: ["ho saputo", "hai saputo", "ha saputo", "abbiamo saputo", "avete saputo", "hanno saputo"],
+            indicativo_passato_remoto:   ["seppi", "sapesti", "seppe", "sapemmo", "sapeste", "seppero"],
+            indicativo_futuro_semplice:  ["saprò", "saprai", "saprà", "sapremo", "saprete", "sapranno"],
+            indicativo_trapassato:       ["avevo saputo", "avevi saputo", "aveva saputo", "avevamo saputo", "avevate saputo", "avevano saputo"],
+            congiuntivo_presente:        ["sappia", "sappia", "sappia", "sappiamo", "sappiate", "sappiano"],
+            congiuntivo_imperfetto:      ["sapessi", "sapessi", "sapesse", "sapessimo", "sapeste", "sapessero"],
+            condizionale_presente:       ["saprei", "sapresti", "saprebbe", "sapremmo", "sapreste", "saprebbero"],
+            condizionale_passato:        ["avrei saputo", "avresti saputo", "avrebbe saputo", "avremmo saputo", "avreste saputo", "avrebbero saputo"],
+            imperativo_presente:         [null, "sappi", "sappia", "sappiamo", "sappiate", "sappiano"],
+        },
+
+        // ── POTERE ───────────────────────────────────────────────────────────
+        "potere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["posso", "puoi", "può", "possiamo", "potete", "possono"],
+            indicativo_imperfetto:       ["potevo", "potevi", "poteva", "potevamo", "potevate", "potevano"],
+            indicativo_passato_prossimo: ["ho potuto", "hai potuto", "ha potuto", "abbiamo potuto", "avete potuto", "hanno potuto"],
+            indicativo_passato_remoto:   ["potei", "potesti", "poté", "potemmo", "poteste", "poterono"],
+            indicativo_futuro_semplice:  ["potrò", "potrai", "potrà", "potremo", "potrete", "potranno"],
+            indicativo_trapassato:       ["avevo potuto", "avevi potuto", "aveva potuto", "avevamo potuto", "avevate potuto", "avevano potuto"],
+            congiuntivo_presente:        ["possa", "possa", "possa", "possiamo", "possiate", "possano"],
+            congiuntivo_imperfetto:      ["potessi", "potessi", "potesse", "potessimo", "poteste", "potessero"],
+            condizionale_presente:       ["potrei", "potresti", "potrebbe", "potremmo", "potreste", "potrebbero"],
+            condizionale_passato:        ["avrei potuto", "avresti potuto", "avrebbe potuto", "avremmo potuto", "avreste potuto", "avrebbero potuto"],
+            imperativo_presente:         [null, null, null, null, null, null],
+        },
+
+        // ── VOLERE ───────────────────────────────────────────────────────────
+        "volere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["voglio", "vuoi", "vuole", "vogliamo", "volete", "vogliono"],
+            indicativo_imperfetto:       ["volevo", "volevi", "voleva", "volevamo", "volevate", "volevano"],
+            indicativo_passato_prossimo: ["ho voluto", "hai voluto", "ha voluto", "abbiamo voluto", "avete voluto", "hanno voluto"],
+            indicativo_passato_remoto:   ["volli", "volesti", "volle", "volemmo", "voleste", "vollero"],
+            indicativo_futuro_semplice:  ["vorrò", "vorrai", "vorrà", "vorremo", "vorrete", "vorranno"],
+            indicativo_trapassato:       ["avevo voluto", "avevi voluto", "aveva voluto", "avevamo voluto", "avevate voluto", "avevano voluto"],
+            congiuntivo_presente:        ["voglia", "voglia", "voglia", "vogliamo", "vogliate", "vogliano"],
+            congiuntivo_imperfetto:      ["volessi", "volessi", "volesse", "volessimo", "voleste", "volessero"],
+            condizionale_presente:       ["vorrei", "vorresti", "vorrebbe", "vorremmo", "vorreste", "vorrebbero"],
+            condizionale_passato:        ["avrei voluto", "avresti voluto", "avrebbe voluto", "avremmo voluto", "avreste voluto", "avrebbero voluto"],
+            imperativo_presente:         [null, null, null, null, null, null],
+        },
+
+        // ── DOVERE ───────────────────────────────────────────────────────────
+        "dovere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["devo", "devi", "deve", "dobbiamo", "dovete", "devono"],
+            indicativo_imperfetto:       ["dovevo", "dovevi", "doveva", "dovevamo", "dovevate", "dovevano"],
+            indicativo_passato_prossimo: ["ho dovuto", "hai dovuto", "ha dovuto", "abbiamo dovuto", "avete dovuto", "hanno dovuto"],
+            indicativo_passato_remoto:   ["dovetti", "dovesti", "dovette", "dovemmo", "doveste", "dovettero"],
+            indicativo_futuro_semplice:  ["dovrò", "dovrai", "dovrà", "dovremo", "dovrete", "dovranno"],
+            indicativo_trapassato:       ["avevo dovuto", "avevi dovuto", "aveva dovuto", "avevamo dovuto", "avevate dovuto", "avevano dovuto"],
+            congiuntivo_presente:        ["debba", "debba", "debba", "dobbiamo", "dobbiate", "debbano"],
+            congiuntivo_imperfetto:      ["dovessi", "dovessi", "dovesse", "dovessimo", "doveste", "dovessero"],
+            condizionale_presente:       ["dovrei", "dovresti", "dovrebbe", "dovremmo", "dovreste", "dovrebbero"],
+            condizionale_passato:        ["avrei dovuto", "avresti dovuto", "avrebbe dovuto", "avremmo dovuto", "avreste dovuto", "avrebbero dovuto"],
+            imperativo_presente:         [null, null, null, null, null, null],
+        },
+
+        // ── USCIRE ───────────────────────────────────────────────────────────
+        "uscire": {
+            ausiliare: "essere",
+            indicativo_presente:         ["esco", "esci", "esce", "usciamo", "uscite", "escono"],
+            indicativo_imperfetto:       ["uscivo", "uscivi", "usciva", "uscivamo", "uscivate", "uscivano"],
+            indicativo_passato_prossimo: ["sono uscito/a", "sei uscito/a", "è uscito/a", "siamo usciti/e", "siete usciti/e", "sono usciti/e"],
+            indicativo_passato_remoto:   ["uscii", "uscisti", "uscì", "uscimmo", "usciste", "uscirono"],
+            indicativo_futuro_semplice:  ["uscirò", "uscirai", "uscirà", "usciremo", "uscirete", "usciranno"],
+            indicativo_trapassato:       ["ero uscito/a", "eri uscito/a", "era uscito/a", "eravamo usciti/e", "eravate usciti/e", "erano usciti/e"],
+            congiuntivo_presente:        ["esca", "esca", "esca", "usciamo", "usciate", "escano"],
+            congiuntivo_imperfetto:      ["uscissi", "uscissi", "uscisse", "uscissimo", "usciste", "uscissero"],
+            condizionale_presente:       ["uscirei", "usciresti", "uscirebbe", "usciremmo", "uscireste", "uscirebbero"],
+            condizionale_passato:        ["sarei uscito/a", "saresti uscito/a", "sarebbe uscito/a", "saremmo usciti/e", "sareste usciti/e", "sarebbero usciti/e"],
+            imperativo_presente:         [null, "esci", "esca", "usciamo", "uscite", "escano"],
+        },
+
+        // ── BERE ─────────────────────────────────────────────────────────────
+        "bere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["bevo", "bevi", "beve", "beviamo", "bevete", "bevono"],
+            indicativo_imperfetto:       ["bevevo", "bevevi", "beveva", "bevevamo", "bevevate", "bevevano"],
+            indicativo_passato_prossimo: ["ho bevuto", "hai bevuto", "ha bevuto", "abbiamo bevuto", "avete bevuto", "hanno bevuto"],
+            indicativo_passato_remoto:   ["bevvi", "bevesti", "bevve", "bevemmo", "beveste", "bevvero"],
+            indicativo_futuro_semplice:  ["berrò", "berrai", "berrà", "berremo", "berrete", "berranno"],
+            indicativo_trapassato:       ["avevo bevuto", "avevi bevuto", "aveva bevuto", "avevamo bevuto", "avevate bevuto", "avevano bevuto"],
+            congiuntivo_presente:        ["beva", "beva", "beva", "beviamo", "beviate", "bevano"],
+            congiuntivo_imperfetto:      ["bevessi", "bevessi", "bevesse", "bevessimo", "beveste", "bevessero"],
+            condizionale_presente:       ["berrei", "berresti", "berrebbe", "berremmo", "berreste", "berrebbero"],
+            condizionale_passato:        ["avrei bevuto", "avresti bevuto", "avrebbe bevuto", "avremmo bevuto", "avreste bevuto", "avrebbero bevuto"],
+            imperativo_presente:         [null, "bevi", "beva", "beviamo", "bevete", "bevano"],
+        },
+
+        // ── PARLARE (-are regolare) ───────────────────────────────────────────
+        "parlare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["parlo", "parli", "parla", "parliamo", "parlate", "parlano"],
+            indicativo_imperfetto:       ["parlavo", "parlavi", "parlava", "parlavamo", "parlavate", "parlavano"],
+            indicativo_passato_prossimo: ["ho parlato", "hai parlato", "ha parlato", "abbiamo parlato", "avete parlato", "hanno parlato"],
+            indicativo_passato_remoto:   ["parlai", "parlasti", "parlò", "parlammo", "parlaste", "parlarono"],
+            indicativo_futuro_semplice:  ["parlerò", "parlerai", "parlerà", "parleremo", "parlerete", "parleranno"],
+            indicativo_trapassato:       ["avevo parlato", "avevi parlato", "aveva parlato", "avevamo parlato", "avevate parlato", "avevano parlato"],
+            congiuntivo_presente:        ["parli", "parli", "parli", "parliamo", "parliate", "parlino"],
+            congiuntivo_imperfetto:      ["parlassi", "parlassi", "parlasse", "parlassimo", "parlaste", "parlassero"],
+            condizionale_presente:       ["parlerei", "parleresti", "parlerebbe", "parleremmo", "parlereste", "parlerebbero"],
+            condizionale_passato:        ["avrei parlato", "avresti parlato", "avrebbe parlato", "avremmo parlato", "avreste parlato", "avrebbero parlato"],
+            imperativo_presente:         [null, "parla", "parli", "parliamo", "parlate", "parlino"],
+        },
+
+        // ── AMARE (-are regolare) ─────────────────────────────────────────────
+        "amare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["amo", "ami", "ama", "amiamo", "amate", "amano"],
+            indicativo_imperfetto:       ["amavo", "amavi", "amava", "amavamo", "amavate", "amavano"],
+            indicativo_passato_prossimo: ["ho amato", "hai amato", "ha amato", "abbiamo amato", "avete amato", "hanno amato"],
+            indicativo_passato_remoto:   ["amai", "amasti", "amò", "amammo", "amaste", "amarono"],
+            indicativo_futuro_semplice:  ["amerò", "amerai", "amerà", "ameremo", "amerete", "ameranno"],
+            indicativo_trapassato:       ["avevo amato", "avevi amato", "aveva amato", "avevamo amato", "avevate amato", "avevano amato"],
+            congiuntivo_presente:        ["ami", "ami", "ami", "amiamo", "amiate", "amino"],
+            congiuntivo_imperfetto:      ["amassi", "amassi", "amasse", "amassimo", "amaste", "amassero"],
+            condizionale_presente:       ["amerei", "ameresti", "amerebbe", "ameremmo", "amereste", "amerebbero"],
+            condizionale_passato:        ["avrei amato", "avresti amato", "avrebbe amato", "avremmo amato", "avreste amato", "avrebbero amato"],
+            imperativo_presente:         [null, "ama", "ami", "amiamo", "amate", "amino"],
+        },
+
+        // ── MANGIARE (-iare, futuro senza -i) ────────────────────────────────
+        "mangiare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["mangio", "mangi", "mangia", "mangiamo", "mangiate", "mangiano"],
+            indicativo_imperfetto:       ["mangiavo", "mangiavi", "mangiava", "mangiavamo", "mangiavate", "mangiavano"],
+            indicativo_passato_prossimo: ["ho mangiato", "hai mangiato", "ha mangiato", "abbiamo mangiato", "avete mangiato", "hanno mangiato"],
+            indicativo_passato_remoto:   ["mangiai", "mangiasti", "mangiò", "mangiammo", "mangiaste", "mangiarono"],
+            indicativo_futuro_semplice:  ["mangerò", "mangerai", "mangerà", "mangeremo", "mangerete", "mangeranno"],
+            indicativo_trapassato:       ["avevo mangiato", "avevi mangiato", "aveva mangiato", "avevamo mangiato", "avevate mangiato", "avevano mangiato"],
+            congiuntivo_presente:        ["mangi", "mangi", "mangi", "mangiamo", "mangiate", "mangino"],
+            congiuntivo_imperfetto:      ["mangiassi", "mangiassi", "mangiasse", "mangiassimo", "mangiaste", "mangiassero"],
+            condizionale_presente:       ["mangerei", "mangeresti", "mangerebbe", "mangeremmo", "mangereste", "mangerebbero"],
+            condizionale_passato:        ["avrei mangiato", "avresti mangiato", "avrebbe mangiato", "avremmo mangiato", "avreste mangiato", "avrebbero mangiato"],
+            imperativo_presente:         [null, "mangia", "mangi", "mangiamo", "mangiate", "mangino"],
+        },
+
+        // ── STUDIARE (-iare, futuro con -ie) ─────────────────────────────────
+        "studiare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["studio", "studi", "studia", "studiamo", "studiate", "studiano"],
+            indicativo_imperfetto:       ["studiavo", "studiavi", "studiava", "studiavamo", "studiavate", "studiavano"],
+            indicativo_passato_prossimo: ["ho studiato", "hai studiato", "ha studiato", "abbiamo studiato", "avete studiato", "hanno studiato"],
+            indicativo_passato_remoto:   ["studiai", "studiasti", "studiò", "studiammo", "studiaste", "studiarono"],
+            indicativo_futuro_semplice:  ["studierò", "studierai", "studierà", "studieremo", "studierete", "studieranno"],
+            indicativo_trapassato:       ["avevo studiato", "avevi studiato", "aveva studiato", "avevamo studiato", "avevate studiato", "avevano studiato"],
+            congiuntivo_presente:        ["studi", "studi", "studi", "studiamo", "studiate", "studino"],
+            congiuntivo_imperfetto:      ["studiassi", "studiassi", "studiasse", "studiassimo", "studiaste", "studiassero"],
+            condizionale_presente:       ["studierei", "studieresti", "studierebbe", "studieremmo", "studiereste", "studierebbero"],
+            condizionale_passato:        ["avrei studiato", "avresti studiato", "avrebbe studiato", "avremmo studiato", "avreste studiato", "avrebbero studiato"],
+            imperativo_presente:         [null, "studia", "studi", "studiamo", "studiate", "studino"],
+        },
+
+        // ── GIOCARE (-care, consonante dura) ─────────────────────────────────
+        "giocare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["gioco", "giochi", "gioca", "giochiamo", "giocate", "giocano"],
+            indicativo_imperfetto:       ["giocavo", "giocavi", "giocava", "giocavamo", "giocavate", "giocavano"],
+            indicativo_passato_prossimo: ["ho giocato", "hai giocato", "ha giocato", "abbiamo giocato", "avete giocato", "hanno giocato"],
+            indicativo_passato_remoto:   ["giocai", "giocasti", "giocò", "giocammo", "giocaste", "giocarono"],
+            indicativo_futuro_semplice:  ["giocherò", "giocherai", "giocherà", "giocheremo", "giocherete", "giocheranno"],
+            indicativo_trapassato:       ["avevo giocato", "avevi giocato", "aveva giocato", "avevamo giocato", "avevate giocato", "avevano giocato"],
+            congiuntivo_presente:        ["giochi", "giochi", "giochi", "giochiamo", "giochiate", "giochino"],
+            congiuntivo_imperfetto:      ["giocassi", "giocassi", "giocasse", "giocassimo", "giocaste", "giocassero"],
+            condizionale_presente:       ["giocherei", "giocheresti", "giocherebbe", "giocheremmo", "giochereste", "giocherebbero"],
+            condizionale_passato:        ["avrei giocato", "avresti giocato", "avrebbe giocato", "avremmo giocato", "avreste giocato", "avrebbero giocato"],
+            imperativo_presente:         [null, "gioca", "giochi", "giochiamo", "giocate", "giochino"],
+        },
+
+        // ── PORTARE (-are regolare) ───────────────────────────────────────────
+        "portare": {
+            ausiliare: "avere",
+            indicativo_presente:         ["porto", "porti", "porta", "portiamo", "portate", "portano"],
+            indicativo_imperfetto:       ["portavo", "portavi", "portava", "portavamo", "portavate", "portavano"],
+            indicativo_passato_prossimo: ["ho portato", "hai portato", "ha portato", "abbiamo portato", "avete portato", "hanno portato"],
+            indicativo_passato_remoto:   ["portai", "portasti", "portò", "portammo", "portaste", "portarono"],
+            indicativo_futuro_semplice:  ["porterò", "porterai", "porterà", "porteremo", "porterete", "porteranno"],
+            indicativo_trapassato:       ["avevo portato", "avevi portato", "aveva portato", "avevamo portato", "avevate portato", "avevano portato"],
+            congiuntivo_presente:        ["porti", "porti", "porti", "portiamo", "portiate", "portino"],
+            congiuntivo_imperfetto:      ["portassi", "portassi", "portasse", "portassimo", "portaste", "portassero"],
+            condizionale_presente:       ["porterei", "porteresti", "porterebbe", "porteremmo", "portereste", "porterebbero"],
+            condizionale_passato:        ["avrei portato", "avresti portato", "avrebbe portato", "avremmo portato", "avreste portato", "avrebbero portato"],
+            imperativo_presente:         [null, "porta", "porti", "portiamo", "portate", "portino"],
+        },
+
+        // ── LEGGERE (-ere, passato remoto forte) ─────────────────────────────
+        "leggere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["leggo", "leggi", "legge", "leggiamo", "leggete", "leggono"],
+            indicativo_imperfetto:       ["leggevo", "leggevi", "leggeva", "leggevamo", "leggevate", "leggevano"],
+            indicativo_passato_prossimo: ["ho letto", "hai letto", "ha letto", "abbiamo letto", "avete letto", "hanno letto"],
+            indicativo_passato_remoto:   ["lessi", "leggesti", "lesse", "leggemmo", "leggeste", "lessero"],
+            indicativo_futuro_semplice:  ["leggerò", "leggerai", "leggerà", "leggeremo", "leggerete", "leggeranno"],
+            indicativo_trapassato:       ["avevo letto", "avevi letto", "aveva letto", "avevamo letto", "avevate letto", "avevano letto"],
+            congiuntivo_presente:        ["legga", "legga", "legga", "leggiamo", "leggiate", "leggano"],
+            congiuntivo_imperfetto:      ["leggessi", "leggessi", "leggesse", "leggessimo", "leggeste", "leggessero"],
+            condizionale_presente:       ["leggerei", "leggeresti", "leggerebbe", "leggeremmo", "leggereste", "leggerebbero"],
+            condizionale_passato:        ["avrei letto", "avresti letto", "avrebbe letto", "avremmo letto", "avreste letto", "avrebbero letto"],
+            imperativo_presente:         [null, "leggi", "legga", "leggiamo", "leggete", "leggano"],
+        },
+
+        // ── SCRIVERE (-ere, passato remoto forte) ────────────────────────────
+        "scrivere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["scrivo", "scrivi", "scrive", "scriviamo", "scrivete", "scrivono"],
+            indicativo_imperfetto:       ["scrivevo", "scrivevi", "scriveva", "scrivevamo", "scrivevate", "scrivevano"],
+            indicativo_passato_prossimo: ["ho scritto", "hai scritto", "ha scritto", "abbiamo scritto", "avete scritto", "hanno scritto"],
+            indicativo_passato_remoto:   ["scrissi", "scrivesti", "scrisse", "scrivemmo", "scriveste", "scrissero"],
+            indicativo_futuro_semplice:  ["scriverò", "scriverai", "scriverà", "scriveremo", "scriverete", "scriveranno"],
+            indicativo_trapassato:       ["avevo scritto", "avevi scritto", "aveva scritto", "avevamo scritto", "avevate scritto", "avevano scritto"],
+            congiuntivo_presente:        ["scriva", "scriva", "scriva", "scriviamo", "scriviate", "scrivano"],
+            congiuntivo_imperfetto:      ["scrivessi", "scrivessi", "scrivesse", "scrivessimo", "scriveste", "scrivessero"],
+            condizionale_presente:       ["scriverei", "scriveresti", "scriverebbe", "scriveremmo", "scrivereste", "scriverebbero"],
+            condizionale_passato:        ["avrei scritto", "avresti scritto", "avrebbe scritto", "avremmo scritto", "avreste scritto", "avrebbero scritto"],
+            imperativo_presente:         [null, "scrivi", "scriva", "scriviamo", "scrivete", "scrivano"],
+        },
+
+        // ── VEDERE (-ere, futuro contratto) ──────────────────────────────────
+        "vedere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["vedo", "vedi", "vede", "vediamo", "vedete", "vedono"],
+            indicativo_imperfetto:       ["vedevo", "vedevi", "vedeva", "vedevamo", "vedevate", "vedevano"],
+            indicativo_passato_prossimo: ["ho visto", "hai visto", "ha visto", "abbiamo visto", "avete visto", "hanno visto"],
+            indicativo_passato_remoto:   ["vidi", "vedesti", "vide", "vedemmo", "vedeste", "videro"],
+            indicativo_futuro_semplice:  ["vedrò", "vedrai", "vedrà", "vedremo", "vedrete", "vedranno"],
+            indicativo_trapassato:       ["avevo visto", "avevi visto", "aveva visto", "avevamo visto", "avevate visto", "avevano visto"],
+            congiuntivo_presente:        ["veda", "veda", "veda", "vediamo", "vediate", "vedano"],
+            congiuntivo_imperfetto:      ["vedessi", "vedessi", "vedesse", "vedessimo", "vedeste", "vedessero"],
+            condizionale_presente:       ["vedrei", "vedresti", "vedrebbe", "vedremmo", "vedreste", "vedrebbero"],
+            condizionale_passato:        ["avrei visto", "avresti visto", "avrebbe visto", "avremmo visto", "avreste visto", "avrebbero visto"],
+            imperativo_presente:         [null, "vedi", "veda", "vediamo", "vedete", "vedano"],
+        },
+
+        // ── METTERE (-ere, passato remoto forte) ─────────────────────────────
+        "mettere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["metto", "metti", "mette", "mettiamo", "mettete", "mettono"],
+            indicativo_imperfetto:       ["mettevo", "mettevi", "metteva", "mettevamo", "mettevate", "mettevano"],
+            indicativo_passato_prossimo: ["ho messo", "hai messo", "ha messo", "abbiamo messo", "avete messo", "hanno messo"],
+            indicativo_passato_remoto:   ["misi", "mettesti", "mise", "mettemmo", "metteste", "misero"],
+            indicativo_futuro_semplice:  ["metterò", "metterai", "metterà", "metteremo", "metterete", "metteranno"],
+            indicativo_trapassato:       ["avevo messo", "avevi messo", "aveva messo", "avevamo messo", "avevate messo", "avevano messo"],
+            congiuntivo_presente:        ["metta", "metta", "metta", "mettiamo", "mettiate", "mettano"],
+            congiuntivo_imperfetto:      ["mettessi", "mettessi", "mettesse", "mettessimo", "metteste", "mettessero"],
+            condizionale_presente:       ["metterei", "metteresti", "metterebbe", "metteremmo", "mettereste", "metterebbero"],
+            condizionale_passato:        ["avrei messo", "avresti messo", "avrebbe messo", "avremmo messo", "avreste messo", "avrebbero messo"],
+            imperativo_presente:         [null, "metti", "metta", "mettiamo", "mettete", "mettano"],
+        },
+
+        // ── PRENDERE (-ere, passato remoto forte) ────────────────────────────
+        "prendere": {
+            ausiliare: "avere",
+            indicativo_presente:         ["prendo", "prendi", "prende", "prendiamo", "prendete", "prendono"],
+            indicativo_imperfetto:       ["prendevo", "prendevi", "prendeva", "prendevamo", "prendevate", "prendevano"],
+            indicativo_passato_prossimo: ["ho preso", "hai preso", "ha preso", "abbiamo preso", "avete preso", "hanno preso"],
+            indicativo_passato_remoto:   ["presi", "prendesti", "prese", "prendemmo", "prendeste", "presero"],
+            indicativo_futuro_semplice:  ["prenderò", "prenderai", "prenderà", "prenderemo", "prenderete", "prenderanno"],
+            indicativo_trapassato:       ["avevo preso", "avevi preso", "aveva preso", "avevamo preso", "avevate preso", "avevano preso"],
+            congiuntivo_presente:        ["prenda", "prenda", "prenda", "prendiamo", "prendiate", "prendano"],
+            congiuntivo_imperfetto:      ["prendessi", "prendessi", "prendesse", "prendessimo", "prendeste", "prendessero"],
+            condizionale_presente:       ["prenderei", "prenderesti", "prenderebbe", "prenderemmo", "prendereste", "prenderebbero"],
+            condizionale_passato:        ["avrei preso", "avresti preso", "avrebbe preso", "avremmo preso", "avreste preso", "avrebbero preso"],
+            imperativo_presente:         [null, "prendi", "prenda", "prendiamo", "prendete", "prendano"],
+        },
+
+        // ── DORMIRE (-ire regolare) ───────────────────────────────────────────
+        "dormire": {
+            ausiliare: "avere",
+            indicativo_presente:         ["dormo", "dormi", "dorme", "dormiamo", "dormite", "dormono"],
+            indicativo_imperfetto:       ["dormivo", "dormivi", "dormiva", "dormivamo", "dormivate", "dormivano"],
+            indicativo_passato_prossimo: ["ho dormito", "hai dormito", "ha dormito", "abbiamo dormito", "avete dormito", "hanno dormito"],
+            indicativo_passato_remoto:   ["dormii", "dormisti", "dormì", "dormimmo", "dormiste", "dormirono"],
+            indicativo_futuro_semplice:  ["dormirò", "dormirai", "dormirà", "dormiremo", "dormirete", "dormiranno"],
+            indicativo_trapassato:       ["avevo dormito", "avevi dormito", "aveva dormito", "avevamo dormito", "avevate dormito", "avevano dormito"],
+            congiuntivo_presente:        ["dorma", "dorma", "dorma", "dormiamo", "dormiate", "dormano"],
+            congiuntivo_imperfetto:      ["dormissi", "dormissi", "dormisse", "dormissimo", "dormiste", "dormissero"],
+            condizionale_presente:       ["dormirei", "dormiresti", "dormirebbe", "dormiremmo", "dormireste", "dormirebbero"],
+            condizionale_passato:        ["avrei dormito", "avresti dormito", "avrebbe dormito", "avremmo dormito", "avreste dormito", "avrebbero dormito"],
+            imperativo_presente:         [null, "dormi", "dorma", "dormiamo", "dormite", "dormano"],
+        },
+
+        // ── PARTIRE (-ire, ausiliare essere) ─────────────────────────────────
+        "partire": {
+            ausiliare: "essere",
+            indicativo_presente:         ["parto", "parti", "parte", "partiamo", "partite", "partono"],
+            indicativo_imperfetto:       ["partivo", "partivi", "partiva", "partivamo", "partivate", "partivano"],
+            indicativo_passato_prossimo: ["sono partito/a", "sei partito/a", "è partito/a", "siamo partiti/e", "siete partiti/e", "sono partiti/e"],
+            indicativo_passato_remoto:   ["partii", "partisti", "partì", "partimmo", "partiste", "partirono"],
+            indicativo_futuro_semplice:  ["partirò", "partirai", "partirà", "partiremo", "partirete", "partiranno"],
+            indicativo_trapassato:       ["ero partito/a", "eri partito/a", "era partito/a", "eravamo partiti/e", "eravate partiti/e", "erano partiti/e"],
+            congiuntivo_presente:        ["parta", "parta", "parta", "partiamo", "partiate", "partano"],
+            congiuntivo_imperfetto:      ["partissi", "partissi", "partisse", "partissimo", "partiste", "partissero"],
+            condizionale_presente:       ["partirei", "partiresti", "partirebbe", "partiremmo", "partireste", "partirebbero"],
+            condizionale_passato:        ["sarei partito/a", "saresti partito/a", "sarebbe partito/a", "saremmo partiti/e", "sareste partiti/e", "sarebbero partiti/e"],
+            imperativo_presente:         [null, "parti", "parta", "partiamo", "partite", "partano"],
+        },
+
+        // ── APRIRE (-ire, participio irregolare) ─────────────────────────────
+        "aprire": {
+            ausiliare: "avere",
+            indicativo_presente:         ["apro", "apri", "apre", "apriamo", "aprite", "aprono"],
+            indicativo_imperfetto:       ["aprivo", "aprivi", "apriva", "aprivamo", "aprivate", "aprivano"],
+            indicativo_passato_prossimo: ["ho aperto", "hai aperto", "ha aperto", "abbiamo aperto", "avete aperto", "hanno aperto"],
+            indicativo_passato_remoto:   ["aprii", "apristi", "aprì", "aprimmo", "apriste", "aprirono"],
+            indicativo_futuro_semplice:  ["aprirò", "aprirai", "aprirà", "apriremo", "aprirete", "apriranno"],
+            indicativo_trapassato:       ["avevo aperto", "avevi aperto", "aveva aperto", "avevamo aperto", "avevate aperto", "avevano aperto"],
+            congiuntivo_presente:        ["apra", "apra", "apra", "apriamo", "apriate", "aprano"],
+            congiuntivo_imperfetto:      ["aprissi", "aprissi", "aprisse", "aprissimo", "apriste", "aprissero"],
+            condizionale_presente:       ["aprirei", "apriresti", "aprirebbe", "apriremmo", "aprireste", "aprirebbero"],
+            condizionale_passato:        ["avrei aperto", "avresti aperto", "avrebbe aperto", "avremmo aperto", "avreste aperto", "avrebbero aperto"],
+            imperativo_presente:         [null, "apri", "apra", "apriamo", "aprite", "aprano"],
+        },
+
+        // ── SENTIRE (-ire regolare) ───────────────────────────────────────────
+        "sentire": {
+            ausiliare: "avere",
+            indicativo_presente:         ["sento", "senti", "sente", "sentiamo", "sentite", "sentono"],
+            indicativo_imperfetto:       ["sentivo", "sentivi", "sentiva", "sentivamo", "sentivate", "sentivano"],
+            indicativo_passato_prossimo: ["ho sentito", "hai sentito", "ha sentito", "abbiamo sentito", "avete sentito", "hanno sentito"],
+            indicativo_passato_remoto:   ["sentii", "sentisti", "sentì", "sentimmo", "sentiste", "sentirono"],
+            indicativo_futuro_semplice:  ["sentirò", "sentirai", "sentirà", "sentiremo", "sentirete", "sentiranno"],
+            indicativo_trapassato:       ["avevo sentito", "avevi sentito", "aveva sentito", "avevamo sentito", "avevate sentito", "avevano sentito"],
+            congiuntivo_presente:        ["senta", "senta", "senta", "sentiamo", "sentiate", "sentano"],
+            congiuntivo_imperfetto:      ["sentissi", "sentissi", "sentisse", "sentissimo", "sentiste", "sentissero"],
+            condizionale_presente:       ["sentirei", "sentiresti", "sentirebbe", "sentiremmo", "sentireste", "sentirebbero"],
+            condizionale_passato:        ["avrei sentito", "avresti sentito", "avrebbe sentito", "avremmo sentito", "avreste sentito", "avrebbero sentito"],
+            imperativo_presente:         [null, "senti", "senta", "sentiamo", "sentite", "sentano"],
+        },
+
+        // ── CAPIRE (-ire con -isc) ────────────────────────────────────────────
+        "capire": {
+            ausiliare: "avere",
+            indicativo_presente:         ["capisco", "capisci", "capisce", "capiamo", "capite", "capiscono"],
+            indicativo_imperfetto:       ["capivo", "capivi", "capiva", "capivamo", "capivate", "capivano"],
+            indicativo_passato_prossimo: ["ho capito", "hai capito", "ha capito", "abbiamo capito", "avete capito", "hanno capito"],
+            indicativo_passato_remoto:   ["capii", "capisti", "capì", "capimmo", "capiste", "capirono"],
+            indicativo_futuro_semplice:  ["capirò", "capirai", "capirà", "capiremo", "capirete", "capiranno"],
+            indicativo_trapassato:       ["avevo capito", "avevi capito", "aveva capito", "avevamo capito", "avevate capito", "avevano capito"],
+            congiuntivo_presente:        ["capisca", "capisca", "capisca", "capiamo", "capiate", "capiscano"],
+            congiuntivo_imperfetto:      ["capissi", "capissi", "capisse", "capissimo", "capiste", "capissero"],
+            condizionale_presente:       ["capirei", "capiresti", "capirebbe", "capiremmo", "capireste", "capirebbero"],
+            condizionale_passato:        ["avrei capito", "avresti capito", "avrebbe capito", "avremmo capito", "avreste capito", "avrebbero capito"],
+            imperativo_presente:         [null, "capisci", "capisca", "capiamo", "capite", "capiscano"],
+        },
+
+        // ── FINIRE (-ire con -isc) ────────────────────────────────────────────
+        "finire": {
+            ausiliare: "avere",
+            indicativo_presente:         ["finisco", "finisci", "finisce", "finiamo", "finite", "finiscono"],
+            indicativo_imperfetto:       ["finivo", "finivi", "finiva", "finivamo", "finivate", "finivano"],
+            indicativo_passato_prossimo: ["ho finito", "hai finito", "ha finito", "abbiamo finito", "avete finito", "hanno finito"],
+            indicativo_passato_remoto:   ["finii", "finisti", "finì", "finimmo", "finiste", "finirono"],
+            indicativo_futuro_semplice:  ["finirò", "finirai", "finirà", "finiremo", "finirete", "finiranno"],
+            indicativo_trapassato:       ["avevo finito", "avevi finito", "aveva finito", "avevamo finito", "avevate finito", "avevano finito"],
+            congiuntivo_presente:        ["finisca", "finisca", "finisca", "finiamo", "finiate", "finiscano"],
+            congiuntivo_imperfetto:      ["finissi", "finissi", "finisse", "finissimo", "finiste", "finissero"],
+            condizionale_presente:       ["finirei", "finiresti", "finirebbe", "finiremmo", "finireste", "finirebbero"],
+            condizionale_passato:        ["avrei finito", "avresti finito", "avrebbe finito", "avremmo finito", "avreste finito", "avrebbero finito"],
+            imperativo_presente:         [null, "finisci", "finisca", "finiamo", "finite", "finiscano"],
+        },
+
+        // ── PREFERIRE (-ire con -isc) ─────────────────────────────────────────
+        "preferire": {
+            ausiliare: "avere",
+            indicativo_presente:         ["preferisco", "preferisci", "preferisce", "preferiamo", "preferite", "preferiscono"],
+            indicativo_imperfetto:       ["preferivo", "preferivi", "preferiva", "preferivamo", "preferivate", "preferivano"],
+            indicativo_passato_prossimo: ["ho preferito", "hai preferito", "ha preferito", "abbiamo preferito", "avete preferito", "hanno preferito"],
+            indicativo_passato_remoto:   ["preferii", "preferisti", "preferì", "preferimmo", "preferiste", "preferirono"],
+            indicativo_futuro_semplice:  ["preferirò", "preferirai", "preferirà", "preferiremo", "preferirete", "preferiranno"],
+            indicativo_trapassato:       ["avevo preferito", "avevi preferito", "aveva preferito", "avevamo preferito", "avevate preferito", "avevano preferito"],
+            congiuntivo_presente:        ["preferisca", "preferisca", "preferisca", "preferiamo", "preferiate", "preferiscano"],
+            congiuntivo_imperfetto:      ["preferissi", "preferissi", "preferisse", "preferissimo", "preferiste", "preferissero"],
+            condizionale_presente:       ["preferirei", "preferiresti", "preferirebbe", "preferiremmo", "preferireste", "preferirebbero"],
+            condizionale_passato:        ["avrei preferito", "avresti preferito", "avrebbe preferito", "avremmo preferito", "avreste preferito", "avrebbero preferito"],
+            imperativo_presente:         [null, "preferisci", "preferisca", "preferiamo", "preferite", "preferiscano"],
+        },
+
+    };
+
+    /* =====================================================================
+       CONFIGURAZIONE TEMPI E TRADUZIONE
+       ===================================================================== */
+
+    const TEMPI_LABELS = {
+        it: {
+            indicativo_presente:         "Indicativo Presente",
+            indicativo_imperfetto:       "Indicativo Imperfetto",
+            indicativo_passato_prossimo: "Indicativo Passato Prossimo",
+            indicativo_passato_remoto:   "Indicativo Passato Remoto",
+            indicativo_futuro_semplice:  "Indicativo Futuro Semplice",
+            indicativo_trapassato:       "Indicativo Trapassato Prossimo",
+            congiuntivo_presente:        "Congiuntivo Presente",
+            congiuntivo_imperfetto:      "Congiuntivo Imperfetto",
+            condizionale_presente:       "Condizionale Presente",
+            condizionale_passato:        "Condizionale Passato",
+            imperativo_presente:         "Imperativo Presente",
+        },
+        en: {
+            indicativo_presente:         "Present Indicative",
+            indicativo_imperfetto:       "Imperfect Indicative",
+            indicativo_passato_prossimo: "Present Perfect",
+            indicativo_passato_remoto:   "Simple Past",
+            indicativo_futuro_semplice:  "Simple Future",
+            indicativo_trapassato:       "Past Perfect",
+            congiuntivo_presente:        "Present Subjunctive",
+            congiuntivo_imperfetto:      "Imperfect Subjunctive",
+            condizionale_presente:       "Present Conditional",
+            condizionale_passato:        "Past Conditional",
+            imperativo_presente:         "Imperative",
+        }
+    };
+
+    const GRUPPI_TEMPI = {
+        indicativo:   ["indicativo_presente", "indicativo_imperfetto", "indicativo_passato_prossimo", "indicativo_passato_remoto", "indicativo_futuro_semplice", "indicativo_trapassato"],
+        congiuntivo:  ["congiuntivo_presente", "congiuntivo_imperfetto"],
+        condizionale: ["condizionale_presente", "condizionale_passato"],
+        imperativo:   ["imperativo_presente"],
+        tutto:        ["indicativo_presente", "indicativo_imperfetto", "indicativo_passato_prossimo", "indicativo_passato_remoto", "indicativo_futuro_semplice", "indicativo_trapassato", "congiuntivo_presente", "congiuntivo_imperfetto", "condizionale_presente", "condizionale_passato", "imperativo_presente"]
+    };
+
+    const NOMI_VERBI = Object.keys(verbi);
+
+    /* =====================================================================
+       TRADUZIONI UI
+       ===================================================================== */
+
+    const translations = {
+        it: {
+            'back':           '← Italiano',
+            'title':          '✍️ Tempi dei Verbi',
+            'correct-label':  'Corrette',
+            'wrong-label':    'Sbagliate',
+            'total-label':    'Totale',
+            'tab-indicativo':   'Indicativo',
+            'tab-congiuntivo':  'Congiuntivo',
+            'tab-condizionale': 'Condizionale',
+            'tab-imperativo':   'Imperativo',
+            'tab-tutto':        'Tutto',
+            'question-label': 'Coniuga il verbo:',
+            'essere-hint':    'ausiliare: essere — scrivi la forma maschile o femminile',
+            'btn-check':      'Conferma',
+            'btn-next':       'Prossima domanda →',
+            'feedback-correct': '✓ Esatto!',
+            'feedback-wrong':   '✗ Sbagliato.',
+            'correct-answer-label': 'La risposta corretta è:',
+        },
+        en: {
+            'back':           '← Italian',
+            'title':          '✍️ Verb Tenses',
+            'correct-label':  'Correct',
+            'wrong-label':    'Wrong',
+            'total-label':    'Total',
+            'tab-indicativo':   'Indicative',
+            'tab-congiuntivo':  'Subjunctive',
+            'tab-condizionale': 'Conditional',
+            'tab-imperativo':   'Imperative',
+            'tab-tutto':        'All',
+            'question-label': 'Conjugate the verb:',
+            'essere-hint':    'auxiliary: essere — write the masculine or feminine form',
+            'btn-check':      'Confirm',
+            'btn-next':       'Next question →',
+            'feedback-correct': '✓ Correct!',
+            'feedback-wrong':   '✗ Wrong.',
+            'correct-answer-label': 'The correct answer is:',
+        }
+    };
+
+    /* =====================================================================
+       STATO DEL GIOCO
+       ===================================================================== */
+
+    let currentLanguage = 'it';
+    let currentTab = 'tutto';
+    let score = { correct: 0, wrong: 0 };
+    let currentQuestion = null;
+    let previousQuestions = []; // last 3: {verb, tense, personaIdx}
+    let answered = false;
+
+    /* =====================================================================
+       LOGICA DI CONTROLLO RISPOSTA
+       ===================================================================== */
+
+    function normalizeInput(str) {
+        return str.toLowerCase().trim();
+    }
+
+    // Espande "andato/a" in ["andato", "andata"],
+    // "andati/e" in ["andati", "andate"], ecc.
+    function expandSlashForm(form) {
+        if (!form.includes('/')) return [form];
+        const words = form.split(' ');
+        const lastWord = words[words.length - 1];
+        if (!lastWord.includes('/')) return [form];
+        const prefix = words.slice(0, -1).join(' ');
+        const slashIdx = lastWord.indexOf('/');
+        const base    = lastWord.slice(0, slashIdx);         // "andato"
+        const suffix  = lastWord.slice(slashIdx + 1);        // "a"
+        const alt     = base.slice(0, base.length - suffix.length) + suffix; // "andata"
+        const result  = prefix ? [`${prefix} ${base}`, `${prefix} ${alt}`] : [base, alt];
+        return result;
+    }
+
+    function getAcceptedForms(raw) {
+        // raw can be: null | string | Array<string>
+        if (raw === null) return [];
+        const candidates = Array.isArray(raw) ? raw : [raw];
+        const all = [];
+        candidates.forEach(c => {
+            expandSlashForm(c).forEach(f => all.push(normalizeInput(f)));
+            // also accept the raw form with slash as typed
+            all.push(normalizeInput(c));
+        });
+        // deduplicate
+        return [...new Set(all)];
+    }
+
+    function isCorrect(userInput, raw) {
+        const normalized = normalizeInput(userInput);
+        return getAcceptedForms(raw).includes(normalized);
+    }
+
+    // Returns displayable string for the correct answer
+    function displayCorrectAnswer(raw) {
+        if (Array.isArray(raw)) return raw.join(' / ');
+        return raw;
+    }
+
+    /* =====================================================================
+       GENERAZIONE DOMANDA
+       ===================================================================== */
+
+    function getAvailableTempi() {
+        return GRUPPI_TEMPI[currentTab];
+    }
+
+    // Verifica che un tempo abbia almeno una forma non-null per quel verbo
+    function tempHasValidForms(verbName, tempo) {
+        const forms = verbi[verbName][tempo];
+        if (!forms) return false;
+        // per imperativo, skip persona 0 (io)
+        const start = tempo === 'imperativo_presente' ? 1 : 0;
+        for (let i = start; i < 6; i++) {
+            if (forms[i] !== null) return true;
+        }
+        return false;
+    }
+
+    function generateQuestion() {
+        answered = false;
+        const tempiDisponibili = getAvailableTempi();
+        let attempts = 0;
+        let verbName, tempo, personaIdx, key;
+
+        do {
+            attempts++;
+            if (attempts > 300) break; // sicurezza
+
+            verbName   = NOMI_VERBI[Math.floor(Math.random() * NOMI_VERBI.length)];
+            const tempiValidi = tempiDisponibili.filter(t => tempHasValidForms(verbName, t));
+            if (tempiValidi.length === 0) continue;
+            tempo = tempiValidi[Math.floor(Math.random() * tempiValidi.length)];
+
+            const startIdx = tempo === 'imperativo_presente' ? 1 : 0;
+            // raccoglie indici di persone con forma valida
+            const validIdx = [];
+            for (let i = startIdx; i < 6; i++) {
+                if (verbi[verbName][tempo][i] !== null) validIdx.push(i);
+            }
+            if (validIdx.length === 0) continue;
+            personaIdx = validIdx[Math.floor(Math.random() * validIdx.length)];
+            key = `${verbName}|${tempo}|${personaIdx}`;
+        } while (previousQuestions.includes(key) && attempts < 300);
+
+        previousQuestions.push(key);
+        if (previousQuestions.length > 3) previousQuestions.shift();
+
+        currentQuestion = { verbName, tempo, personaIdx };
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const { verbName, tempo, personaIdx } = currentQuestion;
+        const verb = verbi[verbName];
+        const isEssereAux = (tempo.includes('passato_prossimo') || tempo.includes('trapassato'))
+                            && verb.ausiliare === 'essere';
+
+        document.getElementById('q-verb').textContent = verbName.toUpperCase();
+        document.getElementById('q-persona').textContent = PERSONE[personaIdx];
+        document.getElementById('q-tense').textContent = TEMPI_LABELS[currentLanguage][tempo];
+        document.getElementById('q-persona-prefix').textContent = PERSONE[personaIdx];
+
+        const hint = document.getElementById('q-essere-hint');
+        hint.style.display = isEssereAux ? 'block' : 'none';
+
+        const input = document.getElementById('answer-input');
+        input.value = '';
+        input.className = 'answer-input';
+        input.disabled = false;
+        input.focus();
+
+        const feedback = document.getElementById('feedback');
+        feedback.className = 'feedback';
+        feedback.textContent = '';
+
+        const btnNext = document.getElementById('btn-next');
+        btnNext.className = 'btn-next';
+
+        const btnCheck = document.getElementById('btn-check');
+        btnCheck.disabled = false;
+    }
+
+    /* =====================================================================
+       CONTROLLO RISPOSTA
+       ===================================================================== */
+
+    function checkAnswer() {
+        if (answered) return;
+        const input = document.getElementById('answer-input');
+        const userInput = input.value.trim();
+        if (!userInput) return;
+
+        answered = true;
+        input.disabled = true;
+        document.getElementById('btn-check').disabled = true;
+
+        const { verbName, tempo, personaIdx } = currentQuestion;
+        const correctRaw = verbi[verbName][tempo][personaIdx];
+        const correct = isCorrect(userInput, correctRaw);
+
+        const feedback = document.getElementById('feedback');
+        const t = translations[currentLanguage];
+
+        if (correct) {
+            score.correct++;
+            input.className = 'answer-input correct-input';
+            feedback.className = 'feedback correct show';
+            feedback.innerHTML = `${t['feedback-correct']} <strong>${displayCorrectAnswer(correctRaw)}</strong>`;
+        } else {
+            score.wrong++;
+            input.className = 'answer-input wrong-input';
+            feedback.className = 'feedback wrong show';
+            feedback.innerHTML = `${t['feedback-wrong']} <span class="correct-answer">${t['correct-answer-label']} <strong>${displayCorrectAnswer(correctRaw)}</strong></span>`;
+        }
+
+        updateScore();
+        document.getElementById('btn-next').className = 'btn-next show';
+        saveHistory();
+    }
+
+    function handleKey(event) {
+        if (event.key === 'Enter') checkAnswer();
+    }
+
+    function nextQuestion() {
+        generateQuestion();
+    }
+
+    /* =====================================================================
+       PUNTEGGIO E STORICO
+       ===================================================================== */
+
+    function updateScore() {
+        document.getElementById('score-correct').textContent = score.correct;
+        document.getElementById('score-wrong').textContent   = score.wrong;
+        document.getElementById('score-total').textContent   = score.correct + score.wrong;
+    }
+
+    function saveHistory() {
+        const total = score.correct + score.wrong;
+        if (total === 0) return;
+        const grade = Math.round((score.correct / total) * 10);
+        const history = JSON.parse(localStorage.getItem('quizHistoryVerbi') || '[]');
+        history.push(grade);
+        if (history.length > 10) history.shift();
+        localStorage.setItem('quizHistoryVerbi', JSON.stringify(history));
+    }
+
+    /* =====================================================================
+       NAVIGAZIONE TAB
+       ===================================================================== */
+
+    function changeTab(tab, evt) {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        if (evt && evt.target) evt.target.classList.add('active');
+        score = { correct: 0, wrong: 0 };
+        previousQuestions = [];
+        updateScore();
+        generateQuestion();
+    }
+
+    /* =====================================================================
+       INTERNAZIONALIZZAZIONE
+       ===================================================================== */
+
+    function setLanguage(lang, evt) {
+        currentLanguage = lang;
+        localStorage.setItem('language', lang);
+
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        if (evt && evt.target) {
+            evt.target.classList.add('active');
+        } else {
+            document.querySelectorAll('.lang-btn')[lang === 'en' ? 1 : 0].classList.add('active');
+        }
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang][key]) el.textContent = translations[lang][key];
+        });
+
+        // aggiorna il nome del tempo nella domanda corrente
+        if (currentQuestion) {
+            document.getElementById('q-tense').textContent = TEMPI_LABELS[lang][currentQuestion.tempo];
+        }
+    }
+
+    /* =====================================================================
+       AVVIO
+       ===================================================================== */
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedLang = localStorage.getItem('language') || 'it';
+        setLanguage(savedLang);
+        generateQuestion();
+    });
+    </script>
+</body>
+</html>
