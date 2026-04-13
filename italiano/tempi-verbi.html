@@ -498,10 +498,25 @@
             }
             .lang-btn { border-color: #667eea; color: #667eea; }
             .lang-btn.active { background: #667eea; color: white; }
-            .container { padding-bottom: 80px; }
             .final-box { min-width: unset; padding: 30px 20px; }
             .final-grade { font-size: 3.5em; }
             .history-box { min-width: unset; }
+
+            .buy-me-coffee {
+                width: 48px;
+                height: 48px;
+                background: #FFDD00;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                bottom: 15px;
+                right: 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            }
+
+            .buy-me-coffee img { display: none; }
+            .buy-me-coffee::after { content: '☕'; font-size: 22px; }
         }
     </style>
 </head>

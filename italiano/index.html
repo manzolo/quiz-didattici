@@ -214,8 +214,22 @@
                 justify-content: center;
                 margin-bottom: 20px;
             }
-            .buy-me-coffee { bottom: 10px; right: 10px; }
-            .buy-me-coffee img { height: 40px; }
+
+            .buy-me-coffee {
+                width: 48px;
+                height: 48px;
+                background: #FFDD00;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                bottom: 15px;
+                right: 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            }
+
+            .buy-me-coffee img { display: none; }
+            .buy-me-coffee::after { content: '☕'; font-size: 22px; }
         }
     </style>
 </head>
