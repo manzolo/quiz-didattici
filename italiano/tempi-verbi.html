@@ -325,6 +325,160 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
+        /* ---- Final Screen ---- */
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .final-screen.show { display: flex; }
+
+        .final-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 400px;
+        }
+
+        .final-title { color: white; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
+        .final-grade { color: white; font-size: 5em; font-weight: bold; margin: 20px 0; }
+        .final-message { color: white; font-size: 1.5em; margin-bottom: 10px; }
+
+        .history-box {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-width: 400px;
+        }
+
+        .history-title { color: #667eea; font-size: 1.5em; font-weight: bold; margin-bottom: 20px; text-align: center; }
+        .history-list { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+
+        .history-item {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history-item.current { background: #667eea; color: white; transform: scale(1.1); }
+        .trend { margin-top: 15px; font-size: 1.3em; font-weight: bold; text-align: center; }
+        .trend.improving { color: #28a745; }
+        .trend.declining { color: #dc3545; }
+        .trend.stable { color: #ffc107; }
+
+        .btn-restart {
+            background: #667eea;
+            color: white;
+            padding: 20px 60px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .btn-restart:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-reset-history {
+            background: transparent;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-reset-history:hover { background: #dc3545; color: white; }
+
+        /* ---- Help Tooltip ---- */
+        .help-container { position: relative; display: inline-block; margin-left: 15px; vertical-align: middle; }
+
+        .help-icon {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .help-icon:hover { background: #5568d3; transform: scale(1.1); }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .help-overlay.show { display: block; }
+
+        .help-tooltip {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            padding-top: 45px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 520px;
+        }
+
+        .help-tooltip.show { display: block; }
+
+        .help-close {
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 30px; height: 30px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-close:hover { background: #c82333; transform: rotate(90deg); }
+        .help-tooltip h3 { color: #667eea; margin-bottom: 20px; font-size: 1.3em; text-align: center; }
+        .help-content { color: #333; line-height: 1.8; text-align: left; }
+        .help-section { margin-bottom: 15px; }
+        .help-section-title { color: #764ba2; font-weight: bold; font-size: 1.1em; margin-bottom: 8px; }
+        .help-example { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-top: 5px; font-size: 0.95em; font-family: monospace; }
+
         @media (max-width: 768px) {
             .quiz-area { padding: 10px 15px; }
             .question-box { min-width: unset; padding: 25px 20px; }
@@ -344,6 +498,10 @@
             }
             .lang-btn { border-color: #667eea; color: #667eea; }
             .lang-btn.active { background: #667eea; color: white; }
+            .container { padding-bottom: 80px; }
+            .final-box { min-width: unset; padding: 30px 20px; }
+            .final-grade { font-size: 3.5em; }
+            .history-box { min-width: unset; }
         }
     </style>
 </head>
@@ -358,7 +516,12 @@
             <span data-i18n="back">← Italiano</span>
         </a>
 
-        <h1 data-i18n="title">✍️ Tempi dei Verbi</h1>
+        <h1>
+            <span data-i18n="title">✍️ Tempi dei Verbi</span>
+            <div class="help-container">
+                <div class="help-icon" onclick="toggleHelp()">?</div>
+            </div>
+        </h1>
 
         <div class="score-section">
             <div class="score-item">
@@ -415,6 +578,64 @@
             <button class="btn-next" id="btn-next" onclick="nextQuestion()" data-i18n="btn-next">
                 Prossima domanda →
             </button>
+        </div>
+
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message"><span data-i18n="answered-correctly">Hai risposto correttamente a</span> <span id="finalCorrect">0</span> <span data-i18n="questions-out-of">domande su 10</span></div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+            </div>
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+    <div class="help-tooltip" id="helpTooltip">
+        <button class="help-close" onclick="toggleHelp()">&times;</button>
+        <h3 data-i18n="help-title">Regole di Coniugazione</h3>
+        <div class="help-content">
+            <div class="help-section">
+                <div class="help-section-title" data-i18n="help-ind-pres">Indicativo Presente</div>
+                <div data-i18n="help-ind-pres-desc">Desinenze: -are → o/i/a/iamo/ate/ano &nbsp;|&nbsp; -ere → o/i/e/iamo/ete/ono &nbsp;|&nbsp; -ire → o/i/e/iamo/ite/ono</div>
+                <div class="help-example">parlare → parlo, parli, parla...<br>leggere → leggo, leggi, legge...<br>dormire → dormo, dormi, dorme...</div>
+            </div>
+            <div class="help-section">
+                <div class="help-section-title" data-i18n="help-ind-imp">Indicativo Imperfetto</div>
+                <div data-i18n="help-ind-imp-desc">Desinenze: -are → avo/avi/ava/avamo/avate/avano &nbsp;|&nbsp; -ere/-ire → evo/evi/eva/evamo/evate/evano</div>
+                <div class="help-example">parlare → parlavo, parlavi...<br>leggere → leggevo, leggevi...</div>
+            </div>
+            <div class="help-section">
+                <div class="help-section-title" data-i18n="help-ind-pp">Indicativo Passato Prossimo</div>
+                <div data-i18n="help-ind-pp-desc">ausiliare (avere/essere) + participio passato. Con essere il participio concorda in genere e numero.</div>
+                <div class="help-example">ho parlato, hai parlato...<br>sono andato/a, sei andato/a...</div>
+            </div>
+            <div class="help-section">
+                <div class="help-section-title" data-i18n="help-ind-fut">Indicativo Futuro Semplice</div>
+                <div data-i18n="help-ind-fut-desc">-are/-ere → ò/ai/à/emo/ete/anno &nbsp;|&nbsp; -ire → irò/irai/irà/iremo/irete/iranno</div>
+                <div class="help-example">parlare → parlerò, parlerai...<br>dormire → dormirò, dormirai...</div>
+            </div>
+            <div class="help-section">
+                <div class="help-section-title" data-i18n="help-cong-pres">Congiuntivo Presente</div>
+                <div data-i18n="help-cong-pres-desc">-are → i/i/i/iamo/iate/ino &nbsp;|&nbsp; -ere/-ire → a/a/a/iamo/iate/ano</div>
+                <div class="help-example">parlare → parli, parli, parli...<br>leggere → legga, legga, legga...</div>
+            </div>
+            <div class="help-section">
+                <div class="help-section-title" data-i18n="help-cond-pres">Condizionale Presente</div>
+                <div data-i18n="help-cond-pres-desc">-are → erei/eresti/erebbe/eremmo/ereste/erebbero &nbsp;|&nbsp; -ere/-ire → ei/esti/ebbe/emmo/este/ebbero</div>
+                <div class="help-example">parlare → parlerei, parleresti...<br>leggere → leggerei, leggeresti...</div>
+            </div>
+            <div class="help-section">
+                <div class="help-section-title" data-i18n="help-irr">Verbi Irregolari</div>
+                <div data-i18n="help-irr-desc">Verbi irregolari da ricordare: essere, avere, andare, fare, dire, venire, stare, dare, sapere, potere, volere, dovere, uscire, bere.</div>
+            </div>
         </div>
     </div>
 
@@ -1015,6 +1236,32 @@
             'feedback-correct': '✓ Esatto!',
             'feedback-wrong':   '✗ Sbagliato.',
             'correct-answer-label': 'La risposta corretta è:',
+            'quiz-completed': 'Quiz Completato!',
+            'answered-correctly': 'Hai risposto correttamente a',
+            'questions-out-of': 'domande su 10',
+            'last-grades': 'I tuoi ultimi voti',
+            'improving': 'Stai migliorando!',
+            'declining': 'Stai peggiorando',
+            'same-result': 'Stesso risultato',
+            'restart': 'Ricomincia Quiz',
+            'reset-history': 'Cancella Storico Voti',
+            'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+            'history-deleted': 'Storico voti cancellato!',
+            'help-title': 'Regole di Coniugazione',
+            'help-ind-pres': 'Indicativo Presente',
+            'help-ind-pres-desc': 'Desinenze: -are → o/i/a/iamo/ate/ano | -ere → o/i/e/iamo/ete/ono | -ire → o/i/e/iamo/ite/ono',
+            'help-ind-imp': 'Indicativo Imperfetto',
+            'help-ind-imp-desc': 'Desinenze: -are → avo/avi/ava/avamo/avate/avano | -ere/-ire → evo/evi/eva/evamo/evate/evano',
+            'help-ind-pp': 'Indicativo Passato Prossimo',
+            'help-ind-pp-desc': 'ausiliare (avere/essere) + participio passato. Con essere il participio concorda in genere e numero.',
+            'help-ind-fut': 'Indicativo Futuro Semplice',
+            'help-ind-fut-desc': '-are/-ere → ò/ai/à/emo/ete/anno | -ire → irò/irai/irà/iremo/irete/iranno',
+            'help-cong-pres': 'Congiuntivo Presente',
+            'help-cong-pres-desc': '-are → i/i/i/iamo/iate/ino | -ere/-ire → a/a/a/iamo/iate/ano',
+            'help-cond-pres': 'Condizionale Presente',
+            'help-cond-pres-desc': '-are → erei/eresti/erebbe/eremmo/ereste/erebbero | -ere/-ire → ei/esti/ebbe/emmo/este/ebbero',
+            'help-irr': 'Verbi Irregolari',
+            'help-irr-desc': 'Verbi irregolari da ricordare: essere, avere, andare, fare, dire, venire, stare, dare, sapere, potere, volere, dovere, uscire, bere.',
         },
         en: {
             'back':           '← Italian',
@@ -1034,6 +1281,32 @@
             'feedback-correct': '✓ Correct!',
             'feedback-wrong':   '✗ Wrong.',
             'correct-answer-label': 'The correct answer is:',
+            'quiz-completed': 'Quiz Completed!',
+            'answered-correctly': 'You answered correctly to',
+            'questions-out-of': 'questions out of 10',
+            'last-grades': 'Your last grades',
+            'improving': 'You\'re improving!',
+            'declining': 'You\'re declining',
+            'same-result': 'Same result',
+            'restart': 'Restart Quiz',
+            'reset-history': 'Delete Grade History',
+            'confirm-reset': 'Are you sure you want to delete all saved grades?',
+            'history-deleted': 'History deleted!',
+            'help-title': 'Conjugation Rules',
+            'help-ind-pres': 'Present Indicative',
+            'help-ind-pres-desc': 'Endings: -are → o/i/a/iamo/ate/ano | -ere → o/i/e/iamo/ete/ono | -ire → o/i/e/iamo/ite/ono',
+            'help-ind-imp': 'Imperfect Indicative',
+            'help-ind-imp-desc': 'Endings: -are → avo/avi/ava/avamo/avate/avano | -ere/-ire → evo/evi/eva/evamo/evate/evano',
+            'help-ind-pp': 'Present Perfect',
+            'help-ind-pp-desc': 'auxiliary (avere/essere) + past participle. With essere, the participle agrees in gender and number.',
+            'help-ind-fut': 'Simple Future',
+            'help-ind-fut-desc': '-are/-ere → ò/ai/à/emo/ete/anno | -ire → irò/irai/irà/iremo/irete/iranno',
+            'help-cong-pres': 'Present Subjunctive',
+            'help-cong-pres-desc': '-are → i/i/i/iamo/iate/ino | -ere/-ire → a/a/a/iamo/iate/ano',
+            'help-cond-pres': 'Present Conditional',
+            'help-cond-pres-desc': '-are → erei/eresti/erebbe/eremmo/ereste/erebbero | -ere/-ire → ei/esti/ebbe/emmo/este/ebbero',
+            'help-irr': 'Irregular Verbs',
+            'help-irr-desc': 'Irregular verbs to remember: essere, avere, andare, fare, dire, venire, stare, dare, sapere, potere, volere, dovere, uscire, bere.',
         }
     };
 
@@ -1041,9 +1314,12 @@
        STATO DEL GIOCO
        ===================================================================== */
 
+    const MAX_QUESTIONS = 10;
+
     let currentLanguage = 'it';
     let currentTab = 'tutto';
     let score = { correct: 0, wrong: 0 };
+    let questionCount = 0;
     let currentQuestion = null;
     let previousQuestions = []; // last 3: {verb, tense, personaIdx}
     let answered = false;
@@ -1215,8 +1491,12 @@
         }
 
         updateScore();
-        document.getElementById('btn-next').className = 'btn-next show';
-        saveHistory();
+        questionCount++;
+        if (questionCount >= MAX_QUESTIONS) {
+            setTimeout(showFinalResults, 1500);
+        } else {
+            document.getElementById('btn-next').className = 'btn-next show';
+        }
     }
 
     function handleKey(event) {
@@ -1237,14 +1517,114 @@
         document.getElementById('score-total').textContent   = score.correct + score.wrong;
     }
 
-    function saveHistory() {
-        const total = score.correct + score.wrong;
-        if (total === 0) return;
-        const grade = Math.round((score.correct / total) * 10);
-        const history = JSON.parse(localStorage.getItem('quizHistoryVerbi') || '[]');
+    function showFinalResults() {
+        document.querySelector('.quiz-area').style.display = 'none';
+        const finalScreen = document.getElementById('finalScreen');
+        finalScreen.classList.add('show');
+
+        const grade = score.correct;
+        document.getElementById('finalCorrect').textContent = score.correct;
+        document.getElementById('finalGrade').textContent = `${grade}/10`;
+
+        const comments = {
+            it: [
+                'Devi esercitarti ancora un po\'!',
+                'Sufficiente, continua a esercitarti!',
+                'Discreto, ma puoi fare meglio!',
+                'Bene! Stai migliorando!',
+                'Molto bene! Continua così!',
+                'Eccellente! Ottimo lavoro!',
+                'Perfetto! Sei un campione!'
+            ],
+            en: [
+                'You need more practice!',
+                'Sufficient, keep practicing!',
+                'Fair, but you can do better!',
+                'Good! You\'re improving!',
+                'Very good! Keep it up!',
+                'Excellent! Great job!',
+                'Perfect! You\'re a champion!'
+            ]
+        };
+
+        let commentIndex;
+        if (grade === 10) commentIndex = 6;
+        else if (grade >= 9) commentIndex = 5;
+        else if (grade >= 8) commentIndex = 4;
+        else if (grade >= 7) commentIndex = 3;
+        else if (grade >= 6) commentIndex = 2;
+        else if (grade >= 5) commentIndex = 1;
+        else commentIndex = 0;
+
+        document.getElementById('finalComment').textContent = comments[currentLanguage][commentIndex];
+        saveGrade(grade);
+        displayHistory();
+    }
+
+    function saveGrade(grade) {
+        let history = JSON.parse(localStorage.getItem('verbiHistory') || '[]');
         history.push(grade);
-        if (history.length > 10) history.shift();
-        localStorage.setItem('quizHistoryVerbi', JSON.stringify(history));
+        if (history.length > 10) history = history.slice(-10);
+        localStorage.setItem('verbiHistory', JSON.stringify(history));
+    }
+
+    function displayHistory() {
+        const history = JSON.parse(localStorage.getItem('verbiHistory') || '[]');
+        if (history.length === 0) {
+            document.getElementById('historyBox').style.display = 'none';
+            return;
+        }
+        document.getElementById('historyBox').style.display = '';
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        history.forEach((grade, index) => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            if (index === history.length - 1) item.classList.add('current');
+            item.textContent = `${grade}/10`;
+            historyList.appendChild(item);
+        });
+        if (history.length >= 2) {
+            const lastGrade = history[history.length - 1];
+            const previousGrade = history[history.length - 2];
+            const trendMessage = document.getElementById('trendMessage');
+            const t = translations[currentLanguage];
+            if (lastGrade > previousGrade) {
+                trendMessage.textContent = `${t['improving']} (+${lastGrade - previousGrade})`;
+                trendMessage.className = 'trend improving';
+            } else if (lastGrade < previousGrade) {
+                trendMessage.textContent = `${t['declining']} (${lastGrade - previousGrade})`;
+                trendMessage.className = 'trend declining';
+            } else {
+                trendMessage.textContent = `${t['same-result']}`;
+                trendMessage.className = 'trend stable';
+            }
+        }
+    }
+
+    function restartQuiz() {
+        score = { correct: 0, wrong: 0 };
+        questionCount = 0;
+        previousQuestions = [];
+        updateScore();
+        document.getElementById('finalScreen').classList.remove('show');
+        document.querySelector('.quiz-area').style.display = 'flex';
+        generateQuestion();
+    }
+
+    function resetHistory() {
+        const t = translations[currentLanguage];
+        if (confirm(t['confirm-reset'])) {
+            localStorage.removeItem('verbiHistory');
+            document.getElementById('historyList').innerHTML = '';
+            document.getElementById('historyBox').style.display = 'none';
+            alert(t['history-deleted']);
+        }
+    }
+
+    function toggleHelp() {
+        document.getElementById('helpOverlay').classList.toggle('show');
+        document.getElementById('helpTooltip').classList.toggle('show');
     }
 
     /* =====================================================================
@@ -1256,8 +1636,11 @@
         document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
         if (evt && evt.target) evt.target.classList.add('active');
         score = { correct: 0, wrong: 0 };
+        questionCount = 0;
         previousQuestions = [];
         updateScore();
+        document.getElementById('finalScreen').classList.remove('show');
+        document.querySelector('.quiz-area').style.display = 'flex';
         generateQuestion();
     }
 
