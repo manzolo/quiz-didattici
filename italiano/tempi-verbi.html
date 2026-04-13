@@ -1229,6 +1229,249 @@
     const NOMI_VERBI = Object.keys(verbi);
 
     /* =====================================================================
+       ENGLISH VERB DATASET
+       ===================================================================== */
+
+    const PERSONE_EN = ["I", "you", "he/she", "we", "you", "they"];
+
+    const TEMPI_LABELS_EN = {
+        present_simple:      "Present Simple",
+        past_simple:         "Past Simple",
+        future_simple:       "Future Simple",
+        present_perfect:     "Present Perfect",
+        past_perfect:        "Past Perfect",
+        future_perfect:      "Future Perfect",
+        present_continuous:  "Present Continuous",
+        past_continuous:     "Past Continuous",
+        conditional_simple:  "Conditional",
+        conditional_perfect: "Conditional Perfect",
+    };
+
+    const GRUPPI_TEMPI_EN = {
+        indicativo:   ["present_simple", "past_simple", "future_simple"],
+        congiuntivo:  ["present_perfect", "past_perfect", "future_perfect"],
+        condizionale: ["present_continuous", "past_continuous"],
+        imperativo:   ["conditional_simple", "conditional_perfect"],
+        tutto:        ["present_simple","past_simple","future_simple","present_perfect","past_perfect","future_perfect","present_continuous","past_continuous","conditional_simple","conditional_perfect"]
+    };
+
+    const verbi_en = {
+
+        // ── TO BE ───────────────────────────────────────────────────────────
+        "to be": {
+            present_simple:      ["am","are","is","are","are","are"],
+            past_simple:         ["was","were","was","were","were","were"],
+            future_simple:       ["will be","will be","will be","will be","will be","will be"],
+            present_perfect:     ["have been","have been","has been","have been","have been","have been"],
+            past_perfect:        ["had been","had been","had been","had been","had been","had been"],
+            future_perfect:      ["will have been","will have been","will have been","will have been","will have been","will have been"],
+            present_continuous:  ["am being","are being","is being","are being","are being","are being"],
+            past_continuous:     ["was being","were being","was being","were being","were being","were being"],
+            conditional_simple:  ["would be","would be","would be","would be","would be","would be"],
+            conditional_perfect: ["would have been","would have been","would have been","would have been","would have been","would have been"],
+        },
+
+        // ── TO HAVE ─────────────────────────────────────────────────────────
+        "to have": {
+            present_simple:      ["have","have","has","have","have","have"],
+            past_simple:         ["had","had","had","had","had","had"],
+            future_simple:       ["will have","will have","will have","will have","will have","will have"],
+            present_perfect:     ["have had","have had","has had","have had","have had","have had"],
+            past_perfect:        ["had had","had had","had had","had had","had had","had had"],
+            future_perfect:      ["will have had","will have had","will have had","will have had","will have had","will have had"],
+            present_continuous:  ["am having","are having","is having","are having","are having","are having"],
+            past_continuous:     ["was having","were having","was having","were having","were having","were having"],
+            conditional_simple:  ["would have","would have","would have","would have","would have","would have"],
+            conditional_perfect: ["would have had","would have had","would have had","would have had","would have had","would have had"],
+        },
+
+        // ── TO DO ───────────────────────────────────────────────────────────
+        "to do": {
+            present_simple:      ["do","do","does","do","do","do"],
+            past_simple:         ["did","did","did","did","did","did"],
+            future_simple:       ["will do","will do","will do","will do","will do","will do"],
+            present_perfect:     ["have done","have done","has done","have done","have done","have done"],
+            past_perfect:        ["had done","had done","had done","had done","had done","had done"],
+            future_perfect:      ["will have done","will have done","will have done","will have done","will have done","will have done"],
+            present_continuous:  ["am doing","are doing","is doing","are doing","are doing","are doing"],
+            past_continuous:     ["was doing","were doing","was doing","were doing","were doing","were doing"],
+            conditional_simple:  ["would do","would do","would do","would do","would do","would do"],
+            conditional_perfect: ["would have done","would have done","would have done","would have done","would have done","would have done"],
+        },
+
+        // ── TO GO ───────────────────────────────────────────────────────────
+        "to go": {
+            present_simple:      ["go","go","goes","go","go","go"],
+            past_simple:         ["went","went","went","went","went","went"],
+            future_simple:       ["will go","will go","will go","will go","will go","will go"],
+            present_perfect:     ["have gone","have gone","has gone","have gone","have gone","have gone"],
+            past_perfect:        ["had gone","had gone","had gone","had gone","had gone","had gone"],
+            future_perfect:      ["will have gone","will have gone","will have gone","will have gone","will have gone","will have gone"],
+            present_continuous:  ["am going","are going","is going","are going","are going","are going"],
+            past_continuous:     ["was going","were going","was going","were going","were going","were going"],
+            conditional_simple:  ["would go","would go","would go","would go","would go","would go"],
+            conditional_perfect: ["would have gone","would have gone","would have gone","would have gone","would have gone","would have gone"],
+        },
+
+        // ── TO MAKE ─────────────────────────────────────────────────────────
+        "to make": {
+            present_simple:      ["make","make","makes","make","make","make"],
+            past_simple:         ["made","made","made","made","made","made"],
+            future_simple:       ["will make","will make","will make","will make","will make","will make"],
+            present_perfect:     ["have made","have made","has made","have made","have made","have made"],
+            past_perfect:        ["had made","had made","had made","had made","had made","had made"],
+            future_perfect:      ["will have made","will have made","will have made","will have made","will have made","will have made"],
+            present_continuous:  ["am making","are making","is making","are making","are making","are making"],
+            past_continuous:     ["was making","were making","was making","were making","were making","were making"],
+            conditional_simple:  ["would make","would make","would make","would make","would make","would make"],
+            conditional_perfect: ["would have made","would have made","would have made","would have made","would have made","would have made"],
+        },
+
+        // ── TO SPEAK ────────────────────────────────────────────────────────
+        "to speak": {
+            present_simple:      ["speak","speak","speaks","speak","speak","speak"],
+            past_simple:         ["spoke","spoke","spoke","spoke","spoke","spoke"],
+            future_simple:       ["will speak","will speak","will speak","will speak","will speak","will speak"],
+            present_perfect:     ["have spoken","have spoken","has spoken","have spoken","have spoken","have spoken"],
+            past_perfect:        ["had spoken","had spoken","had spoken","had spoken","had spoken","had spoken"],
+            future_perfect:      ["will have spoken","will have spoken","will have spoken","will have spoken","will have spoken","will have spoken"],
+            present_continuous:  ["am speaking","are speaking","is speaking","are speaking","are speaking","are speaking"],
+            past_continuous:     ["was speaking","were speaking","was speaking","were speaking","were speaking","were speaking"],
+            conditional_simple:  ["would speak","would speak","would speak","would speak","would speak","would speak"],
+            conditional_perfect: ["would have spoken","would have spoken","would have spoken","would have spoken","would have spoken","would have spoken"],
+        },
+
+        // ── TO WRITE ────────────────────────────────────────────────────────
+        "to write": {
+            present_simple:      ["write","write","writes","write","write","write"],
+            past_simple:         ["wrote","wrote","wrote","wrote","wrote","wrote"],
+            future_simple:       ["will write","will write","will write","will write","will write","will write"],
+            present_perfect:     ["have written","have written","has written","have written","have written","have written"],
+            past_perfect:        ["had written","had written","had written","had written","had written","had written"],
+            future_perfect:      ["will have written","will have written","will have written","will have written","will have written","will have written"],
+            present_continuous:  ["am writing","are writing","is writing","are writing","are writing","are writing"],
+            past_continuous:     ["was writing","were writing","was writing","were writing","were writing","were writing"],
+            conditional_simple:  ["would write","would write","would write","would write","would write","would write"],
+            conditional_perfect: ["would have written","would have written","would have written","would have written","would have written","would have written"],
+        },
+
+        // ── TO COME ─────────────────────────────────────────────────────────
+        "to come": {
+            present_simple:      ["come","come","comes","come","come","come"],
+            past_simple:         ["came","came","came","came","came","came"],
+            future_simple:       ["will come","will come","will come","will come","will come","will come"],
+            present_perfect:     ["have come","have come","has come","have come","have come","have come"],
+            past_perfect:        ["had come","had come","had come","had come","had come","had come"],
+            future_perfect:      ["will have come","will have come","will have come","will have come","will have come","will have come"],
+            present_continuous:  ["am coming","are coming","is coming","are coming","are coming","are coming"],
+            past_continuous:     ["was coming","were coming","was coming","were coming","were coming","were coming"],
+            conditional_simple:  ["would come","would come","would come","would come","would come","would come"],
+            conditional_perfect: ["would have come","would have come","would have come","would have come","would have come","would have come"],
+        },
+
+        // ── TO THINK ────────────────────────────────────────────────────────
+        "to think": {
+            present_simple:      ["think","think","thinks","think","think","think"],
+            past_simple:         ["thought","thought","thought","thought","thought","thought"],
+            future_simple:       ["will think","will think","will think","will think","will think","will think"],
+            present_perfect:     ["have thought","have thought","has thought","have thought","have thought","have thought"],
+            past_perfect:        ["had thought","had thought","had thought","had thought","had thought","had thought"],
+            future_perfect:      ["will have thought","will have thought","will have thought","will have thought","will have thought","will have thought"],
+            present_continuous:  ["am thinking","are thinking","is thinking","are thinking","are thinking","are thinking"],
+            past_continuous:     ["was thinking","were thinking","was thinking","were thinking","were thinking","were thinking"],
+            conditional_simple:  ["would think","would think","would think","would think","would think","would think"],
+            conditional_perfect: ["would have thought","would have thought","would have thought","would have thought","would have thought","would have thought"],
+        },
+
+        // ── TO GIVE ─────────────────────────────────────────────────────────
+        "to give": {
+            present_simple:      ["give","give","gives","give","give","give"],
+            past_simple:         ["gave","gave","gave","gave","gave","gave"],
+            future_simple:       ["will give","will give","will give","will give","will give","will give"],
+            present_perfect:     ["have given","have given","has given","have given","have given","have given"],
+            past_perfect:        ["had given","had given","had given","had given","had given","had given"],
+            future_perfect:      ["will have given","will have given","will have given","will have given","will have given","will have given"],
+            present_continuous:  ["am giving","are giving","is giving","are giving","are giving","are giving"],
+            past_continuous:     ["was giving","were giving","was giving","were giving","were giving","were giving"],
+            conditional_simple:  ["would give","would give","would give","would give","would give","would give"],
+            conditional_perfect: ["would have given","would have given","would have given","would have given","would have given","would have given"],
+        },
+
+        // ── TO TAKE ─────────────────────────────────────────────────────────
+        "to take": {
+            present_simple:      ["take","take","takes","take","take","take"],
+            past_simple:         ["took","took","took","took","took","took"],
+            future_simple:       ["will take","will take","will take","will take","will take","will take"],
+            present_perfect:     ["have taken","have taken","has taken","have taken","have taken","have taken"],
+            past_perfect:        ["had taken","had taken","had taken","had taken","had taken","had taken"],
+            future_perfect:      ["will have taken","will have taken","will have taken","will have taken","will have taken","will have taken"],
+            present_continuous:  ["am taking","are taking","is taking","are taking","are taking","are taking"],
+            past_continuous:     ["was taking","were taking","was taking","were taking","were taking","were taking"],
+            conditional_simple:  ["would take","would take","would take","would take","would take","would take"],
+            conditional_perfect: ["would have taken","would have taken","would have taken","would have taken","would have taken","would have taken"],
+        },
+
+        // ── TO SEE ──────────────────────────────────────────────────────────
+        "to see": {
+            present_simple:      ["see","see","sees","see","see","see"],
+            past_simple:         ["saw","saw","saw","saw","saw","saw"],
+            future_simple:       ["will see","will see","will see","will see","will see","will see"],
+            present_perfect:     ["have seen","have seen","has seen","have seen","have seen","have seen"],
+            past_perfect:        ["had seen","had seen","had seen","had seen","had seen","had seen"],
+            future_perfect:      ["will have seen","will have seen","will have seen","will have seen","will have seen","will have seen"],
+            present_continuous:  ["am seeing","are seeing","is seeing","are seeing","are seeing","are seeing"],
+            past_continuous:     ["was seeing","were seeing","was seeing","were seeing","were seeing","were seeing"],
+            conditional_simple:  ["would see","would see","would see","would see","would see","would see"],
+            conditional_perfect: ["would have seen","would have seen","would have seen","would have seen","would have seen","would have seen"],
+        },
+
+        // ── TO READ ─────────────────────────────────────────────────────────
+        "to read": {
+            present_simple:      ["read","read","reads","read","read","read"],
+            past_simple:         ["read","read","read","read","read","read"],
+            future_simple:       ["will read","will read","will read","will read","will read","will read"],
+            present_perfect:     ["have read","have read","has read","have read","have read","have read"],
+            past_perfect:        ["had read","had read","had read","had read","had read","had read"],
+            future_perfect:      ["will have read","will have read","will have read","will have read","will have read","will have read"],
+            present_continuous:  ["am reading","are reading","is reading","are reading","are reading","are reading"],
+            past_continuous:     ["was reading","were reading","was reading","were reading","were reading","were reading"],
+            conditional_simple:  ["would read","would read","would read","would read","would read","would read"],
+            conditional_perfect: ["would have read","would have read","would have read","would have read","would have read","would have read"],
+        },
+
+        // ── TO PLAY ─────────────────────────────────────────────────────────
+        "to play": {
+            present_simple:      ["play","play","plays","play","play","play"],
+            past_simple:         ["played","played","played","played","played","played"],
+            future_simple:       ["will play","will play","will play","will play","will play","will play"],
+            present_perfect:     ["have played","have played","has played","have played","have played","have played"],
+            past_perfect:        ["had played","had played","had played","had played","had played","had played"],
+            future_perfect:      ["will have played","will have played","will have played","will have played","will have played","will have played"],
+            present_continuous:  ["am playing","are playing","is playing","are playing","are playing","are playing"],
+            past_continuous:     ["was playing","were playing","was playing","were playing","were playing","were playing"],
+            conditional_simple:  ["would play","would play","would play","would play","would play","would play"],
+            conditional_perfect: ["would have played","would have played","would have played","would have played","would have played","would have played"],
+        },
+
+        // ── TO STUDY ────────────────────────────────────────────────────────
+        "to study": {
+            present_simple:      ["study","study","studies","study","study","study"],
+            past_simple:         ["studied","studied","studied","studied","studied","studied"],
+            future_simple:       ["will study","will study","will study","will study","will study","will study"],
+            present_perfect:     ["have studied","have studied","has studied","have studied","have studied","have studied"],
+            past_perfect:        ["had studied","had studied","had studied","had studied","had studied","had studied"],
+            future_perfect:      ["will have studied","will have studied","will have studied","will have studied","will have studied","will have studied"],
+            present_continuous:  ["am studying","are studying","is studying","are studying","are studying","are studying"],
+            past_continuous:     ["was studying","were studying","was studying","were studying","were studying","were studying"],
+            conditional_simple:  ["would study","would study","would study","would study","would study","would study"],
+            conditional_perfect: ["would have studied","would have studied","would have studied","would have studied","would have studied","would have studied"],
+        },
+
+    };
+
+    const NOMI_VERBI_EN = Object.keys(verbi_en);
+
+    /* =====================================================================
        TRADUZIONI UI
        ===================================================================== */
 
@@ -1286,10 +1529,10 @@
             'correct-label':  'Correct',
             'wrong-label':    'Wrong',
             'total-label':    'Total',
-            'tab-indicativo':   'Indicative',
-            'tab-congiuntivo':  'Subjunctive',
-            'tab-condizionale': 'Conditional',
-            'tab-imperativo':   'Imperative',
+            'tab-indicativo':   'Simple',
+            'tab-congiuntivo':  'Perfect',
+            'tab-condizionale': 'Continuous',
+            'tab-imperativo':   'Conditional',
             'tab-tutto':        'All',
             'question-label': 'Conjugate the verb:',
             'essere-hint':    'auxiliary: essere — write the masculine or feminine form',
@@ -1311,21 +1554,21 @@
             'history-deleted': 'History deleted!',
             'overall-trend': 'Overall trend: improvement (average',
             'vs': 'vs',
-            'help-title': 'Conjugation Rules',
-            'help-ind-pres': 'Present Indicative',
-            'help-ind-pres-desc': 'Endings: -are → o/i/a/iamo/ate/ano | -ere → o/i/e/iamo/ete/ono | -ire → o/i/e/iamo/ite/ono',
-            'help-ind-imp': 'Imperfect Indicative',
-            'help-ind-imp-desc': 'Endings: -are → avo/avi/ava/avamo/avate/avano | -ere/-ire → evo/evi/eva/evamo/evate/evano',
-            'help-ind-pp': 'Present Perfect',
-            'help-ind-pp-desc': 'auxiliary (avere/essere) + past participle. With essere, the participle agrees in gender and number.',
-            'help-ind-fut': 'Simple Future',
-            'help-ind-fut-desc': '-are/-ere → ò/ai/à/emo/ete/anno | -ire → irò/irai/irà/iremo/irete/iranno',
-            'help-cong-pres': 'Present Subjunctive',
-            'help-cong-pres-desc': '-are → i/i/i/iamo/iate/ino | -ere/-ire → a/a/a/iamo/iate/ano',
-            'help-cond-pres': 'Present Conditional',
-            'help-cond-pres-desc': '-are → erei/eresti/erebbe/eremmo/ereste/erebbero | -ere/-ire → ei/esti/ebbe/emmo/este/ebbero',
+            'help-title': 'English Verb Tenses',
+            'help-ind-pres': 'Present Simple',
+            'help-ind-pres-desc': 'Base form (I/you/we/they work). Add -s/-es for he/she/it (he works, she goes, it does).',
+            'help-ind-imp': 'Past Simple',
+            'help-ind-imp-desc': 'Regular verbs: add -ed (played, studied). Irregular verbs have unique forms (went, spoke, wrote, thought).',
+            'help-ind-pp': 'Present & Past Perfect',
+            'help-ind-pp-desc': 'Present Perfect: have/has + past participle (I have seen). Past Perfect: had + past participle (I had seen).',
+            'help-ind-fut': 'Future Simple',
+            'help-ind-fut-desc': 'will + base form (I will go, she will read). Same form for all persons.',
+            'help-cong-pres': 'Continuous Tenses',
+            'help-cong-pres-desc': 'Present: am/is/are + -ing (I am going). Past: was/were + -ing (they were playing).',
+            'help-cond-pres': 'Conditional',
+            'help-cond-pres-desc': 'Conditional: would + base form (I would go). Conditional Perfect: would have + past participle (I would have gone).',
             'help-irr': 'Irregular Verbs',
-            'help-irr-desc': 'Irregular verbs to remember: essere, avere, andare, fare, dire, venire, stare, dare, sapere, potere, volere, dovere, uscire, bere.',
+            'help-irr-desc': 'Key irregular past forms: be→was/were, have→had, do→did, go→went, make→made, speak→spoke, write→wrote, come→came, think→thought, give→gave, take→took, see→saw.',
         }
     };
 
@@ -1397,14 +1640,15 @@
        ===================================================================== */
 
     function getAvailableTempi() {
-        return GRUPPI_TEMPI[currentTab];
+        return currentLanguage === 'en' ? GRUPPI_TEMPI_EN[currentTab] : GRUPPI_TEMPI[currentTab];
     }
 
     // Verifica che un tempo abbia almeno una forma non-null per quel verbo
     function tempHasValidForms(verbName, tempo) {
-        const forms = verbi[verbName][tempo];
+        const dataset = currentLanguage === 'en' ? verbi_en : verbi;
+        const forms = dataset[verbName][tempo];
         if (!forms) return false;
-        // per imperativo, skip persona 0 (io)
+        // per imperativo italiano, skip persona 0 (io)
         const start = tempo === 'imperativo_presente' ? 1 : 0;
         for (let i = start; i < 6; i++) {
             if (forms[i] !== null) return true;
@@ -1415,6 +1659,9 @@
     function generateQuestion() {
         answered = false;
         const tempiDisponibili = getAvailableTempi();
+        const isEN = currentLanguage === 'en';
+        const dataset = isEN ? verbi_en : verbi;
+        const nomiVerbi = isEN ? NOMI_VERBI_EN : NOMI_VERBI;
         let attempts = 0;
         let verbName, tempo, personaIdx, key;
 
@@ -1422,7 +1669,7 @@
             attempts++;
             if (attempts > 300) break; // sicurezza
 
-            verbName   = NOMI_VERBI[Math.floor(Math.random() * NOMI_VERBI.length)];
+            verbName   = nomiVerbi[Math.floor(Math.random() * nomiVerbi.length)];
             const tempiValidi = tempiDisponibili.filter(t => tempHasValidForms(verbName, t));
             if (tempiValidi.length === 0) continue;
             tempo = tempiValidi[Math.floor(Math.random() * tempiValidi.length)];
@@ -1431,7 +1678,7 @@
             // raccoglie indici di persone con forma valida
             const validIdx = [];
             for (let i = startIdx; i < 6; i++) {
-                if (verbi[verbName][tempo][i] !== null) validIdx.push(i);
+                if (dataset[verbName][tempo][i] !== null) validIdx.push(i);
             }
             if (validIdx.length === 0) continue;
             personaIdx = validIdx[Math.floor(Math.random() * validIdx.length)];
@@ -1447,14 +1694,19 @@
 
     function renderQuestion() {
         const { verbName, tempo, personaIdx } = currentQuestion;
-        const verb = verbi[verbName];
-        const isEssereAux = (tempo.includes('passato_prossimo') || tempo.includes('trapassato'))
+        const isEN = currentLanguage === 'en';
+        const persone = isEN ? PERSONE_EN : PERSONE;
+        const tenseLabel = isEN ? TEMPI_LABELS_EN[tempo] : TEMPI_LABELS[currentLanguage][tempo];
+
+        const verb = isEN ? verbi_en[verbName] : verbi[verbName];
+        const isEssereAux = !isEN
+                            && (tempo.includes('passato_prossimo') || tempo.includes('trapassato'))
                             && verb.ausiliare === 'essere';
 
         document.getElementById('q-verb').textContent = verbName.toUpperCase();
-        document.getElementById('q-persona').textContent = PERSONE[personaIdx];
-        document.getElementById('q-tense').textContent = TEMPI_LABELS[currentLanguage][tempo];
-        document.getElementById('q-persona-prefix').textContent = PERSONE[personaIdx];
+        document.getElementById('q-persona').textContent = persone[personaIdx];
+        document.getElementById('q-tense').textContent = tenseLabel;
+        document.getElementById('q-persona-prefix').textContent = persone[personaIdx];
 
         const hint = document.getElementById('q-essere-hint');
         hint.style.display = isEssereAux ? 'block' : 'none';
@@ -1491,7 +1743,8 @@
         document.getElementById('btn-check').disabled = true;
 
         const { verbName, tempo, personaIdx } = currentQuestion;
-        const correctRaw = verbi[verbName][tempo][personaIdx];
+        const dataset = currentLanguage === 'en' ? verbi_en : verbi;
+        const correctRaw = dataset[verbName][tempo][personaIdx];
         const correct = isCorrect(userInput, correctRaw);
 
         const feedback = document.getElementById('feedback');
@@ -1691,9 +1944,15 @@
             if (translations[lang][key]) el.textContent = translations[lang][key];
         });
 
-        // aggiorna il nome del tempo nella domanda corrente
+        // quando si cambia lingua, resetta la sessione e genera nuova domanda con i verbi corretti
         if (currentQuestion) {
-            document.getElementById('q-tense').textContent = TEMPI_LABELS[lang][currentQuestion.tempo];
+            score = { correct: 0, wrong: 0 };
+            questionCount = 0;
+            previousQuestions = [];
+            updateScore();
+            document.getElementById('finalScreen').classList.remove('show');
+            document.querySelector('.quiz-area').style.display = 'flex';
+            generateQuestion();
         }
     }
 
