@@ -1262,6 +1262,8 @@
             'reset-history': 'Cancella Storico Voti',
             'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
             'history-deleted': 'Storico voti cancellato!',
+            'overall-trend': 'Trend generale: miglioramento (media',
+            'vs': 'vs',
             'help-title': 'Regole di Coniugazione',
             'help-ind-pres': 'Indicativo Presente',
             'help-ind-pres-desc': 'Desinenze: -are → o/i/a/iamo/ate/ano | -ere → o/i/e/iamo/ete/ono | -ire → o/i/e/iamo/ite/ono',
@@ -1307,6 +1309,8 @@
             'reset-history': 'Delete Grade History',
             'confirm-reset': 'Are you sure you want to delete all saved grades?',
             'history-deleted': 'History deleted!',
+            'overall-trend': 'Overall trend: improvement (average',
+            'vs': 'vs',
             'help-title': 'Conjugation Rules',
             'help-ind-pres': 'Present Indicative',
             'help-ind-pres-desc': 'Endings: -are → o/i/a/iamo/ate/ano | -ere → o/i/e/iamo/ete/ono | -ire → o/i/e/iamo/ite/ono',
@@ -1613,6 +1617,14 @@
             } else {
                 trendMessage.textContent = `${t['same-result']}`;
                 trendMessage.className = 'trend stable';
+            }
+
+            if (history.length >= 6) {
+                const recentAvg = (history.slice(-3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+                const previousAvg = (history.slice(-6, -3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+                if (parseFloat(recentAvg) > parseFloat(previousAvg)) {
+                    trendMessage.textContent += ` | ${t['overall-trend']} ${recentAvg} ${t['vs']} ${previousAvg})`;
+                }
             }
         }
     }
