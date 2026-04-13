@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Quiz Didattici is a static web application for educational quizzes, focused on mathematics. It's a pure client-side application with no build process, backend, or dependencies - just HTML, CSS, and vanilla JavaScript.
+Quiz Didattici is a static web application for educational quizzes covering mathematics and Italian language. It's a pure client-side application with no build process, backend, or dependencies - just HTML, CSS, and vanilla JavaScript.
 
 **Live demo**: https://manzolo.github.io/quiz-didattici/
 
@@ -14,12 +14,22 @@ Quiz Didattici is a static web application for educational quizzes, focused on m
 
 ### File Structure
 ```
-/                           # Root serves as homepage
-├── index.html             # Main landing page with subject categories
+/                                    # Root serves as homepage
+├── index.html                       # Main landing page (Matematica + Italiano sections)
 ├── matematica/
-│   ├── index.html         # Math section hub
-│   ├── equivalenze.html   # Unit conversion quiz (interactive)
-│   └── calcolatore.html   # Unit converter calculator (tool)
+│   ├── index.html                   # Math section hub
+│   ├── equivalenze.html             # Unit conversion quiz
+│   ├── calcolatore.html             # Unit converter calculator (tool)
+│   ├── frazioni.html                # Fractions quiz (simplification, addition, comparison, decimals)
+│   ├── operazioni.html              # Arithmetic operations quiz
+│   ├── geometria.html               # Geometry quiz (area, perimeter, properties)
+│   ├── circonferenza.html           # Circle/circumference quiz with SVG visualizations
+│   ├── circonferenza-formule.html   # Circle formulas reference sheet (printable)
+│   ├── espressioni.html             # Expressions quiz (with step-by-step hints)
+│   └── espressioni-frazioni.html    # Fraction expressions quiz (powers tab included)
+└── italiano/
+    ├── index.html                   # Italian section hub
+    └── tempi-verbi.html             # Verb tenses quiz (regular + irregular verbs)
 ```
 
 ### Key Design Patterns
@@ -63,9 +73,30 @@ const conversions = {
 - All conversions go through base unit: value * fromUnit.toBase / toUnit.toBase
 - Rounding applied to avoid floating-point precision errors: `Math.round(answer * 100000) / 100000`
 
-**4. State Management via localStorage**
+**4. Grade System (after 10 questions)**
+Most quizzes show a final grade screen after 10 questions:
+- `MAX_QUESTIONS = 10` constant
+- `questionCount` tracks answered questions per round
+- `showFinalResults()` displays grade, comment, and history
+- Grade history saved in localStorage (key per quiz, e.g. `geometriaHistory`, `verbiHistory`)
+- `displayHistory()` shows last 10 grades + trend + long-term trend (if 6+ entries)
+- Required translation keys: `quiz-completed`, `answered-correctly`, `questions-out-of`, `last-grades`, `improving`, `declining`, `same-result`, `overall-trend`, `vs`, `restart`, `reset-history`, `confirm-reset`, `history-deleted`
+
+**5. Help Tooltip (Aiutino)**
+Quizzes with a `?` button show a modal with topic rules:
+- `.help-container` / `.help-icon` trigger `toggleHelp()`
+- `.help-overlay` (click-to-close backdrop) + `.help-tooltip` (modal)
+- Content uses `data-i18n` for section titles and descriptions
+- Help icon placed inside `<h1>` alongside the quiz title
+
+**6. Buy Me a Coffee Button**
+All pages have a fixed "Buy Me a Coffee" button:
+- Desktop: full image button (bottom-right, fixed)
+- Mobile (`max-width: 768px`): small 48px yellow circle with ☕ emoji, image hidden
+
+**7. State Management via localStorage**
 - `language`: Current UI language (it/en)
-- `quizHistory`: Array of last 10 quiz grades (equivalenze.html only)
+- `*History`: Array of last 10 quiz grades per quiz (e.g. `geometriaHistory`, `verbiHistory`)
 
 ## Development Workflow
 
@@ -119,12 +150,32 @@ All CSS is inline in `<style>` tags. The design system uses:
 - White cards on gradient background
 
 ### Adding New Quiz Types
-Follow this structure when adding to `matematica/`:
-1. Create new HTML file (e.g., `frazioni.html`)
-2. Copy language selector and back button from existing quiz
-3. Implement same `translations` pattern
-4. Add card link in `matematica/index.html` with translations
-5. Keep consistent visual design (gradients, card styles, buttons)
+Follow this structure when adding a new quiz:
+1. Create new HTML file in the appropriate section folder
+2. Copy language selector, back button, and buy-me-coffee button from existing quiz
+3. Implement same `translations` pattern — **both `it` and `en` blocks must have identical keys**
+4. Add grade system after 10 questions (`MAX_QUESTIONS`, `showFinalResults`, etc.)
+5. Add help button (`?`) with topic rules in both languages
+6. Add mobile buy-me-coffee CSS override (☕ circle) in `@media (max-width: 768px)`
+7. Add card link in the section's `index.html` with translations in both languages
+8. Keep consistent visual design (gradients, card styles, buttons)
+
+### Verifying Bilingual Completeness
+Run this to check IT == EN translation keys:
+```python
+python3 -c "
+import re
+with open('quiz.html') as f: c = f.read()
+trans = c[c.find('const translations = {'):]
+trans = trans[:trans.find('};')+2]
+it_b = trans[trans.find('it: {')+5:trans.find('en: {')]
+en_b = trans[trans.find('en: {')+5:]
+it_k = set(re.findall(r\"'([^']+)':\", it_b))
+en_k = set(re.findall(r\"'([^']+)':\", en_b))
+print('Missing from EN:', it_k - en_k)
+print('Missing from IT:', en_k - it_k)
+"
+```
 
 ### Navigation Structure
 - All pages have back buttons linking up the hierarchy
