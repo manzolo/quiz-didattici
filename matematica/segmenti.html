@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Segmenti e Rette</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            background: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .help-container { position: relative; display: inline-block; }
+
+        .help-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .help-icon:hover { transform: scale(1.1); }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .help-overlay.show { display: block; }
+
+        .help-tooltip {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 560px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .help-tooltip.show { display: block; }
+
+        .help-close {
+            position: absolute;
+            top: 15px; right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+        }
+
+        .help-tooltip h3 {
+            color: #667eea;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            padding-right: 30px;
+        }
+
+        .help-section { margin-bottom: 16px; }
+
+        .help-section-title {
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 1.05em;
+            margin-bottom: 6px;
+        }
+
+        .help-example {
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            padding: 6px 10px;
+            font-size: 0.95em;
+            margin-bottom: 4px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px; left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .back-button:hover { background: rgba(255,255,255,0.3); }
+
+        .language-selector {
+            position: fixed;
+            top: 20px; right: 20px;
+            display: flex;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 10px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover { background: rgba(255,255,255,0.3); }
+        .lang-btn.active { background: white; color: #667eea; }
+
+        .score-section {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .score-item { text-align: center; }
+        .score-label { font-size: 13px; color: #666; margin-bottom: 4px; }
+        .score-value { font-size: 28px; font-weight: bold; color: #667eea; }
+        .score-value.correct { color: #28a745; }
+        .score-value.wrong { color: #dc3545; }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab:hover { background: #f0f2ff; }
+        .tab.active { background: #667eea; color: white; }
+
+        .quiz-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 30px;
+            min-width: 500px;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .question {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .category-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 1em;
+        }
+
+        .seg-visualization {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px auto;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .seg-visualization svg { display: block; max-width: 100%; }
+
+        .answer-box {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .answer-input {
+            padding: 18px 25px;
+            font-size: 2em;
+            border: 4px solid #667eea;
+            border-radius: 15px;
+            text-align: center;
+            width: 180px;
+            font-weight: bold;
+        }
+
+        .answer-input:focus { outline: none; border-color: #f093fb; box-shadow: 0 0 20px rgba(240,147,251,0.5); }
+        .answer-input.correct { border-color: #28a745; background: #d4edda; }
+        .answer-input.wrong { border-color: #dc3545; background: #f8d7da; }
+
+        .unit-label { font-size: 1.6em; font-weight: bold; color: #667eea; }
+
+        .two-answers {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .input-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .input-label { font-size: 1.1em; font-weight: bold; color: #667eea; }
+
+        .multiple-choice {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 320px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .choice-btn {
+            padding: 14px 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .choice-btn:hover { background: #667eea; color: white; }
+        .choice-btn.selected { background: #667eea; color: white; }
+        .choice-btn.correct { border-color: #28a745; background: #d4edda; color: #28a745; }
+        .choice-btn.wrong { border-color: #dc3545; background: #f8d7da; color: #dc3545; }
+
+        .button-group { display: flex; gap: 15px; margin-top: 25px; }
+
+        .btn {
+            padding: 14px 35px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check { background: #667eea; color: white; }
+        .btn-check:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-next { background: #28a745; color: white; display: none; }
+        .btn-next:hover { background: #218838; transform: translateY(-2px); }
+        .btn-next.show { display: block; }
+
+        .feedback {
+            margin-top: 18px;
+            font-size: 1.2em;
+            font-weight: bold;
+            min-height: 36px;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .feedback.correct { color: #28a745; }
+        .feedback.wrong { color: #dc3545; }
+
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .final-screen.show { display: flex; }
+
+        .final-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 50px 70px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 30px;
+            min-width: 500px;
+        }
+
+        .final-title { color: white; font-size: 2.2em; font-weight: bold; margin-bottom: 15px; }
+        .final-grade { color: white; font-size: 4.5em; font-weight: bold; margin: 15px 0; }
+        .final-message { color: white; font-size: 1.4em; margin-bottom: 8px; }
+
+        .history-box {
+            background: #f8f9fa;
+            padding: 25px 35px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            min-width: 400px;
+        }
+
+        .history-title { font-size: 1.2em; font-weight: bold; color: #667eea; margin-bottom: 15px; }
+
+        .history-list { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
+
+        .history-item {
+            background: #667eea;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .history-item.current { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); transform: scale(1.1); }
+
+        .trend { font-size: 1em; font-weight: bold; }
+        .trend.improving { color: #28a745; }
+        .trend.declining { color: #dc3545; }
+        .trend.stable { color: #667eea; }
+
+        .btn-restart {
+            padding: 14px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-restart:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-reset-history {
+            padding: 10px 25px;
+            font-size: 1em;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-reset-history:hover { background: #c82333; }
+
+        .buy-me-coffee {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .buy-me-coffee:hover { transform: translateY(-5px); }
+        .buy-me-coffee img { height: 50px; width: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        @media (max-width: 768px) {
+            .back-button { top: 10px; left: 10px; padding: 8px 14px; font-size: 0.9em; }
+            .language-selector { top: 10px; right: 10px; padding: 6px; }
+            .container { padding: 10px; padding-top: 65px; }
+            h1 { font-size: 1.4em; }
+            .question-box { min-width: unset; padding: 20px; }
+            .question { font-size: 1.1em; }
+            .answer-input { width: 120px; font-size: 1.5em; padding: 12px 15px; }
+            .unit-label { font-size: 1.2em; }
+            .choice-btn { font-size: 0.95em; padding: 10px 14px; }
+            .final-box { min-width: unset; padding: 30px; }
+            .final-grade { font-size: 3em; }
+            .history-box { min-width: unset; }
+            .tab { flex: 1 1 45%; font-size: 0.9em; padding: 8px 10px; }
+            .buy-me-coffee {
+                width: 48px; height: 48px;
+                background: #FFDD00;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                bottom: 15px; right: 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            }
+            .buy-me-coffee img { display: none; }
+            .buy-me-coffee::after { content: '☕'; font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span data-i18n="back">← Matematica</span>
+    </a>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it')">IT</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+
+    <div class="container">
+        <h1>
+            <span data-i18n="title">Quiz Segmenti e Rette</span>
+            <div class="help-container">
+                <div class="help-icon" onclick="toggleHelp()">?</div>
+            </div>
+        </h1>
+
+        <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+        <div class="help-tooltip" id="helpTooltip">
+            <button class="help-close" onclick="toggleHelp()">&times;</button>
+            <h3 data-i18n="help-title">Regole sui Segmenti e Rette</h3>
+            <div class="help-content">
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-seg-title">Segmento e Retta</div>
+                    <div class="help-example" data-i18n="help-seg-1">Segmento AB: parte di retta tra i punti A e B (ha due estremi)</div>
+                    <div class="help-example" data-i18n="help-seg-2">Semiretta: parte di retta con un'origine, si estende all'infinito</div>
+                    <div class="help-example" data-i18n="help-seg-3">Retta: si estende all'infinito in entrambe le direzioni</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-mid-title">Punto Medio</div>
+                    <div class="help-example" data-i18n="help-mid-1">M è punto medio di AB se AM = MB = AB ÷ 2</div>
+                    <div class="help-example" data-i18n="help-mid-ex">Es: AB = 10 cm → AM = MB = 5 cm</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-ops-title">Somma e Differenza</div>
+                    <div class="help-example" data-i18n="help-ops-1">Somma: AB + CD = lunghezza totale unendo i due segmenti</div>
+                    <div class="help-example" data-i18n="help-ops-2">Differenza: AB − CD = quanto AB supera CD (AB &gt; CD)</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-mult-title">Multipli e Sottomultipli</div>
+                    <div class="help-example" data-i18n="help-mult-1">Triplo di AB = 3 × AB</div>
+                    <div class="help-example" data-i18n="help-mult-2">Metà di AB = AB ÷ 2</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-prob-title">Problemi con due segmenti</div>
+                    <div class="help-example" data-i18n="help-prob-1">Somma = S, differenza = D → CD = (S−D)÷2, AB = CD+D</div>
+                    <div class="help-example" data-i18n="help-prob-ex">Es: S=20cm, D=4cm → CD=8cm, AB=12cm</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-lines-title">Rette Parallele e Perpendicolari</div>
+                    <div class="help-example" data-i18n="help-lines-1">Parallele: non si incontrano mai, stessa distanza</div>
+                    <div class="help-example" data-i18n="help-lines-2">Perpendicolari: si incontrano formando 4 angoli retti (90°)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="score">Punteggio</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct">Corrette</div>
+                <div class="score-value correct" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong">Sbagliate</div>
+                <div class="score-value wrong" id="wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="questions">Domande</div>
+                <div class="score-value" id="total">0/10</div>
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="tab active" onclick="changeCategory('tutte')" data-i18n="all">Tutte</button>
+            <button class="tab" onclick="changeCategory('definizioni')" data-i18n="definitions">Definizioni</button>
+            <button class="tab" onclick="changeCategory('calcoli')" data-i18n="calculations">Calcoli</button>
+            <button class="tab" onclick="changeCategory('problemi')" data-i18n="problems">Problemi</button>
+        </div>
+
+        <div class="quiz-area" id="quizArea">
+            <div class="question-box">
+                <div class="question" id="question"></div>
+                <div class="seg-visualization" id="segVisualization" style="display:none;"></div>
+                <div class="category-label" id="categoryLabel"></div>
+            </div>
+
+            <div class="answer-box" id="answerBox"></div>
+
+            <div class="button-group">
+                <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()" data-i18n="check">Verifica</button>
+                <button class="btn btn-next" id="btnNext" onclick="nextQuestion()" data-i18n="next">Prossima Domanda</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message">
+                    <span data-i18n="answered-correctly">Hai risposto correttamente a</span>
+                    <span id="finalCorrect">0</span>
+                    <span data-i18n="questions-out-of">domande su 10</span>
+                </div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+            </div>
+
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee">
+    </a>
+
+    <script>
+        let currentLanguage = 'it';
+
+        const translations = {
+            it: {
+                'back': '← Matematica',
+                'title': 'Quiz Segmenti e Rette',
+                'score': 'Punteggio',
+                'correct': 'Corrette',
+                'wrong': 'Sbagliate',
+                'questions': 'Domande',
+                'all': 'Tutte',
+                'definitions': 'Definizioni',
+                'calculations': 'Calcoli',
+                'problems': 'Problemi',
+                'check': 'Verifica',
+                'next': 'Prossima Domanda',
+                'restart': 'Ricomincia Quiz',
+                'reset-history': 'Cancella Storico Voti',
+                'help-title': 'Regole sui Segmenti e Rette',
+                'help-seg-title': 'Segmento e Retta',
+                'help-seg-1': 'Segmento AB: parte di retta tra i punti A e B (ha due estremi)',
+                'help-seg-2': 'Semiretta: parte di retta con un\'origine, si estende all\'infinito',
+                'help-seg-3': 'Retta: si estende all\'infinito in entrambe le direzioni',
+                'help-mid-title': 'Punto Medio',
+                'help-mid-1': 'M è punto medio di AB se AM = MB = AB ÷ 2',
+                'help-mid-ex': 'Es: AB = 10 cm → AM = MB = 5 cm',
+                'help-ops-title': 'Somma e Differenza',
+                'help-ops-1': 'Somma: AB + CD = lunghezza totale unendo i due segmenti',
+                'help-ops-2': 'Differenza: AB − CD = quanto AB supera CD (AB > CD)',
+                'help-mult-title': 'Multipli e Sottomultipli',
+                'help-mult-1': 'Triplo di AB = 3 × AB',
+                'help-mult-2': 'Metà di AB = AB ÷ 2',
+                'help-prob-title': 'Problemi con due segmenti',
+                'help-prob-1': 'Somma = S, differenza = D → CD = (S−D)÷2, AB = CD+D',
+                'help-prob-ex': 'Es: S=20cm, D=4cm → CD=8cm, AB=12cm',
+                'help-lines-title': 'Rette Parallele e Perpendicolari',
+                'help-lines-1': 'Parallele: non si incontrano mai, stessa distanza',
+                'help-lines-2': 'Perpendicolari: si incontrano formando 4 angoli retti (90°)',
+                'insert-value': 'Inserisci un valore!',
+                'correct-answer': 'Corretto! ✓',
+                'wrong-answer': 'Sbagliato! La risposta corretta è',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti',
+                'improving': 'Stai migliorando!',
+                'declining': 'Stai peggiorando',
+                'same-result': 'Stesso risultato',
+                'overall-trend': 'Trend generale: miglioramento (media',
+                'vs': 'vs',
+                'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+                'history-deleted': 'Storico voti cancellato!',
+                'cat-definitions': 'Definizioni',
+                'cat-calculations': 'Calcoli',
+                'cat-problems': 'Problemi',
+                'q-midpoint': 'Il segmento AB misura {n} cm. Quanto misura AM, dove M è il punto medio?',
+                'q-sum': 'AB = {a} cm, CD = {b} cm. Quanto misura AB + CD?',
+                'q-diff': 'AB = {a} cm, CD = {b} cm. Quanto misura AB − CD?',
+                'q-multiple': 'AB = {a} cm. Quanto misura il {n}× di AB?',
+                'q-submultiple': 'AB = {a} cm. Quanto misura AB ÷ {n}?',
+                'q-problem': 'La somma di AB e CD è {s} cm. AB supera CD di {d} cm. Trova le misure di AB e CD.',
+                'lbl-ab': 'AB =',
+                'lbl-cd': 'CD =',
+                'wrong-ab-cd': 'Sbagliato! AB = {ab} cm, CD = {cd} cm'
+            },
+            en: {
+                'back': '← Mathematics',
+                'title': 'Segments and Lines Quiz',
+                'score': 'Score',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'questions': 'Questions',
+                'all': 'All',
+                'definitions': 'Definitions',
+                'calculations': 'Calculations',
+                'problems': 'Problems',
+                'check': 'Check',
+                'next': 'Next Question',
+                'restart': 'Restart Quiz',
+                'reset-history': 'Clear History',
+                'help-title': 'Segments and Lines Rules',
+                'help-seg-title': 'Segment and Line',
+                'help-seg-1': 'Segment AB: part of a line between points A and B (has two endpoints)',
+                'help-seg-2': 'Ray: part of a line with an origin, extends infinitely in one direction',
+                'help-seg-3': 'Line: extends infinitely in both directions',
+                'help-mid-title': 'Midpoint',
+                'help-mid-1': 'M is the midpoint of AB if AM = MB = AB ÷ 2',
+                'help-mid-ex': 'Ex: AB = 10 cm → AM = MB = 5 cm',
+                'help-ops-title': 'Sum and Difference',
+                'help-ops-1': 'Sum: AB + CD = total length joining the two segments',
+                'help-ops-2': 'Difference: AB − CD = how much AB exceeds CD (AB > CD)',
+                'help-mult-title': 'Multiples and Submultiples',
+                'help-mult-1': 'Triple of AB = 3 × AB',
+                'help-mult-2': 'Half of AB = AB ÷ 2',
+                'help-prob-title': 'Problems with two segments',
+                'help-prob-1': 'Sum = S, difference = D → CD = (S−D)÷2, AB = CD+D',
+                'help-prob-ex': 'Ex: S=20cm, D=4cm → CD=8cm, AB=12cm',
+                'help-lines-title': 'Parallel and Perpendicular Lines',
+                'help-lines-1': 'Parallel: never meet, always same distance apart',
+                'help-lines-2': 'Perpendicular: meet forming 4 right angles (90°)',
+                'insert-value': 'Please enter a value!',
+                'correct-answer': 'Correct! ✓',
+                'wrong-answer': 'Wrong! The correct answer is',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades',
+                'improving': 'You\'re improving!',
+                'declining': 'You\'re declining',
+                'same-result': 'Same result',
+                'overall-trend': 'Overall trend: improvement (average',
+                'vs': 'vs',
+                'confirm-reset': 'Are you sure you want to delete all saved grades?',
+                'history-deleted': 'History deleted!',
+                'cat-definitions': 'Definitions',
+                'cat-calculations': 'Calculations',
+                'cat-problems': 'Problems',
+                'q-midpoint': 'Segment AB measures {n} cm. How long is AM, where M is the midpoint?',
+                'q-sum': 'AB = {a} cm, CD = {b} cm. What is AB + CD?',
+                'q-diff': 'AB = {a} cm, CD = {b} cm. What is AB − CD?',
+                'q-multiple': 'AB = {a} cm. What is {n}× AB?',
+                'q-submultiple': 'AB = {a} cm. What is AB ÷ {n}?',
+                'q-problem': 'The sum of AB and CD is {s} cm. AB exceeds CD by {d} cm. Find the lengths of AB and CD.',
+                'lbl-ab': 'AB =',
+                'lbl-cd': 'CD =',
+                'wrong-ab-cd': 'Wrong! AB = {ab} cm, CD = {cd} cm'
+            }
+        };
+
+        function t(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        const categoryNames = {
+            definizioni: { it: 'Definizioni', en: 'Definitions' },
+            calcoli: { it: 'Calcoli', en: 'Calculations' },
+            problemi: { it: 'Problemi', en: 'Problems' }
+        };
+
+        const definitionQuestions = [
+            {
+                visualType: 'segment',
+                it: {
+                    question: 'Come si chiama la parte di retta delimitata da due punti detti estremi?',
+                    options: ['Segmento', 'Retta', 'Semiretta', 'Piano'],
+                    answer: 'Segmento'
+                },
+                en: {
+                    question: 'What is the part of a line bounded by two points called endpoints?',
+                    options: ['Segment', 'Line', 'Ray', 'Plane'],
+                    answer: 'Segment'
+                }
+            },
+            {
+                visualType: 'ray',
+                it: {
+                    question: 'Come si chiama la parte di retta con un\'origine che si estende all\'infinito in una sola direzione?',
+                    options: ['Semiretta', 'Segmento', 'Piano', 'Angolo'],
+                    answer: 'Semiretta'
+                },
+                en: {
+                    question: 'What is the part of a line with an origin that extends infinitely in one direction?',
+                    options: ['Ray', 'Segment', 'Plane', 'Angle'],
+                    answer: 'Ray'
+                }
+            },
+            {
+                visualType: 'midpoint',
+                it: {
+                    question: 'Il punto medio di un segmento AB lo divide in...',
+                    options: ['due parti uguali', 'due parti diverse', 'tre parti uguali', 'quattro parti uguali'],
+                    answer: 'due parti uguali'
+                },
+                en: {
+                    question: 'The midpoint of segment AB divides it into...',
+                    options: ['two equal parts', 'two different parts', 'three equal parts', 'four equal parts'],
+                    answer: 'two equal parts'
+                }
+            },
+            {
+                visualType: 'congruent',
+                it: {
+                    question: 'Due segmenti si dicono congruenti (o uguali) se...',
+                    options: ['hanno la stessa lunghezza', 'stanno sulla stessa retta', 'si intersecano', 'sono paralleli'],
+                    answer: 'hanno la stessa lunghezza'
+                },
+                en: {
+                    question: 'Two segments are called congruent (or equal) if...',
+                    options: ['they have the same length', 'they lie on the same line', 'they intersect', 'they are parallel'],
+                    answer: 'they have the same length'
+                }
+            },
+            {
+                visualType: 'parallel',
+                it: {
+                    question: 'Come si chiamano due rette che non si incontrano mai e mantengono sempre la stessa distanza?',
+                    options: ['Rette parallele', 'Rette perpendicolari', 'Rette incidenti', 'Rette consecutive'],
+                    answer: 'Rette parallele'
+                },
+                en: {
+                    question: 'What are two lines that never meet and always maintain the same distance?',
+                    options: ['Parallel lines', 'Perpendicular lines', 'Intersecting lines', 'Consecutive lines'],
+                    answer: 'Parallel lines'
+                }
+            },
+            {
+                visualType: 'perpendicular',
+                it: {
+                    question: 'Come si chiamano due rette che si incontrano formando 4 angoli retti (90°)?',
+                    options: ['Rette perpendicolari', 'Rette parallele', 'Rette consecutive', 'Rette adiacenti'],
+                    answer: 'Rette perpendicolari'
+                },
+                en: {
+                    question: 'What are two lines that meet forming 4 right angles (90°)?',
+                    options: ['Perpendicular lines', 'Parallel lines', 'Consecutive lines', 'Adjacent lines'],
+                    answer: 'Perpendicular lines'
+                }
+            },
+            {
+                visualType: 'adjacent',
+                it: {
+                    question: 'Due segmenti si dicono adiacenti se...',
+                    options: ['hanno un estremo in comune e non si sovrappongono', 'si intersecano nel punto di mezzo', 'sono paralleli', 'hanno la stessa lunghezza'],
+                    answer: 'hanno un estremo in comune e non si sovrappongono'
+                },
+                en: {
+                    question: 'Two segments are called adjacent if...',
+                    options: ['they share one endpoint and do not overlap', 'they intersect at the midpoint', 'they are parallel', 'they have the same length'],
+                    answer: 'they share one endpoint and do not overlap'
+                }
+            },
+            {
+                visualType: 'consecutive',
+                it: {
+                    question: 'Due segmenti si dicono consecutivi se...',
+                    options: ['hanno solo un estremo in comune', 'sono paralleli', 'hanno la stessa lunghezza', 'si sovrappongono completamente'],
+                    answer: 'hanno solo un estremo in comune'
+                },
+                en: {
+                    question: 'Two segments are called consecutive if...',
+                    options: ['they share exactly one endpoint', 'they are parallel', 'they have the same length', 'they completely overlap'],
+                    answer: 'they share exactly one endpoint'
+                }
+            },
+            {
+                visualType: 'line',
+                it: {
+                    question: 'Quante rette si possono tracciare passanti per due punti distinti?',
+                    options: ['Una sola', 'Due', 'Infinite', 'Nessuna'],
+                    answer: 'Una sola'
+                },
+                en: {
+                    question: 'How many lines can be drawn through two distinct points?',
+                    options: ['Exactly one', 'Two', 'Infinitely many', 'None'],
+                    answer: 'Exactly one'
+                }
+            },
+            {
+                visualType: 'point',
+                it: {
+                    question: 'Quante rette si possono tracciare passanti per un solo punto?',
+                    options: ['Infinite', 'Una sola', 'Zero', 'Due'],
+                    answer: 'Infinite'
+                },
+                en: {
+                    question: 'How many lines can be drawn through a single point?',
+                    options: ['Infinitely many', 'Exactly one', 'Zero', 'Two'],
+                    answer: 'Infinitely many'
+                }
+            },
+            {
+                visualType: 'intersecting',
+                it: {
+                    question: 'Come si chiamano due rette (o segmenti) che si incontrano in un punto?',
+                    options: ['Rette incidenti (o secanti)', 'Rette parallele', 'Rette adiacenti', 'Rette congruenti'],
+                    answer: 'Rette incidenti (o secanti)'
+                },
+                en: {
+                    question: 'What are two lines (or segments) that meet at a point called?',
+                    options: ['Intersecting lines', 'Parallel lines', 'Adjacent lines', 'Congruent lines'],
+                    answer: 'Intersecting lines'
+                }
+            },
+            {
+                visualType: 'multiple',
+                it: {
+                    question: 'Il triplo di un segmento AB è un segmento...',
+                    options: ['lungo 3 volte AB', 'lungo metà di AB', 'uguale ad AB', 'lungo il doppio di AB'],
+                    answer: 'lungo 3 volte AB'
+                },
+                en: {
+                    question: 'The triple of segment AB is a segment...',
+                    options: ['3 times as long as AB', 'half as long as AB', 'equal to AB', 'twice as long as AB'],
+                    answer: '3 times as long as AB'
+                }
+            }
+        ];
+
+        // ── SVG drawing functions ────────────────────────────────────────────
+
+        function svgStyle() {
+            return `<style>
+                .sl { font-family: sans-serif; font-size: 14px; font-weight: bold; fill: #667eea; }
+                .sl2 { font-family: sans-serif; font-size: 14px; font-weight: bold; fill: #f5576c; }
+                .sm { font-family: sans-serif; font-size: 13px; fill: #333; }
+                .sml { font-family: sans-serif; font-size: 12px; fill: #666; }
+            </style>`;
+        }
+
+        function drawSegment(length, unit, color='#667eea', labelClass='sl') {
+            const W = 340, x1 = 30, x2 = x1 + W;
+            return `<svg width="${x2+30}" height="70" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                <line x1="${x1}" y1="35" x2="${x2}" y2="35" stroke="${color}" stroke-width="3"/>
+                <circle cx="${x1}" cy="35" r="5" fill="${color}"/>
+                <circle cx="${x2}" cy="35" r="5" fill="${color}"/>
+                <text x="${x1}" y="22" text-anchor="middle" class="${labelClass}">A</text>
+                <text x="${x2}" y="22" text-anchor="middle" class="${labelClass}">B</text>
+                <text x="${(x1+x2)/2}" y="58" text-anchor="middle" class="sm">${length} ${unit}</text>
+            </svg>`;
+        }
+
+        function drawSegmentWithMidpoint(total, unit) {
+            const W = 320, x1 = 30, xM = x1 + W/2, x2 = x1 + W;
+            return `<svg width="${x2+30}" height="85" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                <line x1="${x1}" y1="40" x2="${x2}" y2="40" stroke="#667eea" stroke-width="3"/>
+                <circle cx="${x1}" cy="40" r="5" fill="#667eea"/>
+                <circle cx="${xM}" cy="40" r="6" fill="#28a745"/>
+                <circle cx="${x2}" cy="40" r="5" fill="#667eea"/>
+                <text x="${x1}" y="24" text-anchor="middle" class="sl">A</text>
+                <text x="${xM}" y="24" text-anchor="middle" style="font-family:sans-serif;font-size:14px;font-weight:bold;fill:#28a745;">M</text>
+                <text x="${x2}" y="24" text-anchor="middle" class="sl">B</text>
+                <text x="${(x1+xM)/2}" y="62" text-anchor="middle" class="sml">?</text>
+                <text x="${(xM+x2)/2}" y="62" text-anchor="middle" class="sml">?</text>
+                <text x="${(x1+x2)/2}" y="78" text-anchor="middle" class="sm">${total} ${unit}</text>
+            </svg>`;
+        }
+
+        function drawTwoSegments(len1, len2, unit) {
+            const maxLen = Math.max(len1, len2);
+            const scale = 300 / maxLen;
+            const w1 = Math.round(len1 * scale), w2 = Math.round(len2 * scale);
+            const x0 = 40;
+            return `<svg width="${x0+Math.max(w1,w2)+50}" height="130" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                <line x1="${x0}" y1="38" x2="${x0+w1}" y2="38" stroke="#667eea" stroke-width="3"/>
+                <circle cx="${x0}" cy="38" r="4" fill="#667eea"/>
+                <circle cx="${x0+w1}" cy="38" r="4" fill="#667eea"/>
+                <text x="${x0}" y="24" text-anchor="middle" class="sl">A</text>
+                <text x="${x0+w1}" y="24" text-anchor="middle" class="sl">B</text>
+                <text x="${x0+w1/2}" y="55" text-anchor="middle" class="sm">${len1} ${unit}</text>
+                <line x1="${x0}" y1="98" x2="${x0+w2}" y2="98" stroke="#f5576c" stroke-width="3"/>
+                <circle cx="${x0}" cy="98" r="4" fill="#f5576c"/>
+                <circle cx="${x0+w2}" cy="98" r="4" fill="#f5576c"/>
+                <text x="${x0}" y="84" text-anchor="middle" class="sl2">C</text>
+                <text x="${x0+w2}" y="84" text-anchor="middle" class="sl2">D</text>
+                <text x="${x0+w2/2}" y="115" text-anchor="middle" class="sm">${len2} ${unit}</text>
+            </svg>`;
+        }
+
+        function drawMultipleSegment(base, multiplier, unit) {
+            const scaleBase = 80, wBase = base * scaleBase / Math.max(base, 6);
+            const scale = Math.min(scaleBase, 280 / (base * multiplier));
+            const wB = Math.round(base * scale);
+            const wM = Math.round(base * multiplier * scale);
+            const x0 = 30;
+            return `<svg width="${x0+wM+40}" height="110" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                <line x1="${x0}" y1="35" x2="${x0+wB}" y2="35" stroke="#667eea" stroke-width="3"/>
+                <circle cx="${x0}" cy="35" r="4" fill="#667eea"/>
+                <circle cx="${x0+wB}" cy="35" r="4" fill="#667eea"/>
+                <text x="${x0}" y="22" text-anchor="middle" class="sl">A</text>
+                <text x="${x0+wB}" y="22" text-anchor="middle" class="sl">B</text>
+                <text x="${x0+wB/2}" y="50" text-anchor="middle" class="sm">${base} ${unit}</text>
+                <line x1="${x0}" y1="85" x2="${x0+wM}" y2="85" stroke="#f5576c" stroke-width="3"/>
+                <circle cx="${x0}" cy="85" r="4" fill="#f5576c"/>
+                <circle cx="${x0+wM}" cy="85" r="4" fill="#f5576c"/>
+                <text x="${x0+wM/2}" y="105" text-anchor="middle" class="sm">${multiplier}× AB = ? ${unit}</text>
+            </svg>`;
+        }
+
+        function drawProblemSegments(sum, diff, unit) {
+            const CD = (sum - diff) / 2;
+            const AB = CD + diff;
+            const scale = Math.min(8, 280 / AB);
+            const wAB = Math.round(AB * scale);
+            const wCD = Math.round(CD * scale);
+            const x0 = 30;
+            return `<svg width="${x0+wAB+50}" height="150" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                <line x1="${x0}" y1="35" x2="${x0+wAB}" y2="35" stroke="#667eea" stroke-width="3"/>
+                <circle cx="${x0}" cy="35" r="4" fill="#667eea"/>
+                <circle cx="${x0+wAB}" cy="35" r="4" fill="#667eea"/>
+                <text x="${x0}" y="22" text-anchor="middle" class="sl">A</text>
+                <text x="${x0+wAB}" y="22" text-anchor="middle" class="sl">B</text>
+                <text x="${x0+wAB/2}" y="52" text-anchor="middle" class="sm">AB = ? ${unit}</text>
+                <line x1="${x0}" y1="90" x2="${x0+wCD}" y2="90" stroke="#f5576c" stroke-width="3"/>
+                <circle cx="${x0}" cy="90" r="4" fill="#f5576c"/>
+                <circle cx="${x0+wCD}" cy="90" r="4" fill="#f5576c"/>
+                <text x="${x0}" y="76" text-anchor="middle" class="sl2">C</text>
+                <text x="${x0+wCD}" y="76" text-anchor="middle" class="sl2">D</text>
+                <text x="${x0+wCD/2}" y="107" text-anchor="middle" class="sm">CD = ? ${unit}</text>
+                <line x1="${x0}" y1="128" x2="${x0+wAB}" y2="128" stroke="#555" stroke-width="2" stroke-dasharray="5,3"/>
+                <text x="${x0+wAB/2}" y="145" text-anchor="middle" class="sm">${sum} ${unit} totali</text>
+            </svg>`;
+        }
+
+        function drawDefinitionSVG(visualType) {
+            const c1 = '#667eea', c2 = '#f5576c', cg = '#28a745';
+            switch (visualType) {
+                case 'segment':
+                    return `<svg width="340" height="60" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="30" y1="30" x2="310" y2="30" stroke="${c1}" stroke-width="3"/>
+                        <circle cx="30" cy="30" r="5" fill="${c1}"/><circle cx="310" cy="30" r="5" fill="${c1}"/>
+                        <text x="30" y="18" text-anchor="middle" class="sl">A</text>
+                        <text x="310" y="18" text-anchor="middle" class="sl">B</text>
+                    </svg>`;
+                case 'ray':
+                    return `<svg width="340" height="60" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="30" y1="30" x2="300" y2="30" stroke="${c1}" stroke-width="3"/>
+                        <circle cx="30" cy="30" r="5" fill="${c1}"/>
+                        <polygon points="300,25 320,30 300,35" fill="${c1}"/>
+                        <text x="30" y="18" text-anchor="middle" class="sl">O</text>
+                    </svg>`;
+                case 'midpoint':
+                    return `<svg width="340" height="65" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="30" y1="30" x2="310" y2="30" stroke="${c1}" stroke-width="3"/>
+                        <circle cx="30" cy="30" r="5" fill="${c1}"/>
+                        <circle cx="170" cy="30" r="6" fill="${cg}"/>
+                        <circle cx="310" cy="30" r="5" fill="${c1}"/>
+                        <text x="30" y="18" text-anchor="middle" class="sl">A</text>
+                        <text x="170" y="18" text-anchor="middle" style="font-family:sans-serif;font-size:14px;font-weight:bold;fill:${cg};">M</text>
+                        <text x="310" y="18" text-anchor="middle" class="sl">B</text>
+                        <text x="100" y="52" text-anchor="middle" class="sml">3 cm</text>
+                        <text x="240" y="52" text-anchor="middle" class="sml">3 cm</text>
+                    </svg>`;
+                case 'congruent':
+                    return `<svg width="300" height="90" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="30" y1="30" x2="270" y2="30" stroke="${c1}" stroke-width="3"/>
+                        <circle cx="30" cy="30" r="4" fill="${c1}"/><circle cx="270" cy="30" r="4" fill="${c1}"/>
+                        <text x="30" y="18" text-anchor="middle" class="sl">A</text>
+                        <text x="270" y="18" text-anchor="middle" class="sl">B</text>
+                        <line x1="30" y1="70" x2="270" y2="70" stroke="${c2}" stroke-width="3"/>
+                        <circle cx="30" cy="70" r="4" fill="${c2}"/><circle cx="270" cy="70" r="4" fill="${c2}"/>
+                        <text x="30" y="88" text-anchor="middle" class="sl2">C</text>
+                        <text x="270" y="88" text-anchor="middle" class="sl2">D</text>
+                    </svg>`;
+                case 'parallel':
+                    return `<svg width="300" height="80" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="20" y1="25" x2="280" y2="25" stroke="${c1}" stroke-width="3"/>
+                        <text x="285" y="30" class="sl">r</text>
+                        <line x1="20" y1="58" x2="280" y2="58" stroke="${c1}" stroke-width="3"/>
+                        <text x="285" y="63" class="sl">s</text>
+                        <text x="150" y="75" text-anchor="middle" class="sml">r ∥ s</text>
+                    </svg>`;
+                case 'perpendicular':
+                    return `<svg width="160" height="160" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="20" y1="80" x2="140" y2="80" stroke="${c1}" stroke-width="3"/>
+                        <line x1="80" y1="20" x2="80" y2="140" stroke="${c1}" stroke-width="3"/>
+                        <rect x="80" y="70" width="10" height="10" fill="none" stroke="${c2}" stroke-width="2"/>
+                        <text x="20" y="72" class="sl">A</text><text x="148" y="72" class="sl">B</text>
+                        <text x="88" y="18" class="sl">C</text><text x="88" y="150" class="sl">D</text>
+                        <text x="80" y="158" text-anchor="middle" class="sml">90°</text>
+                    </svg>`;
+                case 'adjacent':
+                    return `<svg width="320" height="65" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="30" y1="35" x2="170" y2="35" stroke="${c1}" stroke-width="3"/>
+                        <circle cx="30" cy="35" r="4" fill="${c1}"/>
+                        <circle cx="170" cy="35" r="5" fill="${cg}"/>
+                        <line x1="170" y1="35" x2="300" y2="35" stroke="${c2}" stroke-width="3"/>
+                        <circle cx="300" cy="35" r="4" fill="${c2}"/>
+                        <text x="30" y="22" text-anchor="middle" class="sl">A</text>
+                        <text x="170" y="22" text-anchor="middle" style="font-family:sans-serif;font-size:14px;font-weight:bold;fill:${cg};">B=C</text>
+                        <text x="300" y="22" text-anchor="middle" class="sl2">D</text>
+                    </svg>`;
+                case 'consecutive':
+                    return `<svg width="200" height="140" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="100" y1="100" x2="30" y2="30" stroke="${c1}" stroke-width="3"/>
+                        <circle cx="100" cy="100" r="5" fill="${cg}"/>
+                        <circle cx="30" cy="30" r="4" fill="${c1}"/>
+                        <line x1="100" y1="100" x2="170" y2="30" stroke="${c2}" stroke-width="3"/>
+                        <circle cx="170" cy="30" r="4" fill="${c2}"/>
+                        <text x="22" y="22" class="sl">A</text>
+                        <text x="105" y="118" class="sl" style="fill:${cg};">B=C</text>
+                        <text x="174" y="22" class="sl2">D</text>
+                    </svg>`;
+                case 'line':
+                    return `<svg width="340" height="60" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="10" y1="30" x2="330" y2="30" stroke="${c1}" stroke-width="3" stroke-dasharray="8,4"/>
+                        <circle cx="120" cy="30" r="5" fill="${c1}"/>
+                        <circle cx="220" cy="30" r="5" fill="${c1}"/>
+                        <text x="120" y="18" text-anchor="middle" class="sl">A</text>
+                        <text x="220" y="18" text-anchor="middle" class="sl">B</text>
+                        <text x="170" y="52" text-anchor="middle" class="sml">1 retta sola</text>
+                    </svg>`;
+                case 'point':
+                    return `<svg width="160" height="160" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="80" y1="10" x2="80" y2="150" stroke="${c1}" stroke-width="2" opacity="0.5"/>
+                        <line x1="10" y1="80" x2="150" y2="80" stroke="${c1}" stroke-width="2" opacity="0.5"/>
+                        <line x1="20" y1="20" x2="140" y2="140" stroke="${c1}" stroke-width="2" opacity="0.5"/>
+                        <line x1="140" y1="20" x2="20" y2="140" stroke="${c1}" stroke-width="2" opacity="0.5"/>
+                        <circle cx="80" cy="80" r="6" fill="${c2}"/>
+                        <text x="90" y="70" class="sl2">P</text>
+                    </svg>`;
+                case 'intersecting':
+                    return `<svg width="180" height="160" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="20" y1="30" x2="160" y2="130" stroke="${c1}" stroke-width="3"/>
+                        <line x1="20" y1="130" x2="160" y2="30" stroke="${c2}" stroke-width="3"/>
+                        <circle cx="90" cy="80" r="6" fill="${cg}"/>
+                        <text x="98" y="75" style="font-family:sans-serif;font-size:12px;fill:${cg};">P</text>
+                    </svg>`;
+                case 'multiple':
+                    return `<svg width="340" height="90" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="30" y1="30" x2="130" y2="30" stroke="${c1}" stroke-width="3"/>
+                        <circle cx="30" cy="30" r="4" fill="${c1}"/><circle cx="130" cy="30" r="4" fill="${c1}"/>
+                        <text x="80" y="18" text-anchor="middle" class="sm">AB</text>
+                        <line x1="30" y1="70" x2="330" y2="70" stroke="${c2}" stroke-width="3"/>
+                        <circle cx="30" cy="70" r="4" fill="${c2}"/><circle cx="330" cy="70" r="4" fill="${c2}"/>
+                        <text x="180" y="88" text-anchor="middle" class="sm">3 × AB</text>
+                    </svg>`;
+                default:
+                    return '';
+            }
+        }
+
+        // ── State ────────────────────────────────────────────────────────────
+
+        let currentQuestion = null;
+        let score = 0, correct = 0, wrong = 0, total = 0;
+        let selectedCategory = 'tutte';
+        const MAX_QUESTIONS = 10;
+        let previousQuestions = [];
+        let selectedChoice = null;
+
+        // ── Question generation ──────────────────────────────────────────────
+
+        function generateQuestion() {
+            for (let attempts = 0; attempts < 60; attempts++) {
+                let category;
+                if (selectedCategory === 'tutte') {
+                    const cats = ['definizioni', 'calcoli', 'calcoli', 'problemi'];
+                    category = cats[Math.floor(Math.random() * cats.length)];
+                } else {
+                    category = selectedCategory;
+                }
+
+                let q = null;
+
+                if (category === 'definizioni') {
+                    const idx = Math.floor(Math.random() * definitionQuestions.length);
+                    const def = definitionQuestions[idx];
+                    const langDef = def[currentLanguage];
+                    const shuffledOptions = [...langDef.options].sort(() => Math.random() - 0.5);
+                    q = {
+                        category, type: 'definition', idx,
+                        visualType: def.visualType,
+                        answer: langDef.answer,
+                        choices: shuffledOptions
+                    };
+                } else if (category === 'calcoli') {
+                    const subtypes = ['midpoint', 'sum', 'difference', 'multiple', 'submultiple'];
+                    const sub = subtypes[Math.floor(Math.random() * subtypes.length)];
+
+                    if (sub === 'midpoint') {
+                        const halves = [3,4,5,6,7,8,9,10,11,12,15];
+                        const half = halves[Math.floor(Math.random() * halves.length)];
+                        const n = half * 2;
+                        q = { category, type: 'numeric', subtype: 'midpoint', n, answer: half, unit: 'cm' };
+                    } else if (sub === 'sum') {
+                        const a = Math.floor(Math.random() * 14) + 2;
+                        const b = Math.floor(Math.random() * 14) + 2;
+                        q = { category, type: 'numeric', subtype: 'sum', a, b, answer: a + b, unit: 'cm' };
+                    } else if (sub === 'difference') {
+                        const b = Math.floor(Math.random() * 12) + 2;
+                        const a = b + Math.floor(Math.random() * 12) + 2;
+                        q = { category, type: 'numeric', subtype: 'difference', a, b, answer: a - b, unit: 'cm' };
+                    } else if (sub === 'multiple') {
+                        const a = Math.floor(Math.random() * 10) + 2;
+                        const n = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                        q = { category, type: 'numeric', subtype: 'multiple', a, n, answer: a * n, unit: 'cm' };
+                    } else {
+                        const n = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                        const result = Math.floor(Math.random() * 10) + 2;
+                        const a = result * n;
+                        q = { category, type: 'numeric', subtype: 'submultiple', a, n, answer: result, unit: 'cm' };
+                    }
+                } else if (category === 'problemi') {
+                    const diffs = [2, 4, 6, 8, 10, 12];
+                    const d = diffs[Math.floor(Math.random() * diffs.length)];
+                    const CD = Math.floor(Math.random() * 16) + 5;
+                    const AB = CD + d;
+                    const s = AB + CD;
+                    q = { category, type: 'problem', s, d, answerAB: AB, answerCD: CD, unit: 'cm' };
+                }
+
+                if (!q) continue;
+
+                const key = JSON.stringify({
+                    type: q.type,
+                    idx: q.idx,
+                    subtype: q.subtype,
+                    n: q.n, a: q.a, b: q.b, s: q.s, d: q.d
+                });
+                if (previousQuestions.includes(key)) continue;
+                previousQuestions.push(key);
+                if (previousQuestions.length > 4) previousQuestions.shift();
+                return q;
+            }
+            return { category: 'calcoli', type: 'numeric', subtype: 'sum', a: 5, b: 3, answer: 8, unit: 'cm' };
+        }
+
+        // ── Display ──────────────────────────────────────────────────────────
+
+        function updateQuestionDisplay() {
+            if (!currentQuestion) return;
+            const q = currentQuestion;
+            const qEl = document.getElementById('question');
+            const viz = document.getElementById('segVisualization');
+            const answerBox = document.getElementById('answerBox');
+            answerBox.innerHTML = '';
+            viz.style.display = 'none';
+            viz.innerHTML = '';
+
+            if (q.type === 'definition') {
+                const langDef = definitionQuestions[q.idx][currentLanguage];
+                qEl.textContent = langDef.question;
+                q.answer = langDef.answer;
+                q.choices = [...langDef.options].sort(() => Math.random() - 0.5);
+                const svgHtml = drawDefinitionSVG(q.visualType);
+                if (svgHtml) { viz.innerHTML = svgHtml; viz.style.display = 'inline-block'; }
+                answerBox.innerHTML = `<div class="multiple-choice">
+                    ${q.choices.map(opt =>
+                        `<button class="choice-btn" data-value="${opt}" onclick="selectChoice(this)">${opt}</button>`
+                    ).join('')}
+                </div>`;
+
+            } else if (q.type === 'numeric') {
+                const tmpl = key => t(key);
+                if (q.subtype === 'midpoint') {
+                    qEl.textContent = tmpl('q-midpoint').replace('{n}', q.n);
+                    viz.innerHTML = drawSegmentWithMidpoint(q.n, q.unit);
+                } else if (q.subtype === 'sum') {
+                    qEl.textContent = tmpl('q-sum').replace('{a}', q.a).replace('{b}', q.b);
+                    viz.innerHTML = drawTwoSegments(q.a, q.b, q.unit);
+                } else if (q.subtype === 'difference') {
+                    qEl.textContent = tmpl('q-diff').replace('{a}', q.a).replace('{b}', q.b);
+                    viz.innerHTML = drawTwoSegments(q.a, q.b, q.unit);
+                } else if (q.subtype === 'multiple') {
+                    qEl.textContent = tmpl('q-multiple').replace('{a}', q.a).replace('{n}', q.n);
+                    viz.innerHTML = drawMultipleSegment(q.a, q.n, q.unit);
+                } else {
+                    qEl.textContent = tmpl('q-submultiple').replace('{a}', q.a).replace('{n}', q.n);
+                    viz.innerHTML = drawSegment(q.a, q.unit);
+                }
+                viz.style.display = 'inline-block';
+                answerBox.innerHTML = `
+                    <input type="number" class="answer-input" id="answerInput" placeholder="?" step="0.5" autofocus>
+                    <div class="unit-label">${q.unit}</div>`;
+
+            } else if (q.type === 'problem') {
+                qEl.textContent = t('q-problem').replace('{s}', q.s).replace('{d}', q.d);
+                viz.innerHTML = drawProblemSegments(q.s, q.d, q.unit);
+                viz.style.display = 'inline-block';
+                answerBox.innerHTML = `<div class="two-answers">
+                    <div class="input-group">
+                        <div class="input-label">${t('lbl-ab')}</div>
+                        <input type="number" class="answer-input" id="answerAB" placeholder="?" step="0.5" style="width:130px;">
+                        <div class="unit-label">${q.unit}</div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-label">${t('lbl-cd')}</div>
+                        <input type="number" class="answer-input" id="answerCD" placeholder="?" step="0.5" style="width:130px;">
+                        <div class="unit-label">${q.unit}</div>
+                    </div>
+                </div>`;
+            }
+
+            document.getElementById('categoryLabel').textContent =
+                categoryNames[q.category][currentLanguage];
+        }
+
+        // ── Interaction ──────────────────────────────────────────────────────
+
+        function selectChoice(btn) {
+            selectedChoice = btn.dataset.value;
+            document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            const q = currentQuestion;
+            let isCorrect = false;
+            let wrongMsg = '';
+
+            if (q.type === 'definition') {
+                if (!selectedChoice) {
+                    feedback.textContent = t('insert-value');
+                    feedback.className = 'feedback wrong';
+                    return;
+                }
+                isCorrect = selectedChoice === q.answer;
+                document.querySelectorAll('.choice-btn').forEach(btn => {
+                    btn.disabled = true;
+                    if (btn.dataset.value === q.answer) btn.classList.add('correct');
+                    else if (btn.dataset.value === selectedChoice && !isCorrect) btn.classList.add('wrong');
+                });
+                if (!isCorrect) wrongMsg = `${t('wrong-answer')} "${q.answer}"`;
+
+            } else if (q.type === 'numeric') {
+                const input = document.getElementById('answerInput');
+                const val = parseFloat(input.value);
+                if (isNaN(val)) {
+                    feedback.textContent = t('insert-value');
+                    feedback.className = 'feedback wrong';
+                    return;
+                }
+                isCorrect = Math.abs(val - q.answer) < 0.01;
+                input.classList.add(isCorrect ? 'correct' : 'wrong');
+                input.disabled = true;
+                if (!isCorrect) wrongMsg = `${t('wrong-answer')} ${q.answer} ${q.unit}`;
+
+            } else if (q.type === 'problem') {
+                const inAB = document.getElementById('answerAB');
+                const inCD = document.getElementById('answerCD');
+                const vAB = parseFloat(inAB.value);
+                const vCD = parseFloat(inCD.value);
+                if (isNaN(vAB) || isNaN(vCD)) {
+                    feedback.textContent = t('insert-value');
+                    feedback.className = 'feedback wrong';
+                    return;
+                }
+                const okAB = Math.abs(vAB - q.answerAB) < 0.01;
+                const okCD = Math.abs(vCD - q.answerCD) < 0.01;
+                isCorrect = okAB && okCD;
+                inAB.classList.add(okAB ? 'correct' : 'wrong');
+                inCD.classList.add(okCD ? 'correct' : 'wrong');
+                inAB.disabled = true; inCD.disabled = true;
+                if (!isCorrect) {
+                    wrongMsg = t('wrong-ab-cd')
+                        .replace('{ab}', q.answerAB).replace('{cd}', q.answerCD);
+                }
+            }
+
+            total++;
+            if (isCorrect) {
+                correct++;
+                score += 10;
+                feedback.textContent = t('correct-answer');
+                feedback.className = 'feedback correct';
+            } else {
+                wrong++;
+                feedback.textContent = wrongMsg;
+                feedback.className = 'feedback wrong';
+            }
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+            document.getElementById('btnCheck').style.display = 'none';
+
+            if (total >= MAX_QUESTIONS) {
+                setTimeout(showFinalResults, 1500);
+            } else {
+                document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion = generateQuestion();
+            selectedChoice = null;
+            updateQuestionDisplay();
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('btnCheck').style.display = 'block';
+            document.getElementById('btnNext').classList.remove('show');
+            const first = document.querySelector('.answer-input');
+            if (first) first.focus();
+        }
+
+        function changeCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            if (total > 0) {
+                score = 0; correct = 0; wrong = 0; total = 0;
+                previousQuestions = [];
+                document.getElementById('score').textContent = 0;
+                document.getElementById('correct').textContent = 0;
+                document.getElementById('wrong').textContent = 0;
+                document.getElementById('total').textContent = `0/${MAX_QUESTIONS}`;
+            }
+            nextQuestion();
+        }
+
+        // ── Grade system ─────────────────────────────────────────────────────
+
+        function showFinalResults() {
+            document.getElementById('quizArea').style.display = 'none';
+            document.getElementById('finalScreen').classList.add('show');
+
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalGrade').textContent = `${correct}/10`;
+
+            const comments = {
+                it: ['Devi esercitarti ancora!', 'Sufficiente, continua!', 'Discreto, puoi fare meglio!', 'Bene! Stai migliorando!', 'Molto bene! Continua così!', 'Eccellente! Ottimo lavoro!', 'Perfetto! Sei un campione!'],
+                en: ['You need more practice!', 'Sufficient, keep going!', 'Fair, you can do better!', 'Good! You\'re improving!', 'Very good! Keep it up!', 'Excellent! Great job!', 'Perfect! You\'re a champion!']
+            };
+            const idx = correct === 10 ? 6 : correct >= 9 ? 5 : correct >= 8 ? 4 : correct >= 7 ? 3 : correct >= 6 ? 2 : correct >= 5 ? 1 : 0;
+            document.getElementById('finalComment').textContent = comments[currentLanguage][idx];
+
+            saveGrade(correct);
+            displayHistory();
+        }
+
+        function saveGrade(grade) {
+            let history = JSON.parse(localStorage.getItem('segmentiHistory') || '[]');
+            history.push(grade);
+            if (history.length > 10) history = history.slice(-10);
+            localStorage.setItem('segmentiHistory', JSON.stringify(history));
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('segmentiHistory') || '[]');
+            if (!history.length) { document.getElementById('historyBox').style.display = 'none'; return; }
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            history.forEach((g, i) => {
+                const item = document.createElement('div');
+                item.className = 'history-item' + (i === history.length - 1 ? ' current' : '');
+                item.textContent = `${g}/10`;
+                list.appendChild(item);
+            });
+            if (history.length >= 2) {
+                const last = history[history.length - 1], prev = history[history.length - 2];
+                const trend = document.getElementById('trendMessage');
+                if (last > prev) { trend.textContent = `${t('improving')} (+${last - prev})`; trend.className = 'trend improving'; }
+                else if (last < prev) { trend.textContent = `${t('declining')} (${last - prev})`; trend.className = 'trend declining'; }
+                else { trend.textContent = t('same-result'); trend.className = 'trend stable'; }
+                if (history.length >= 6) {
+                    const recentAvg = (history.slice(-3).reduce((a,b)=>a+b,0)/3).toFixed(1);
+                    const prevAvg = (history.slice(-6,-3).reduce((a,b)=>a+b,0)/3).toFixed(1);
+                    if (recentAvg > prevAvg)
+                        document.getElementById('trendMessage').textContent +=
+                            ` | ${t('overall-trend')} ${recentAvg} ${t('vs')} ${prevAvg})`;
+                }
+            }
+        }
+
+        function restartQuiz() {
+            score = 0; correct = 0; wrong = 0; total = 0;
+            previousQuestions = []; selectedChoice = null;
+            document.getElementById('score').textContent = 0;
+            document.getElementById('correct').textContent = 0;
+            document.getElementById('wrong').textContent = 0;
+            document.getElementById('total').textContent = `0/${MAX_QUESTIONS}`;
+            document.getElementById('finalScreen').classList.remove('show');
+            document.getElementById('quizArea').style.display = 'flex';
+            nextQuestion();
+        }
+
+        function resetHistory() {
+            if (confirm(t('confirm-reset'))) {
+                localStorage.removeItem('segmentiHistory');
+                document.getElementById('historyBox').style.display = 'none';
+                alert(t('history-deleted'));
+            }
+        }
+
+        // ── Language ─────────────────────────────────────────────────────────
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('segmentiLanguage', lang);
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.textContent = translations[lang][key];
+            });
+            if (currentQuestion) updateQuestionDisplay();
+        }
+
+        function toggleHelp() {
+            document.getElementById('helpOverlay').classList.toggle('show');
+            document.getElementById('helpTooltip').classList.toggle('show');
+        }
+
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const btnCheck = document.getElementById('btnCheck');
+                if (btnCheck.style.display !== 'none') checkAnswer();
+                else nextQuestion();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('segmentiLanguage') || 'it';
+            currentLanguage = saved;
+            if (saved === 'en') {
+                document.querySelector('.lang-btn.active').classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations['en'][key]) el.textContent = translations['en'][key];
+                });
+            }
+            nextQuestion();
+        });
+    </script>
+</body>
+</html>
