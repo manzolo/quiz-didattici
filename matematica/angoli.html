@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Angoli</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+        }
+        .container { background: white; flex: 1; display: flex; flex-direction: column; padding: 20px; overflow: hidden; }
+        h1 { color: #667eea; text-align: center; margin-bottom: 20px; font-size: 2.2em; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .help-container { position: relative; display: inline-block; }
+        .help-icon { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 1.1em; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(102,126,234,0.4); transition: transform 0.2s; flex-shrink: 0; }
+        .help-icon:hover { transform: scale(1.1); }
+        .help-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+        .help-overlay.show { display: block; }
+        .help-tooltip { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: white; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 1000; max-width: 580px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .help-tooltip.show { display: block; }
+        .help-close { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.8em; cursor: pointer; color: #666; line-height: 1; }
+        .help-tooltip h3 { color: #667eea; font-size: 1.4em; margin-bottom: 20px; padding-right: 30px; }
+        .help-section { margin-bottom: 16px; }
+        .help-section-title { font-weight: bold; color: #764ba2; font-size: 1.05em; margin-bottom: 6px; }
+        .help-example { background: #f8f9fa; border-left: 3px solid #667eea; padding: 6px 10px; font-size: 0.95em; margin-bottom: 4px; border-radius: 0 5px 5px 0; }
+        .back-button { position: fixed; top: 20px; left: 20px; display: inline-flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 1em; font-weight: bold; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 10px; transition: all 0.3s; z-index: 100; }
+        .back-button:hover { background: rgba(255,255,255,0.3); }
+        .language-selector { position: fixed; top: 20px; right: 20px; display: flex; gap: 8px; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 10px; z-index: 100; }
+        .lang-btn { background: transparent; border: 2px solid white; color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .lang-btn:hover { background: rgba(255,255,255,0.3); }
+        .lang-btn.active { background: white; color: #667eea; }
+        .score-section { display: flex; justify-content: space-around; background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .score-item { text-align: center; }
+        .score-label { font-size: 13px; color: #666; margin-bottom: 4px; }
+        .score-value { font-size: 28px; font-weight: bold; color: #667eea; }
+        .score-value.correct { color: #28a745; }
+        .score-value.wrong { color: #dc3545; }
+        .category-tabs { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; border: 3px solid #667eea; border-radius: 10px; background: white; color: #667eea; font-weight: bold; cursor: pointer; font-size: 1em; transition: all 0.3s; flex: 1; text-align: center; }
+        .tab:hover { background: #f0f2ff; }
+        .tab.active { background: #667eea; color: white; }
+        .quiz-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .question-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 40px; border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.3); text-align: center; margin-bottom: 30px; min-width: 500px; max-width: 700px; width: 100%; }
+        .question { color: white; font-size: 1.5em; font-weight: bold; margin-bottom: 15px; line-height: 1.4; }
+        .category-label { color: rgba(255,255,255,0.8); font-size: 1em; }
+        .angle-visualization { background: white; border-radius: 12px; padding: 15px; margin: 10px auto; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow-x: auto; max-width: 100%; }
+        .angle-visualization svg { display: block; max-width: 100%; }
+        .answer-box { display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .answer-input { padding: 18px 25px; font-size: 2em; border: 4px solid #667eea; border-radius: 15px; text-align: center; width: 160px; font-weight: bold; }
+        .answer-input:focus { outline: none; border-color: #f093fb; box-shadow: 0 0 20px rgba(240,147,251,0.5); }
+        .answer-input.correct { border-color: #28a745; background: #d4edda; }
+        .answer-input.wrong { border-color: #dc3545; background: #f8d7da; }
+        .unit-label { font-size: 1.6em; font-weight: bold; color: #667eea; }
+        .multiple-choice { display: flex; flex-direction: column; gap: 12px; min-width: 320px; max-width: 520px; width: 100%; }
+        .choice-btn { padding: 14px 20px; font-size: 1.1em; font-weight: bold; border: 3px solid #667eea; border-radius: 12px; background: white; color: #667eea; cursor: pointer; transition: all 0.3s; text-align: left; }
+        .choice-btn:hover { background: #667eea; color: white; }
+        .choice-btn.selected { background: #667eea; color: white; }
+        .choice-btn.correct { border-color: #28a745; background: #d4edda; color: #28a745; }
+        .choice-btn.wrong { border-color: #dc3545; background: #f8d7da; color: #dc3545; }
+        .button-group { display: flex; gap: 15px; margin-top: 25px; }
+        .btn { padding: 14px 35px; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+        .btn-check { background: #667eea; color: white; }
+        .btn-check:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+        .btn-next { background: #28a745; color: white; display: none; }
+        .btn-next:hover { background: #218838; transform: translateY(-2px); }
+        .btn-next.show { display: block; }
+        .feedback { margin-top: 18px; font-size: 1.2em; font-weight: bold; min-height: 36px; max-width: 700px; text-align: center; }
+        .feedback.correct { color: #28a745; }
+        .feedback.wrong { color: #dc3545; }
+        .final-screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+        .final-screen.show { display: flex; }
+        .final-box { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 50px 70px; border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.3); text-align: center; margin-bottom: 30px; min-width: 500px; }
+        .final-title { color: white; font-size: 2.2em; font-weight: bold; margin-bottom: 15px; }
+        .final-grade { color: white; font-size: 4.5em; font-weight: bold; margin: 15px 0; }
+        .final-message { color: white; font-size: 1.4em; margin-bottom: 8px; }
+        .history-box { background: #f8f9fa; padding: 25px 35px; border-radius: 15px; text-align: center; margin-bottom: 20px; min-width: 400px; }
+        .history-title { font-size: 1.2em; font-weight: bold; color: #667eea; margin-bottom: 15px; }
+        .history-list { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
+        .history-item { background: #667eea; color: white; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 1.1em; }
+        .history-item.current { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); transform: scale(1.1); }
+        .trend { font-size: 1em; font-weight: bold; }
+        .trend.improving { color: #28a745; }
+        .trend.declining { color: #dc3545; }
+        .trend.stable { color: #667eea; }
+        .btn-restart { padding: 14px 40px; font-size: 1.2em; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; cursor: pointer; margin-bottom: 12px; transition: all 0.3s; }
+        .btn-restart:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+        .btn-reset-history { padding: 10px 25px; font-size: 1em; background: #dc3545; color: white; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+        .btn-reset-history:hover { background: #c82333; }
+        .buy-me-coffee { position: fixed; bottom: 20px; right: 20px; z-index: 1000; transition: transform 0.3s ease; }
+        .buy-me-coffee:hover { transform: translateY(-5px); }
+        .buy-me-coffee img { height: 50px; width: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        @media (max-width: 768px) {
+            .back-button { top: 10px; left: 10px; padding: 8px 14px; font-size: 0.9em; }
+            .language-selector { top: 10px; right: 10px; padding: 6px; }
+            .container { padding: 10px; padding-top: 65px; }
+            h1 { font-size: 1.4em; }
+            .question-box { min-width: unset; padding: 20px; }
+            .question { font-size: 1.1em; }
+            .answer-input { width: 120px; font-size: 1.5em; padding: 12px 15px; }
+            .unit-label { font-size: 1.2em; }
+            .choice-btn { font-size: 0.95em; padding: 10px 14px; }
+            .final-box { min-width: unset; padding: 30px; }
+            .final-grade { font-size: 3em; }
+            .history-box { min-width: unset; }
+            .tab { flex: 1 1 45%; font-size: 0.9em; padding: 8px 10px; }
+            .buy-me-coffee { width: 48px; height: 48px; background: #FFDD00; border-radius: 50%; display: flex; align-items: center; justify-content: center; bottom: 15px; right: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+            .buy-me-coffee img { display: none; }
+            .buy-me-coffee::after { content: '☕'; font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button"><span data-i18n="back">← Matematica</span></a>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it')">IT</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+
+    <div class="container">
+        <h1>
+            <span data-i18n="title">Quiz Angoli</span>
+            <div class="help-container">
+                <div class="help-icon" onclick="toggleHelp()">?</div>
+            </div>
+        </h1>
+
+        <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+        <div class="help-tooltip" id="helpTooltip">
+            <button class="help-close" onclick="toggleHelp()">&times;</button>
+            <h3 data-i18n="help-title">Regole sugli Angoli</h3>
+            <div class="help-content">
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-def-title">Definizioni di base</div>
+                    <div class="help-example" data-i18n="help-def-1">Angolo: regione di piano compresa tra due semirette con la stessa origine</div>
+                    <div class="help-example" data-i18n="help-def-2">Vertice: il punto di origine comune delle due semirette</div>
+                    <div class="help-example" data-i18n="help-def-3">Lati: le due semirette che formano l'angolo</div>
+                    <div class="help-example" data-i18n="help-def-4">Ampiezza: misura dell'angolo, espressa in gradi (°)</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-types-title">Tipi di angoli</div>
+                    <div class="help-example" data-i18n="help-types-1">Angolo nullo: 0°</div>
+                    <div class="help-example" data-i18n="help-types-2">Angolo acuto: 0° &lt; α &lt; 90°</div>
+                    <div class="help-example" data-i18n="help-types-3">Angolo retto: α = 90°</div>
+                    <div class="help-example" data-i18n="help-types-4">Angolo ottuso: 90° &lt; α &lt; 180°</div>
+                    <div class="help-example" data-i18n="help-types-5">Angolo piatto: α = 180°</div>
+                    <div class="help-example" data-i18n="help-types-6">Angolo concavo (riflessivo): 180° &lt; α &lt; 360°</div>
+                    <div class="help-example" data-i18n="help-types-7">Angolo giro: α = 360°</div>
+                    <div class="help-example" data-i18n="help-types-8">Angoli convessi: α ≤ 180°  |  Angoli concavi: α &gt; 180°</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-special-title">Angoli speciali</div>
+                    <div class="help-example" data-i18n="help-special-1">Congruenti: due angoli con la stessa ampiezza</div>
+                    <div class="help-example" data-i18n="help-special-2">Consecutivi: stessa origine e un lato in comune</div>
+                    <div class="help-example" data-i18n="help-special-3">Adiacenti: consecutivi con i lati non comuni opposti (formano un angolo piatto)</div>
+                    <div class="help-example" data-i18n="help-special-4">Opposti al vertice: formati da due rette secanti; sono congruenti</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-bisect-title">Bisettrice</div>
+                    <div class="help-example" data-i18n="help-bisect-1">La semiretta che divide l'angolo in due angoli congruenti</div>
+                    <div class="help-example" data-i18n="help-bisect-2">Es: bisettrice di 80° → divide in 2 angoli da 40° ciascuno</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-calc-title">Angoli complementari, supplementari, esplementari</div>
+                    <div class="help-example" data-i18n="help-calc-1">Complementari: α + β = 90°  →  complementare di α = 90° − α</div>
+                    <div class="help-example" data-i18n="help-calc-2">Supplementari: α + β = 180°  →  supplementare di α = 180° − α</div>
+                    <div class="help-example" data-i18n="help-calc-3">Esplementari: α + β = 360°  →  esplementare di α = 360° − α</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-gonio-title">Goniometro</div>
+                    <div class="help-example" data-i18n="help-gonio-1">Strumento semicircolare graduato da 0° a 180° per misurare gli angoli</div>
+                    <div class="help-example" data-i18n="help-gonio-2">Si appoggia il centro sul vertice e si legge il grado sul lato dell'angolo</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="score">Punteggio</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct">Corrette</div>
+                <div class="score-value correct" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong">Sbagliate</div>
+                <div class="score-value wrong" id="wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="questions">Domande</div>
+                <div class="score-value" id="total">0/10</div>
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="tab active" onclick="changeCategory('tutte')" data-i18n="all">Tutte</button>
+            <button class="tab" onclick="changeCategory('definizioni')" data-i18n="definitions">Definizioni</button>
+            <button class="tab" onclick="changeCategory('calcoli')" data-i18n="calculations">Calcoli</button>
+            <button class="tab" onclick="changeCategory('classificazioni')" data-i18n="classifications">Classificazioni</button>
+        </div>
+
+        <div class="quiz-area" id="quizArea">
+            <div class="question-box">
+                <div class="question" id="question"></div>
+                <div class="angle-visualization" id="angleViz" style="display:none;"></div>
+                <div class="category-label" id="categoryLabel"></div>
+            </div>
+            <div class="answer-box" id="answerBox"></div>
+            <div class="button-group">
+                <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()" data-i18n="check">Verifica</button>
+                <button class="btn btn-next" id="btnNext" onclick="nextQuestion()" data-i18n="next">Prossima Domanda</button>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message">
+                    <span data-i18n="answered-correctly">Hai risposto correttamente a</span>
+                    <span id="finalCorrect">0</span>
+                    <span data-i18n="questions-out-of">domande su 10</span>
+                </div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+            </div>
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee">
+    </a>
+
+    <script>
+        let currentLanguage = 'it';
+
+        const translations = {
+            it: {
+                'back': '← Matematica',
+                'title': 'Quiz Angoli',
+                'score': 'Punteggio',
+                'correct': 'Corrette',
+                'wrong': 'Sbagliate',
+                'questions': 'Domande',
+                'all': 'Tutte',
+                'definitions': 'Definizioni',
+                'calculations': 'Calcoli',
+                'classifications': 'Classificazioni',
+                'check': 'Verifica',
+                'next': 'Prossima Domanda',
+                'restart': 'Ricomincia Quiz',
+                'reset-history': 'Cancella Storico Voti',
+                'help-title': 'Regole sugli Angoli',
+                'help-def-title': 'Definizioni di base',
+                'help-def-1': 'Angolo: regione di piano compresa tra due semirette con la stessa origine',
+                'help-def-2': 'Vertice: il punto di origine comune delle due semirette',
+                'help-def-3': 'Lati: le due semirette che formano l\'angolo',
+                'help-def-4': 'Ampiezza: misura dell\'angolo, espressa in gradi (°)',
+                'help-types-title': 'Tipi di angoli',
+                'help-types-1': 'Angolo nullo: 0°',
+                'help-types-2': 'Angolo acuto: 0° < α < 90°',
+                'help-types-3': 'Angolo retto: α = 90°',
+                'help-types-4': 'Angolo ottuso: 90° < α < 180°',
+                'help-types-5': 'Angolo piatto: α = 180°',
+                'help-types-6': 'Angolo concavo (riflessivo): 180° < α < 360°',
+                'help-types-7': 'Angolo giro: α = 360°',
+                'help-types-8': 'Angoli convessi: α ≤ 180°  |  Angoli concavi: α > 180°',
+                'help-special-title': 'Angoli speciali',
+                'help-special-1': 'Congruenti: due angoli con la stessa ampiezza',
+                'help-special-2': 'Consecutivi: stessa origine e un lato in comune',
+                'help-special-3': 'Adiacenti: consecutivi con i lati non comuni opposti (formano un angolo piatto)',
+                'help-special-4': 'Opposti al vertice: formati da due rette secanti; sono congruenti',
+                'help-bisect-title': 'Bisettrice',
+                'help-bisect-1': 'La semiretta che divide l\'angolo in due angoli congruenti',
+                'help-bisect-2': 'Es: bisettrice di 80° → divide in 2 angoli da 40° ciascuno',
+                'help-calc-title': 'Angoli complementari, supplementari, esplementari',
+                'help-calc-1': 'Complementari: α + β = 90°  →  complementare di α = 90° − α',
+                'help-calc-2': 'Supplementari: α + β = 180°  →  supplementare di α = 180° − α',
+                'help-calc-3': 'Esplementari: α + β = 360°  →  esplementare di α = 360° − α',
+                'help-gonio-title': 'Goniometro',
+                'help-gonio-1': 'Strumento semicircolare graduato da 0° a 180° per misurare gli angoli',
+                'help-gonio-2': 'Si appoggia il centro sul vertice e si legge il grado sul lato dell\'angolo',
+                'insert-value': 'Inserisci un valore!',
+                'correct-answer': 'Corretto! ✓',
+                'wrong-answer': 'Sbagliato! La risposta corretta è',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti',
+                'improving': 'Stai migliorando!',
+                'declining': 'Stai peggiorando',
+                'same-result': 'Stesso risultato',
+                'overall-trend': 'Trend generale: miglioramento (media',
+                'vs': 'vs',
+                'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+                'history-deleted': 'Storico voti cancellato!',
+                'cat-definitions': 'Definizioni',
+                'cat-calculations': 'Calcoli',
+                'cat-classifications': 'Classificazioni',
+                'q-complementary': 'Quanto misura il complementare di {n}°?',
+                'q-supplementary': 'Quanto misura il supplementare di {n}°?',
+                'q-explementary': 'Quanto misura l\'esplementare di {n}°?',
+                'q-bisector': 'La bisettrice divide un angolo di {n}° in due angoli da...',
+                'q-classify': 'Come si chiama un angolo di {n}°?',
+                'angle-null': 'Angolo nullo',
+                'angle-acute': 'Angolo acuto',
+                'angle-right': 'Angolo retto',
+                'angle-obtuse': 'Angolo ottuso',
+                'angle-flat': 'Angolo piatto',
+                'angle-reflex': 'Angolo concavo',
+                'angle-full': 'Angolo giro'
+            },
+            en: {
+                'back': '← Mathematics',
+                'title': 'Angles Quiz',
+                'score': 'Score',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'questions': 'Questions',
+                'all': 'All',
+                'definitions': 'Definitions',
+                'calculations': 'Calculations',
+                'classifications': 'Classifications',
+                'check': 'Check',
+                'next': 'Next Question',
+                'restart': 'Restart Quiz',
+                'reset-history': 'Clear History',
+                'help-title': 'Angle Rules',
+                'help-def-title': 'Basic definitions',
+                'help-def-1': 'Angle: region of a plane between two rays sharing the same origin',
+                'help-def-2': 'Vertex: the common origin point of the two rays',
+                'help-def-3': 'Sides: the two rays that form the angle',
+                'help-def-4': 'Measure: the size of the angle, expressed in degrees (°)',
+                'help-types-title': 'Types of angles',
+                'help-types-1': 'Null angle: 0°',
+                'help-types-2': 'Acute angle: 0° < α < 90°',
+                'help-types-3': 'Right angle: α = 90°',
+                'help-types-4': 'Obtuse angle: 90° < α < 180°',
+                'help-types-5': 'Flat (straight) angle: α = 180°',
+                'help-types-6': 'Reflex angle: 180° < α < 360°',
+                'help-types-7': 'Full angle: α = 360°',
+                'help-types-8': 'Convex angles: α ≤ 180°  |  Reflex angles: α > 180°',
+                'help-special-title': 'Special angles',
+                'help-special-1': 'Congruent: two angles with the same measure',
+                'help-special-2': 'Consecutive: same vertex and one common side',
+                'help-special-3': 'Adjacent: consecutive with non-common sides forming a straight line',
+                'help-special-4': 'Vertical (opposite): formed by two intersecting lines; they are congruent',
+                'help-bisect-title': 'Angle bisector',
+                'help-bisect-1': 'The ray that divides an angle into two congruent angles',
+                'help-bisect-2': 'Ex: bisector of 80° → divides into 2 angles of 40° each',
+                'help-calc-title': 'Complementary, supplementary, explementary angles',
+                'help-calc-1': 'Complementary: α + β = 90°  →  complement of α = 90° − α',
+                'help-calc-2': 'Supplementary: α + β = 180°  →  supplement of α = 180° − α',
+                'help-calc-3': 'Explementary: α + β = 360°  →  explement of α = 360° − α',
+                'help-gonio-title': 'Protractor (Goniometer)',
+                'help-gonio-1': 'A semicircular tool graduated from 0° to 180° for measuring angles',
+                'help-gonio-2': 'Place the center on the vertex and read the degree on the side of the angle',
+                'insert-value': 'Please enter a value!',
+                'correct-answer': 'Correct! ✓',
+                'wrong-answer': 'Wrong! The correct answer is',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades',
+                'improving': 'You\'re improving!',
+                'declining': 'You\'re declining',
+                'same-result': 'Same result',
+                'overall-trend': 'Overall trend: improvement (average',
+                'vs': 'vs',
+                'confirm-reset': 'Are you sure you want to delete all saved grades?',
+                'history-deleted': 'History deleted!',
+                'cat-definitions': 'Definitions',
+                'cat-calculations': 'Calculations',
+                'cat-classifications': 'Classifications',
+                'q-complementary': 'What is the complement of {n}°?',
+                'q-supplementary': 'What is the supplement of {n}°?',
+                'q-explementary': 'What is the explement of {n}°?',
+                'q-bisector': 'The bisector divides an angle of {n}° into two angles of...',
+                'q-classify': 'What is an angle of {n}° called?',
+                'angle-null': 'Null angle',
+                'angle-acute': 'Acute angle',
+                'angle-right': 'Right angle',
+                'angle-obtuse': 'Obtuse angle',
+                'angle-flat': 'Flat angle',
+                'angle-reflex': 'Reflex angle',
+                'angle-full': 'Full angle'
+            }
+        };
+
+        function t(key) { return translations[currentLanguage][key] || key; }
+
+        const categoryNames = {
+            definizioni:    { it: 'Definizioni',     en: 'Definitions' },
+            calcoli:        { it: 'Calcoli',          en: 'Calculations' },
+            classificazioni:{ it: 'Classificazioni',  en: 'Classifications' }
+        };
+
+        // ── SVG helpers ──────────────────────────────────────────────────────
+
+        function svgStyle() {
+            return `<style>
+                .sl{font-family:sans-serif;font-size:14px;font-weight:bold;fill:#667eea;}
+                .sl2{font-family:sans-serif;font-size:14px;font-weight:bold;fill:#f5576c;}
+                .sg{font-family:sans-serif;font-size:14px;font-weight:bold;fill:#28a745;}
+                .sm{font-family:sans-serif;font-size:13px;fill:#333;}
+                .sml{font-family:sans-serif;font-size:12px;fill:#666;}
+            </style>`;
+        }
+
+        function drawAngleSVG(deg, color, showLabel) {
+            if (color === undefined) color = '#667eea';
+            if (showLabel === undefined) showLabel = true;
+            const RAD = Math.PI / 180;
+            const L = 95, arcR = 30;
+            const rad = deg * RAD;
+
+            // Relative to vertex at origin
+            const r1 = { x: L, y: 0 };
+            const r2 = { x: L * Math.cos(rad), y: -L * Math.sin(rad) };
+            const a2 = { x: arcR * Math.cos(rad), y: -arcR * Math.sin(rad) };
+            const labelR = arcR + 18;
+            const lbl = { x: labelR * Math.cos(rad / 2), y: -labelR * Math.sin(rad / 2) };
+
+            const allX = [0, r1.x, r2.x, a2.x, lbl.x];
+            const allY = [0, r1.y, r2.y, a2.y, lbl.y];
+            const pad = 22;
+            const minX = Math.min(...allX) - pad;
+            const maxX = Math.max(...allX) + pad;
+            const minY = Math.min(...allY) - pad;
+            const maxY = Math.max(...allY) + pad;
+            const W = Math.ceil(maxX - minX);
+            const H = Math.ceil(maxY - minY);
+            const ox = -minX, oy = -minY;
+
+            const vx = ox, vy = oy;
+            const r1x = +(ox + r1.x).toFixed(1), r1y = +(oy + r1.y).toFixed(1);
+            const r2x = +(ox + r2.x).toFixed(1), r2y = +(oy + r2.y).toFixed(1);
+            const a1x = +(ox + arcR).toFixed(1), a1y = +(oy).toFixed(1);
+            const a2x = +(ox + a2.x).toFixed(1), a2y = +(oy + a2.y).toFixed(1);
+            const lx  = +(ox + lbl.x).toFixed(1), ly  = +(oy + lbl.y).toFixed(1);
+
+            let arcPath = '';
+            if (deg === 0) {
+                // no arc
+            } else if (deg === 90) {
+                const s = 13;
+                arcPath = `<path d="M ${vx+s} ${vy} L ${vx+s} ${vy-s} L ${vx} ${vy-s}" fill="none" stroke="${color}" stroke-width="1.5"/>`;
+            } else if (deg === 360) {
+                arcPath = `<circle cx="${vx}" cy="${vy}" r="${arcR}" fill="none" stroke="${color}" stroke-width="1.5"/>`;
+            } else {
+                const large = deg > 180 ? 1 : 0;
+                arcPath = `<path d="M ${a1x} ${a1y} A ${arcR} ${arcR} 0 ${large} 0 ${a2x} ${a2y}" fill="none" stroke="${color}" stroke-width="1.5"/>`;
+            }
+
+            const labelText = showLabel ? `<text x="${lx}" y="${ly}" text-anchor="middle" class="sm">${deg}°</text>` : '';
+
+            return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                ${arcPath}
+                <line x1="${vx}" y1="${vy}" x2="${r1x}" y2="${r1y}" stroke="${color}" stroke-width="2.5"/>
+                <line x1="${vx}" y1="${vy}" x2="${r2x}" y2="${r2y}" stroke="${color}" stroke-width="2.5"/>
+                <circle cx="${vx}" cy="${vy}" r="4" fill="${color}"/>
+                <text x="${+(vx-4).toFixed(0)}" y="${+(vy+18).toFixed(0)}" class="sl" style="fill:${color};">V</text>
+                ${labelText}
+            </svg>`;
+        }
+
+        function drawAngleNamed(type) {
+            const c1 = '#667eea', c2 = '#f5576c', cg = '#28a745';
+            switch (type) {
+                case 'null':
+                    return `<svg width="220" height="60" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="30" y1="35" x2="190" y2="35" stroke="${c1}" stroke-width="2.5"/>
+                        <circle cx="30" cy="35" r="4" fill="${c1}"/>
+                        <text x="22" y="24" class="sl">V</text>
+                        <text x="110" y="20" text-anchor="middle" class="sm">0°</text>
+                    </svg>`;
+                case 'right':
+                    return drawAngleSVG(90, c1, true);
+                case 'flat':
+                    return drawAngleSVG(180, c1, true);
+                case 'full':
+                    return drawAngleSVG(360, c1, true);
+                case 'acute':
+                    return drawAngleSVG(45, c1, true);
+                case 'obtuse':
+                    return drawAngleSVG(120, c1, true);
+                case 'reflex':
+                    return drawAngleSVG(240, c1, true);
+                case 'convex':
+                    return drawAngleSVG(60, c1, true);
+                case 'bisector': {
+                    // 80° angle split by bisector at 40°
+                    const deg = 80, bisRad = (deg / 2) * Math.PI / 180, RAD = Math.PI / 180;
+                    const L = 95, arcR = 30;
+                    const r1 = { x: L, y: 0 };
+                    const r2 = { x: L * Math.cos(deg * RAD), y: -L * Math.sin(deg * RAD) };
+                    const rb = { x: L * Math.cos(bisRad), y: -L * Math.sin(bisRad) };
+                    // bounding
+                    const allX = [0, r1.x, r2.x, rb.x];
+                    const allY = [0, r1.y, r2.y, rb.y];
+                    const pad = 22, ox = -Math.min(...allX) + pad, oy = -Math.min(...allY) + pad;
+                    const W = Math.ceil(Math.max(...allX) - Math.min(...allX) + pad * 2);
+                    const H = Math.ceil(Math.max(...allY) - Math.min(...allY) + pad * 2);
+                    const vx = ox, vy = oy;
+                    return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <path d="M ${+(ox+arcR).toFixed(1)} ${oy} A ${arcR} ${arcR} 0 0 0 ${+(ox+arcR*Math.cos(deg*RAD)).toFixed(1)} ${+(oy-arcR*Math.sin(deg*RAD)).toFixed(1)}" fill="none" stroke="${c1}" stroke-width="1.5"/>
+                        <line x1="${vx}" y1="${vy}" x2="${+(ox+r1.x).toFixed(1)}" y2="${+(oy+r1.y).toFixed(1)}" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="${vx}" y1="${vy}" x2="${+(ox+r2.x).toFixed(1)}" y2="${+(oy+r2.y).toFixed(1)}" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="${vx}" y1="${vy}" x2="${+(ox+rb.x).toFixed(1)}" y2="${+(oy+rb.y).toFixed(1)}" stroke="${cg}" stroke-width="2" stroke-dasharray="6,3"/>
+                        <circle cx="${vx}" cy="${vy}" r="4" fill="${c1}"/>
+                        <text x="${+(ox+20).toFixed(0)}" y="${+(oy-12).toFixed(0)}" class="sml" style="fill:${cg};">bisettrice</text>
+                        <text x="${+(vx-4).toFixed(0)}" y="${+(vy+18).toFixed(0)}" class="sl">V</text>
+                    </svg>`;
+                }
+                case 'vertical': {
+                    // two intersecting lines showing vertical angles
+                    return `<svg width="200" height="180" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="20" y1="30"  x2="180" y2="150" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="20" y1="150" x2="180" y2="30"  stroke="${c1}" stroke-width="2.5"/>
+                        <circle cx="100" cy="90" r="4" fill="${c2}"/>
+                        <path d="M 118 90 A 18 18 0 0 0 108 72" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <path d="M 82 90 A 18 18 0 0 0 92 108" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <text x="125" y="85" class="sml" style="fill:${c2};">α</text>
+                        <text x="75" y="112" class="sml" style="fill:${c2};">α</text>
+                        <text x="100" y="165" text-anchor="middle" class="sml">angoli opposti al vertice</text>
+                    </svg>`;
+                }
+                case 'adjacent': {
+                    // two adjacent angles on a straight line
+                    return `<svg width="260" height="110" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="20" y1="75" x2="240" y2="75" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="120" y1="75" x2="170" y2="15" stroke="${c1}" stroke-width="2.5"/>
+                        <circle cx="120" cy="75" r="4" fill="${c1}"/>
+                        <path d="M 155 75 A 35 35 0 0 0 133 41" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <path d="M 85" y="75 A 35 35 0 0 1 107 41" fill="none" stroke="${cg}" stroke-width="1.5"/>
+                        <path d="M 85 75 A 35 35 0 0 1 133 41" fill="none" stroke="${cg}" stroke-width="1.5"/>
+                        <text x="155" y="68" class="sml" style="fill:${c2};">β</text>
+                        <text x="95" y="60" class="sml" style="fill:${cg};">α</text>
+                        <text x="120" y="95" text-anchor="middle" class="sml">α + β = 180°</text>
+                    </svg>`;
+                }
+                case 'consecutive': {
+                    return `<svg width="220" height="140" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="40" y1="110" x2="190" y2="110" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="40" y1="110" x2="100" y2="20"  stroke="${c2}" stroke-width="2.5"/>
+                        <line x1="40" y1="110" x2="160" y2="40"  stroke="${cg}" stroke-width="2.5"/>
+                        <circle cx="40" cy="110" r="4" fill="${c1}"/>
+                        <path d="M 75 110 A 35 35 0 0 0 68 74" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <path d="M 75 110 A 35 35 0 0 0 55 76" fill="none" stroke="${cg}" stroke-width="1.5"/>
+                        <text x="52" y="80" class="sml" style="fill:${cg};">α</text>
+                        <text x="70" y="78" class="sml" style="fill:${c2};">β</text>
+                        <text x="40" y="128" class="sml">lato comune</text>
+                    </svg>`;
+                }
+                case 'congruent':
+                    return `<svg width="300" height="130" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        ${drawAngleSVG(50, c1, false).replace('<svg', '<g transform="translate(10,5)"><svg').replace('</svg>', '</svg></g>')}
+                        ${drawAngleSVG(50, c2, false).replace('<svg', '<g transform="translate(160,5)"><svg').replace('</svg>', '</svg></g>')}
+                        <text x="150" y="70" text-anchor="middle" class="sm">≅</text>
+                        <text x="150" y="100" text-anchor="middle" class="sml">stessa ampiezza</text>
+                    </svg>`;
+                case 'goniometer':
+                    return `<svg width="200" height="115" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <path d="M 20 100 A 80 80 0 0 1 180 100" fill="#f0f2ff" stroke="${c1}" stroke-width="2"/>
+                        <line x1="20" y1="100" x2="180" y2="100" stroke="${c1}" stroke-width="1.5"/>
+                        <line x1="100" y1="100" x2="100" y2="20" stroke="${c2}" stroke-width="1.5"/>
+                        <circle cx="100" cy="100" r="4" fill="${c1}"/>
+                        ${[0,30,60,90,120,150,180].map(a => {
+                            const rad = a * Math.PI / 180;
+                            const ix = 100 + 80 * Math.cos(Math.PI - rad);
+                            const iy = 100 - 80 * Math.sin(Math.PI - rad);
+                            const ox2 = 100 + 90 * Math.cos(Math.PI - rad);
+                            const oy2 = 100 - 90 * Math.sin(Math.PI - rad);
+                            return `<line x1="${ix.toFixed(1)}" y1="${iy.toFixed(1)}" x2="${ox2.toFixed(1)}" y2="${oy2.toFixed(1)}" stroke="${c1}" stroke-width="1"/>
+                                    <text x="${(100 + 100 * Math.cos(Math.PI - rad)).toFixed(1)}" y="${(100 - 100 * Math.sin(Math.PI - rad) + 5).toFixed(1)}" text-anchor="middle" style="font-size:9px;fill:#555;">${a}</text>`;
+                        }).join('')}
+                        <text x="100" y="113" text-anchor="middle" class="sml">goniometro</text>
+                    </svg>`;
+                case 'complementary':
+                    return `<svg width="200" height="140" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="40" y1="120" x2="160" y2="120" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="40" y1="120" x2="40" y2="20"  stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="40" y1="120" x2="130" y2="40" stroke="${c2}" stroke-width="2.5"/>
+                        <circle cx="40" cy="120" r="4" fill="${c1}"/>
+                        <path d="M 53 120 A 13 13 0 0 1 40 107" fill="none" stroke="${c1}" stroke-width="1.5"/>
+                        <path d="M 95 120 A 55 55 0 0 0 40 65" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <text x="57" y="113" class="sml" style="fill:${c1};">α</text>
+                        <text x="78" y="90" class="sml" style="fill:${c2};">β</text>
+                        <text x="100" y="138" text-anchor="middle" class="sml">α + β = 90°</text>
+                    </svg>`;
+                case 'supplementary':
+                    return `<svg width="260" height="110" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="20" y1="80" x2="240" y2="80" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="110" y1="80" x2="160" y2="15" stroke="${c1}" stroke-width="2.5"/>
+                        <circle cx="110" cy="80" r="4" fill="${c1}"/>
+                        <path d="M 145 80 A 35 35 0 0 0 121 48" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <path d="M 75 80 A 35 35 0 0 1 121 48" fill="none" stroke="${cg}" stroke-width="1.5"/>
+                        <text x="148" y="73" class="sml" style="fill:${c2};">β</text>
+                        <text x="84" y="68" class="sml" style="fill:${cg};">α</text>
+                        <text x="130" y="100" text-anchor="middle" class="sml">α + β = 180°</text>
+                    </svg>`;
+                case 'explementary':
+                    return `<svg width="170" height="170" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <circle cx="85" cy="85" r="55" fill="none" stroke="#eee" stroke-width="1"/>
+                        <line x1="85" y1="85" x2="140" y2="85" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="85" y1="85" x2="85" y2="30"  stroke="${c2}" stroke-width="2.5"/>
+                        <line x1="85" y1="85" x2="30" y2="115" stroke="${cg}" stroke-width="2.5"/>
+                        <circle cx="85" cy="85" r="4" fill="#333"/>
+                        <path d="M 120 85 A 35 35 0 0 0 85 50" fill="none" stroke="${c1}" stroke-width="1.5"/>
+                        <path d="M 85 50 A 35 35 0 0 0 55 113" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <path d="M 55 113 A 35 35 0 0 0 120 85" fill="none" stroke="${cg}" stroke-width="1.5"/>
+                        <text x="107" y="75" class="sml" style="fill:${c1};">α</text>
+                        <text x="60" y="58" class="sml" style="fill:${c2};">β</text>
+                        <text x="46" y="105" class="sml" style="fill:${cg};">γ</text>
+                        <text x="85" y="158" text-anchor="middle" class="sml">α+β+γ = 360°</text>
+                    </svg>`;
+                default:
+                    return drawAngleSVG(60, c1, true);
+            }
+        }
+
+        // ── Definition questions ─────────────────────────────────────────────
+
+        const definitionQuestions = [
+            {
+                visualType: 'generic',
+                it: { question: 'Cos\'è un angolo?', options: ['Regione di piano compresa tra due semirette con la stessa origine', 'Parte di retta compresa tra due punti', 'Una retta che si estende all\'infinito', 'Un punto su un piano'], answer: 'Regione di piano compresa tra due semirette con la stessa origine' },
+                en: { question: 'What is an angle?', options: ['Region of a plane between two rays sharing the same origin', 'Part of a line between two points', 'A line extending infinitely', 'A point on a plane'], answer: 'Region of a plane between two rays sharing the same origin' }
+            },
+            {
+                visualType: 'generic',
+                it: { question: 'Come si chiama il punto di origine comune delle due semirette di un angolo?', options: ['Vertice', 'Lato', 'Estremo', 'Centro'], answer: 'Vertice' },
+                en: { question: 'What is the common origin point of the two rays of an angle called?', options: ['Vertex', 'Side', 'Endpoint', 'Center'], answer: 'Vertex' }
+            },
+            {
+                visualType: 'generic',
+                it: { question: 'Come si chiamano le due semirette che formano un angolo?', options: ['Lati', 'Diagonali', 'Mediane', 'Altezze'], answer: 'Lati' },
+                en: { question: 'What are the two rays forming an angle called?', options: ['Sides', 'Diagonals', 'Medians', 'Altitudes'], answer: 'Sides' }
+            },
+            {
+                visualType: 'null',
+                it: { question: 'Quanto misura un angolo nullo?', options: ['0°', '90°', '180°', '360°'], answer: '0°' },
+                en: { question: 'How many degrees is a null angle?', options: ['0°', '90°', '180°', '360°'], answer: '0°' }
+            },
+            {
+                visualType: 'right',
+                it: { question: 'Quanto misura un angolo retto?', options: ['90°', '0°', '180°', '45°'], answer: '90°' },
+                en: { question: 'How many degrees is a right angle?', options: ['90°', '0°', '180°', '45°'], answer: '90°' }
+            },
+            {
+                visualType: 'flat',
+                it: { question: 'Quanto misura un angolo piatto?', options: ['180°', '90°', '360°', '270°'], answer: '180°' },
+                en: { question: 'How many degrees is a flat (straight) angle?', options: ['180°', '90°', '360°', '270°'], answer: '180°' }
+            },
+            {
+                visualType: 'full',
+                it: { question: 'Quanto misura un angolo giro?', options: ['360°', '180°', '270°', '90°'], answer: '360°' },
+                en: { question: 'How many degrees is a full angle?', options: ['360°', '180°', '270°', '90°'], answer: '360°' }
+            },
+            {
+                visualType: 'acute',
+                it: { question: 'Un angolo acuto ha ampiezza...', options: ['compresa tra 0° e 90° (esclusi)', 'uguale a 90°', 'compresa tra 90° e 180°', 'uguale a 180°'], answer: 'compresa tra 0° e 90° (esclusi)' },
+                en: { question: 'An acute angle has a measure...', options: ['between 0° and 90° (exclusive)', 'equal to 90°', 'between 90° and 180°', 'equal to 180°'], answer: 'between 0° and 90° (exclusive)' }
+            },
+            {
+                visualType: 'obtuse',
+                it: { question: 'Un angolo ottuso ha ampiezza...', options: ['compresa tra 90° e 180° (esclusi)', 'compresa tra 0° e 90°', 'uguale a 90°', 'uguale a 180°'], answer: 'compresa tra 90° e 180° (esclusi)' },
+                en: { question: 'An obtuse angle has a measure...', options: ['between 90° and 180° (exclusive)', 'between 0° and 90°', 'equal to 90°', 'equal to 180°'], answer: 'between 90° and 180° (exclusive)' }
+            },
+            {
+                visualType: 'convex',
+                it: { question: 'Un angolo convesso ha ampiezza...', options: ['minore o uguale a 180°', 'maggiore di 180°', 'uguale a 90°', 'uguale a 360°'], answer: 'minore o uguale a 180°' },
+                en: { question: 'A convex angle has a measure...', options: ['less than or equal to 180°', 'greater than 180°', 'equal to 90°', 'equal to 360°'], answer: 'less than or equal to 180°' }
+            },
+            {
+                visualType: 'reflex',
+                it: { question: 'Un angolo concavo (riflessivo) ha ampiezza...', options: ['maggiore di 180° e minore di 360°', 'minore di 180°', 'uguale a 180°', 'uguale a 360°'], answer: 'maggiore di 180° e minore di 360°' },
+                en: { question: 'A reflex (concave) angle has a measure...', options: ['greater than 180° and less than 360°', 'less than 180°', 'equal to 180°', 'equal to 360°'], answer: 'greater than 180° and less than 360°' }
+            },
+            {
+                visualType: 'congruent',
+                it: { question: 'Due angoli si dicono congruenti se...', options: ['hanno la stessa ampiezza', 'hanno la stessa posizione', 'sono adiacenti', 'si sovrappongono parzialmente'], answer: 'hanno la stessa ampiezza' },
+                en: { question: 'Two angles are called congruent if...', options: ['they have the same measure', 'they have the same position', 'they are adjacent', 'they partially overlap'], answer: 'they have the same measure' }
+            },
+            {
+                visualType: 'consecutive',
+                it: { question: 'Due angoli consecutivi hanno...', options: ['la stessa origine e un lato in comune', 'la stessa ampiezza', 'la stessa origine ma nessun lato in comune', 'i lati non comuni che formano una retta'], answer: 'la stessa origine e un lato in comune' },
+                en: { question: 'Two consecutive angles have...', options: ['the same vertex and one common side', 'the same measure', 'the same vertex but no common side', 'non-common sides forming a straight line'], answer: 'the same vertex and one common side' }
+            },
+            {
+                visualType: 'adjacent',
+                it: { question: 'Due angoli adiacenti sono angoli consecutivi i cui lati non comuni...', options: ['sono opposti (formano un angolo piatto)', 'sono paralleli', 'sono perpendicolari', 'sono congruenti'], answer: 'sono opposti (formano un angolo piatto)' },
+                en: { question: 'Two adjacent angles are consecutive angles whose non-common sides...', options: ['are opposite (form a straight angle)', 'are parallel', 'are perpendicular', 'are congruent'], answer: 'are opposite (form a straight angle)' }
+            },
+            {
+                visualType: 'vertical',
+                it: { question: 'Gli angoli opposti al vertice (formati da due rette secanti) sono...', options: ['congruenti (uguali)', 'supplementari (somma 180°)', 'complementari (somma 90°)', 'adiacenti'], answer: 'congruenti (uguali)' },
+                en: { question: 'Vertical angles (formed by two intersecting lines) are...', options: ['congruent (equal)', 'supplementary (sum 180°)', 'complementary (sum 90°)', 'adjacent'], answer: 'congruent (equal)' }
+            },
+            {
+                visualType: 'bisector',
+                it: { question: 'La bisettrice di un angolo è...', options: ['la semiretta che lo divide in due angoli congruenti', 'il lato più lungo dell\'angolo', 'la retta perpendicolare al vertice', 'il punto medio dell\'arco'], answer: 'la semiretta che lo divide in due angoli congruenti' },
+                en: { question: 'The angle bisector is...', options: ['the ray that divides it into two congruent angles', 'the longest side of the angle', 'the line perpendicular to the vertex', 'the midpoint of the arc'], answer: 'the ray that divides it into two congruent angles' }
+            },
+            {
+                visualType: 'goniometer',
+                it: { question: 'Il goniometro è uno strumento che serve a...', options: ['misurare l\'ampiezza degli angoli in gradi', 'misurare la lunghezza dei lati', 'disegnare angoli retti', 'calcolare l\'area degli angoli'], answer: 'misurare l\'ampiezza degli angoli in gradi' },
+                en: { question: 'A protractor (goniometer) is a tool used to...', options: ['measure the size of angles in degrees', 'measure the length of sides', 'draw right angles', 'calculate the area of angles'], answer: 'measure the size of angles in degrees' }
+            },
+            {
+                visualType: 'complementary',
+                it: { question: 'Due angoli complementari hanno una somma di...', options: ['90°', '180°', '360°', '270°'], answer: '90°' },
+                en: { question: 'Two complementary angles have a sum of...', options: ['90°', '180°', '360°', '270°'], answer: '90°' }
+            },
+            {
+                visualType: 'supplementary',
+                it: { question: 'Due angoli supplementari hanno una somma di...', options: ['180°', '90°', '360°', '270°'], answer: '180°' },
+                en: { question: 'Two supplementary angles have a sum of...', options: ['180°', '90°', '360°', '270°'], answer: '180°' }
+            },
+            {
+                visualType: 'explementary',
+                it: { question: 'Due angoli esplementari hanno una somma di...', options: ['360°', '180°', '90°', '270°'], answer: '360°' },
+                en: { question: 'Two explementary angles have a sum of...', options: ['360°', '180°', '90°', '270°'], answer: '360°' }
+            }
+        ];
+
+        // ── Classification data ──────────────────────────────────────────────
+
+        const classifyPool = [
+            { deg: 0,   key: 'angle-null' },
+            { deg: 25,  key: 'angle-acute' },
+            { deg: 40,  key: 'angle-acute' },
+            { deg: 60,  key: 'angle-acute' },
+            { deg: 75,  key: 'angle-acute' },
+            { deg: 90,  key: 'angle-right' },
+            { deg: 100, key: 'angle-obtuse' },
+            { deg: 120, key: 'angle-obtuse' },
+            { deg: 135, key: 'angle-obtuse' },
+            { deg: 150, key: 'angle-obtuse' },
+            { deg: 175, key: 'angle-obtuse' },
+            { deg: 180, key: 'angle-flat' },
+            { deg: 210, key: 'angle-reflex' },
+            { deg: 240, key: 'angle-reflex' },
+            { deg: 300, key: 'angle-reflex' },
+            { deg: 360, key: 'angle-full' }
+        ];
+
+        const allAngleKeys = ['angle-null','angle-acute','angle-right','angle-obtuse','angle-flat','angle-reflex','angle-full'];
+
+        // ── State ────────────────────────────────────────────────────────────
+
+        let currentQuestion = null;
+        let score = 0, correct = 0, wrong = 0, total = 0;
+        let selectedCategory = 'tutte';
+        const MAX_QUESTIONS = 10;
+        let previousQuestions = [];
+        let selectedChoice = null;
+
+        // ── Question generation ──────────────────────────────────────────────
+
+        function generateQuestion() {
+            for (let attempts = 0; attempts < 60; attempts++) {
+                let category;
+                if (selectedCategory === 'tutte') {
+                    const cats = ['definizioni', 'definizioni', 'calcoli', 'calcoli', 'classificazioni'];
+                    category = cats[Math.floor(Math.random() * cats.length)];
+                } else {
+                    category = selectedCategory;
+                }
+
+                let q = null;
+
+                if (category === 'definizioni') {
+                    const idx = Math.floor(Math.random() * definitionQuestions.length);
+                    const def = definitionQuestions[idx];
+                    const langDef = def[currentLanguage];
+                    q = {
+                        category, type: 'definition', idx,
+                        visualType: def.visualType,
+                        answer: langDef.answer,
+                        choices: [...langDef.options].sort(() => Math.random() - 0.5)
+                    };
+
+                } else if (category === 'calcoli') {
+                    const subtypes = ['complementary', 'supplementary', 'explementary', 'bisector'];
+                    const sub = subtypes[Math.floor(Math.random() * subtypes.length)];
+                    let n, answer;
+                    if (sub === 'complementary') {
+                        const vals = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85];
+                        n = vals[Math.floor(Math.random() * vals.length)];
+                        answer = 90 - n;
+                    } else if (sub === 'supplementary') {
+                        const vals = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170];
+                        n = vals[Math.floor(Math.random() * vals.length)];
+                        answer = 180 - n;
+                    } else if (sub === 'explementary') {
+                        const vals = [30,45,60,90,120,135,150,180,200,240,270,300,315,330];
+                        n = vals[Math.floor(Math.random() * vals.length)];
+                        answer = 360 - n;
+                    } else { // bisector
+                        const vals = [20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180];
+                        n = vals[Math.floor(Math.random() * vals.length)];
+                        answer = n / 2;
+                    }
+                    q = { category, type: 'numeric', subtype: sub, n, answer };
+
+                } else if (category === 'classificazioni') {
+                    const item = classifyPool[Math.floor(Math.random() * classifyPool.length)];
+                    const correctName = t(item.key);
+                    const wrongKeys = allAngleKeys.filter(k => k !== item.key);
+                    const shuffledWrong = wrongKeys.sort(() => Math.random() - 0.5).slice(0, 3);
+                    const choices = [...shuffledWrong.map(k => t(k)), correctName].sort(() => Math.random() - 0.5);
+                    q = {
+                        category, type: 'classification',
+                        deg: item.deg, answerKey: item.key,
+                        answer: correctName,
+                        choices
+                    };
+                }
+
+                if (!q) continue;
+
+                const key = JSON.stringify({
+                    type: q.type, idx: q.idx, subtype: q.subtype, n: q.n, deg: q.deg
+                });
+                if (previousQuestions.includes(key)) continue;
+                previousQuestions.push(key);
+                if (previousQuestions.length > 4) previousQuestions.shift();
+                return q;
+            }
+            // fallback
+            const def = definitionQuestions[0];
+            const langDef = def[currentLanguage];
+            return {
+                category: 'definizioni', type: 'definition', idx: 0,
+                visualType: def.visualType, answer: langDef.answer,
+                choices: [...langDef.options].sort(() => Math.random() - 0.5)
+            };
+        }
+
+        // ── Display ──────────────────────────────────────────────────────────
+
+        function updateQuestionDisplay() {
+            if (!currentQuestion) return;
+            const q = currentQuestion;
+            const qEl = document.getElementById('question');
+            const viz = document.getElementById('angleViz');
+            const answerBox = document.getElementById('answerBox');
+            answerBox.innerHTML = '';
+            viz.style.display = 'none';
+            viz.innerHTML = '';
+
+            if (q.type === 'definition') {
+                const langDef = definitionQuestions[q.idx][currentLanguage];
+                qEl.textContent = langDef.question;
+                q.answer = langDef.answer;
+                q.choices = [...langDef.options].sort(() => Math.random() - 0.5);
+
+                const svgHtml = q.visualType === 'generic'
+                    ? drawAngleSVG(60, '#667eea', false)
+                    : drawAngleNamed(q.visualType);
+                if (svgHtml) { viz.innerHTML = svgHtml; viz.style.display = 'inline-block'; }
+
+                answerBox.innerHTML = `<div class="multiple-choice">
+                    ${q.choices.map(opt =>
+                        `<button class="choice-btn" data-value="${opt}" onclick="selectChoice(this)">${opt}</button>`
+                    ).join('')}
+                </div>`;
+
+            } else if (q.type === 'numeric') {
+                const tmpl = t('q-' + q.subtype).replace('{n}', q.n);
+                qEl.textContent = tmpl;
+
+                // Show a relevant SVG for the calculation type
+                let vizHtml = '';
+                if (q.subtype === 'complementary') vizHtml = drawAngleNamed('complementary');
+                else if (q.subtype === 'supplementary') vizHtml = drawAngleNamed('supplementary');
+                else if (q.subtype === 'explementary') vizHtml = drawAngleNamed('explementary');
+                else if (q.subtype === 'bisector') vizHtml = drawAngleNamed('bisector');
+                if (vizHtml) { viz.innerHTML = vizHtml; viz.style.display = 'inline-block'; }
+
+                answerBox.innerHTML = `
+                    <input type="number" class="answer-input" id="answerInput" placeholder="?" step="0.5" autofocus>
+                    <div class="unit-label">°</div>`;
+
+            } else if (q.type === 'classification') {
+                qEl.textContent = t('q-classify').replace('{n}', q.deg);
+                // Regenerate answer with current language
+                q.answer = t(q.answerKey);
+                const wrongKeys = allAngleKeys.filter(k => k !== q.answerKey);
+                const shuffledWrong = wrongKeys.sort(() => Math.random() - 0.5).slice(0, 3);
+                q.choices = [...shuffledWrong.map(k => t(k)), q.answer].sort(() => Math.random() - 0.5);
+
+                const svgHtml = drawAngleSVG(q.deg, '#667eea', false);
+                viz.innerHTML = svgHtml; viz.style.display = 'inline-block';
+
+                answerBox.innerHTML = `<div class="multiple-choice">
+                    ${q.choices.map(opt =>
+                        `<button class="choice-btn" data-value="${opt}" onclick="selectChoice(this)">${opt}</button>`
+                    ).join('')}
+                </div>`;
+            }
+
+            document.getElementById('categoryLabel').textContent =
+                categoryNames[q.category][currentLanguage];
+        }
+
+        // ── Interaction ──────────────────────────────────────────────────────
+
+        function selectChoice(btn) {
+            selectedChoice = btn.dataset.value;
+            document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            const q = currentQuestion;
+            let isCorrect = false;
+            let wrongMsg = '';
+
+            if (q.type === 'definition' || q.type === 'classification') {
+                if (!selectedChoice) {
+                    feedback.textContent = t('insert-value');
+                    feedback.className = 'feedback wrong';
+                    return;
+                }
+                isCorrect = selectedChoice === q.answer;
+                document.querySelectorAll('.choice-btn').forEach(btn => {
+                    btn.disabled = true;
+                    if (btn.dataset.value === q.answer) btn.classList.add('correct');
+                    else if (btn.dataset.value === selectedChoice && !isCorrect) btn.classList.add('wrong');
+                });
+                if (!isCorrect) wrongMsg = `${t('wrong-answer')} "${q.answer}"`;
+
+            } else if (q.type === 'numeric') {
+                const input = document.getElementById('answerInput');
+                const val = parseFloat(input.value);
+                if (isNaN(val)) {
+                    feedback.textContent = t('insert-value');
+                    feedback.className = 'feedback wrong';
+                    return;
+                }
+                isCorrect = Math.abs(val - q.answer) < 0.01;
+                input.classList.add(isCorrect ? 'correct' : 'wrong');
+                input.disabled = true;
+                if (!isCorrect) wrongMsg = `${t('wrong-answer')} ${q.answer}°`;
+            }
+
+            total++;
+            if (isCorrect) {
+                correct++;
+                score += 10;
+                feedback.textContent = t('correct-answer');
+                feedback.className = 'feedback correct';
+            } else {
+                wrong++;
+                feedback.textContent = wrongMsg;
+                feedback.className = 'feedback wrong';
+            }
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+            document.getElementById('btnCheck').style.display = 'none';
+
+            if (total >= MAX_QUESTIONS) {
+                setTimeout(showFinalResults, 1500);
+            } else {
+                document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion = generateQuestion();
+            selectedChoice = null;
+            updateQuestionDisplay();
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('btnCheck').style.display = 'block';
+            document.getElementById('btnNext').classList.remove('show');
+            const first = document.querySelector('.answer-input');
+            if (first) first.focus();
+        }
+
+        function changeCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            if (total > 0) {
+                score = 0; correct = 0; wrong = 0; total = 0;
+                previousQuestions = [];
+                document.getElementById('score').textContent = 0;
+                document.getElementById('correct').textContent = 0;
+                document.getElementById('wrong').textContent = 0;
+                document.getElementById('total').textContent = `0/${MAX_QUESTIONS}`;
+            }
+            nextQuestion();
+        }
+
+        // ── Grade system ─────────────────────────────────────────────────────
+
+        function showFinalResults() {
+            document.getElementById('quizArea').style.display = 'none';
+            document.getElementById('finalScreen').classList.add('show');
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalGrade').textContent = `${correct}/10`;
+
+            const comments = {
+                it: ['Devi esercitarti ancora!', 'Sufficiente, continua!', 'Discreto, puoi fare meglio!', 'Bene! Stai migliorando!', 'Molto bene! Continua così!', 'Eccellente! Ottimo lavoro!', 'Perfetto! Sei un campione!'],
+                en: ['You need more practice!', 'Sufficient, keep going!', 'Fair, you can do better!', 'Good! You\'re improving!', 'Very good! Keep it up!', 'Excellent! Great job!', 'Perfect! You\'re a champion!']
+            };
+            const idx = correct === 10 ? 6 : correct >= 9 ? 5 : correct >= 8 ? 4 : correct >= 7 ? 3 : correct >= 6 ? 2 : correct >= 5 ? 1 : 0;
+            document.getElementById('finalComment').textContent = comments[currentLanguage][idx];
+            saveGrade(correct);
+            displayHistory();
+        }
+
+        function saveGrade(grade) {
+            let history = JSON.parse(localStorage.getItem('angoliHistory') || '[]');
+            history.push(grade);
+            if (history.length > 10) history = history.slice(-10);
+            localStorage.setItem('angoliHistory', JSON.stringify(history));
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('angoliHistory') || '[]');
+            if (!history.length) { document.getElementById('historyBox').style.display = 'none'; return; }
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            history.forEach((g, i) => {
+                const item = document.createElement('div');
+                item.className = 'history-item' + (i === history.length - 1 ? ' current' : '');
+                item.textContent = `${g}/10`;
+                list.appendChild(item);
+            });
+            if (history.length >= 2) {
+                const last = history[history.length - 1], prev = history[history.length - 2];
+                const trend = document.getElementById('trendMessage');
+                if (last > prev) { trend.textContent = `${t('improving')} (+${last - prev})`; trend.className = 'trend improving'; }
+                else if (last < prev) { trend.textContent = `${t('declining')} (${last - prev})`; trend.className = 'trend declining'; }
+                else { trend.textContent = t('same-result'); trend.className = 'trend stable'; }
+                if (history.length >= 6) {
+                    const recentAvg = (history.slice(-3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+                    const prevAvg = (history.slice(-6, -3).reduce((a, b) => a + b, 0) / 3).toFixed(1);
+                    if (recentAvg > prevAvg)
+                        document.getElementById('trendMessage').textContent +=
+                            ` | ${t('overall-trend')} ${recentAvg} ${t('vs')} ${prevAvg})`;
+                }
+            }
+        }
+
+        function restartQuiz() {
+            score = 0; correct = 0; wrong = 0; total = 0;
+            previousQuestions = []; selectedChoice = null;
+            document.getElementById('score').textContent = 0;
+            document.getElementById('correct').textContent = 0;
+            document.getElementById('wrong').textContent = 0;
+            document.getElementById('total').textContent = `0/${MAX_QUESTIONS}`;
+            document.getElementById('finalScreen').classList.remove('show');
+            document.getElementById('quizArea').style.display = 'flex';
+            nextQuestion();
+        }
+
+        function resetHistory() {
+            if (confirm(t('confirm-reset'))) {
+                localStorage.removeItem('angoliHistory');
+                document.getElementById('historyBox').style.display = 'none';
+                alert(t('history-deleted'));
+            }
+        }
+
+        // ── Language ─────────────────────────────────────────────────────────
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('angoliLanguage', lang);
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.textContent = translations[lang][key];
+            });
+            if (currentQuestion) updateQuestionDisplay();
+        }
+
+        function toggleHelp() {
+            document.getElementById('helpOverlay').classList.toggle('show');
+            document.getElementById('helpTooltip').classList.toggle('show');
+        }
+
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const btnCheck = document.getElementById('btnCheck');
+                if (btnCheck.style.display !== 'none') checkAnswer();
+                else nextQuestion();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('angoliLanguage') || 'it';
+            currentLanguage = saved;
+            if (saved === 'en') {
+                document.querySelector('.lang-btn.active').classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations['en'][key]) el.textContent = translations['en'][key];
+                });
+            }
+            nextQuestion();
+        });
+    </script>
+</body>
+</html>
