@@ -48,7 +48,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
             animation: fadeInDown 0.8s ease-out;
         }
 
@@ -140,6 +140,27 @@
         .coming-soon-badge {
             background: #ccc;
             color: #666;
+        }
+
+        .section-header {
+            color: white;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin: 40px 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.02em;
+        }
+
+        .section-header:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-icon {
+            font-size: 1.2em;
         }
 
         @keyframes fadeInDown {
@@ -268,27 +289,12 @@
             <p data-i18n="subtitle">Esercizi di matematica per la Scuola Media</p>
         </div>
 
+        <!-- Aritmetica -->
+        <div class="section-header">
+            <span class="section-icon">🔢</span>
+            <span data-i18n="sec-arithmetic">Aritmetica</span>
+        </div>
         <div class="quiz-grid">
-            <a href="equivalenze.html" class="quiz-card">
-                <div class="quiz-icon">📏</div>
-                <div class="quiz-title" data-i18n="conversions">Equivalenze</div>
-                <div class="quiz-description" data-i18n="conversions-desc">
-                    Esercitati con le equivalenze di massa, lunghezza e volume.
-                    Converti tra kg, g, mg e molte altre unità!
-                </div>
-                <div class="quiz-badge" data-i18n="available">Disponibile</div>
-            </a>
-
-            <a href="calcolatore.html" class="quiz-card">
-                <div class="quiz-icon">🧮</div>
-                <div class="quiz-title" data-i18n="calculator">Calcolatore</div>
-                <div class="quiz-description" data-i18n="calculator-desc">
-                    Converti rapidamente tra diverse unità di misura.
-                    Inserisci un valore e vedi tutte le conversioni!
-                </div>
-                <div class="quiz-badge" data-i18n="available">Disponibile</div>
-            </a>
-
             <a href="operazioni.html" class="quiz-card">
                 <div class="quiz-icon">➕</div>
                 <div class="quiz-title" data-i18n="operations">Operazioni</div>
@@ -309,26 +315,6 @@
                 <div class="quiz-badge" data-i18n="available">Disponibile</div>
             </a>
 
-            <a href="geometria.html" class="quiz-card">
-                <div class="quiz-icon">📐</div>
-                <div class="quiz-title" data-i18n="geometry">Geometria</div>
-                <div class="quiz-description" data-i18n="geometry-desc">
-                    Calcola aree, perimetri e volumi di figure geometriche.
-                    Scopri il mondo della geometria!
-                </div>
-                <div class="quiz-badge" data-i18n="available">Disponibile</div>
-            </a>
-
-            <a href="circonferenza.html" class="quiz-card">
-                <div class="quiz-icon">⭕</div>
-                <div class="quiz-title" data-i18n="circumference">Circonferenza</div>
-                <div class="quiz-description" data-i18n="circumference-desc">
-                    Archi, settori, aree e formule inverse.
-                    Esercitati con circonferenza e cerchio!
-                </div>
-                <div class="quiz-badge" data-i18n="available">Disponibile</div>
-            </a>
-
             <a href="espressioni.html" class="quiz-card">
                 <div class="quiz-icon">⚡</div>
                 <div class="quiz-title" data-i18n="expressions">Espressioni</div>
@@ -345,6 +331,60 @@
                 <div class="quiz-description" data-i18n="expr-fractions-desc">
                     Addizioni, sottrazioni, moltiplicazioni e divisioni tra frazioni
                     con parentesi tonde, quadre e graffe.
+                </div>
+                <div class="quiz-badge" data-i18n="available">Disponibile</div>
+            </a>
+        </div>
+
+        <!-- Misure -->
+        <div class="section-header">
+            <span class="section-icon">📏</span>
+            <span data-i18n="sec-measures">Misure</span>
+        </div>
+        <div class="quiz-grid">
+            <a href="equivalenze.html" class="quiz-card">
+                <div class="quiz-icon">⚖️</div>
+                <div class="quiz-title" data-i18n="conversions">Equivalenze</div>
+                <div class="quiz-description" data-i18n="conversions-desc">
+                    Esercitati con le equivalenze di massa, lunghezza e volume.
+                    Converti tra kg, g, mg e molte altre unità!
+                </div>
+                <div class="quiz-badge" data-i18n="available">Disponibile</div>
+            </a>
+
+            <a href="calcolatore.html" class="quiz-card">
+                <div class="quiz-icon">🧮</div>
+                <div class="quiz-title" data-i18n="calculator">Calcolatore</div>
+                <div class="quiz-description" data-i18n="calculator-desc">
+                    Converti rapidamente tra diverse unità di misura.
+                    Inserisci un valore e vedi tutte le conversioni!
+                </div>
+                <div class="quiz-badge" data-i18n="available">Disponibile</div>
+            </a>
+        </div>
+
+        <!-- Geometria -->
+        <div class="section-header">
+            <span class="section-icon">📐</span>
+            <span data-i18n="sec-geometry">Geometria</span>
+        </div>
+        <div class="quiz-grid">
+            <a href="geometria.html" class="quiz-card">
+                <div class="quiz-icon">🔷</div>
+                <div class="quiz-title" data-i18n="geometry">Geometria</div>
+                <div class="quiz-description" data-i18n="geometry-desc">
+                    Calcola aree, perimetri e volumi di figure geometriche.
+                    Scopri il mondo della geometria!
+                </div>
+                <div class="quiz-badge" data-i18n="available">Disponibile</div>
+            </a>
+
+            <a href="circonferenza.html" class="quiz-card">
+                <div class="quiz-icon">⭕</div>
+                <div class="quiz-title" data-i18n="circumference">Circonferenza</div>
+                <div class="quiz-description" data-i18n="circumference-desc">
+                    Archi, settori, aree e formule inverse.
+                    Esercitati con circonferenza e cerchio!
                 </div>
                 <div class="quiz-badge" data-i18n="available">Disponibile</div>
             </a>
@@ -401,6 +441,9 @@
                 'segments-desc': 'Definizioni, punto medio, somma e differenza di segmenti, rette parallele e perpendicolari.',
                 'angles': 'Angoli',
                 'angles-desc': 'Nomenclatura, tipi di angoli, bisettrice, angoli complementari, supplementari ed esplementari.',
+                'sec-arithmetic': 'Aritmetica',
+                'sec-measures': 'Misure',
+                'sec-geometry': 'Geometria',
                 'available': 'Disponibile',
                 'coming-soon': 'Prossimamente'
             },
@@ -428,6 +471,9 @@
                 'segments-desc': 'Definitions, midpoint, sum and difference of segments, parallel and perpendicular lines.',
                 'angles': 'Angles',
                 'angles-desc': 'Nomenclature, types of angles, bisector, complementary, supplementary and explementary angles.',
+                'sec-arithmetic': 'Arithmetic',
+                'sec-measures': 'Measures',
+                'sec-geometry': 'Geometry',
                 'available': 'Available',
                 'coming-soon': 'Coming Soon'
             }
