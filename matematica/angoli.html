@@ -95,7 +95,7 @@
         @media (max-width: 768px) {
             .back-button { top: 10px; left: 10px; padding: 8px 14px; font-size: 0.9em; }
             .language-selector { top: 10px; right: 10px; padding: 6px; }
-            .container { padding: 10px; padding-top: 65px; }
+            .container { padding: 10px; padding-top: 65px; padding-bottom: 80px; }
             h1 { font-size: 1.4em; }
             .question-box { min-width: unset; padding: 20px; }
             .question { font-size: 1.1em; }
@@ -610,19 +610,21 @@
                         <text x="130" y="100" text-anchor="middle" class="sml">α + β = 180°</text>
                     </svg>`;
                 case 'explementary':
+                    // Three symmetric 120° angles. Arc endpoints at r=35 from center (85,85):
+                    // ray1 0°: (120,85), ray2 120°: (68,55), ray3 240°: (68,115)
                     return `<svg width="170" height="170" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
                         <circle cx="85" cy="85" r="55" fill="none" stroke="#eee" stroke-width="1"/>
                         <line x1="85" y1="85" x2="140" y2="85" stroke="${c1}" stroke-width="2.5"/>
-                        <line x1="85" y1="85" x2="85" y2="30"  stroke="${c2}" stroke-width="2.5"/>
-                        <line x1="85" y1="85" x2="30" y2="115" stroke="${cg}" stroke-width="2.5"/>
+                        <line x1="85" y1="85" x2="58"  y2="37"  stroke="${c2}" stroke-width="2.5"/>
+                        <line x1="85" y1="85" x2="58"  y2="133" stroke="${cg}" stroke-width="2.5"/>
                         <circle cx="85" cy="85" r="4" fill="#333"/>
-                        <path d="M 120 85 A 35 35 0 0 0 85 50" fill="none" stroke="${c1}" stroke-width="1.5"/>
-                        <path d="M 85 50 A 35 35 0 0 0 55 113" fill="none" stroke="${c2}" stroke-width="1.5"/>
-                        <path d="M 55 113 A 35 35 0 0 0 120 85" fill="none" stroke="${cg}" stroke-width="1.5"/>
-                        <text x="107" y="75" class="sml" style="fill:${c1};">α</text>
-                        <text x="60" y="58" class="sml" style="fill:${c2};">β</text>
-                        <text x="46" y="105" class="sml" style="fill:${cg};">γ</text>
-                        <text x="85" y="158" text-anchor="middle" class="sml">α+β+γ = 360°</text>
+                        <path d="M 120 85 A 35 35 0 0 0 68 55"  fill="none" stroke="${c1}" stroke-width="1.5"/>
+                        <path d="M 68 55  A 35 35 0 0 0 68 115" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <path d="M 68 115 A 35 35 0 0 0 120 85" fill="none" stroke="${cg}" stroke-width="1.5"/>
+                        <text x="111" y="47"  text-anchor="middle" class="sml" style="fill:${c1};">α</text>
+                        <text x="34"  y="88"  text-anchor="middle" class="sml" style="fill:${c2};">β</text>
+                        <text x="111" y="130" text-anchor="middle" class="sml" style="fill:${cg};">γ</text>
+                        <text x="85"  y="158" text-anchor="middle" class="sml">α+β+γ = 360°</text>
                     </svg>`;
                 default:
                     return drawAngleSVG(60, c1, true);
