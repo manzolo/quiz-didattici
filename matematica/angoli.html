@@ -550,16 +550,20 @@
                     </svg>`;
                 }
                 case 'consecutive': {
-                    return `<svg width="220" height="140" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
-                        <line x1="40" y1="110" x2="190" y2="110" stroke="${c1}" stroke-width="2.5"/>
-                        <line x1="40" y1="110" x2="100" y2="20"  stroke="${c2}" stroke-width="2.5"/>
-                        <line x1="40" y1="110" x2="160" y2="40"  stroke="${cg}" stroke-width="2.5"/>
-                        <circle cx="40" cy="110" r="4" fill="${c1}"/>
-                        <path d="M 75 110 A 35 35 0 0 0 68 74" fill="none" stroke="${c2}" stroke-width="1.5"/>
-                        <path d="M 75 110 A 35 35 0 0 0 55 76" fill="none" stroke="${cg}" stroke-width="1.5"/>
-                        <text x="52" y="80" class="sml" style="fill:${cg};">α</text>
-                        <text x="70" y="78" class="sml" style="fill:${c2};">β</text>
-                        <text x="40" y="128" class="sml">lato comune</text>
+                    // Vertex (80,120). Outer right ray 0°, common side 70° (green), outer left 140° (red).
+                    // Arc α (blue): horizontal→common side. Arc β (red): common side→outer left.
+                    // All arc endpoints verified at r=35: (115,120), (92,87), (53,98).
+                    return `<svg width="225" height="148" xmlns="http://www.w3.org/2000/svg">${svgStyle()}
+                        <line x1="80" y1="120" x2="200" y2="120" stroke="${c1}" stroke-width="2.5"/>
+                        <line x1="80" y1="120" x2="107" y2="45"  stroke="${cg}" stroke-width="2.5"/>
+                        <line x1="80" y1="120" x2="19"  y2="69"  stroke="${c2}" stroke-width="2.5"/>
+                        <circle cx="80" cy="120" r="4" fill="#555"/>
+                        <path d="M 115 120 A 35 35 0 0 0 92 87" fill="none" stroke="${c1}" stroke-width="1.5"/>
+                        <path d="M 92 87  A 35 35 0 0 0 53 98" fill="none" stroke="${c2}" stroke-width="1.5"/>
+                        <text x="119" y="100" class="sml" style="fill:${c1};">α</text>
+                        <text x="60"  y="88"  class="sml" style="fill:${c2};">β</text>
+                        <text x="112" y="38"  class="sml" style="fill:${cg};">lato comune</text>
+                        <text x="76"  y="136" class="sl">V</text>
                     </svg>`;
                 }
                 case 'congruent':
