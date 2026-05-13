@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Solidi Geometrici</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+        }
+
+        .container {
+            background: white; flex: 1;
+            display: flex; flex-direction: column;
+            padding: 20px; overflow: hidden;
+        }
+
+        h1 {
+            color: #667eea; text-align: center;
+            margin-bottom: 20px; font-size: 2.5em;
+        }
+
+        .score-section {
+            display: flex; justify-content: space-around;
+            background: #f8f9fa; padding: 20px;
+            border-radius: 10px; margin-bottom: 20px;
+        }
+
+        .score-item { text-align: center; }
+        .score-label { font-size: 14px; color: #666; margin-bottom: 5px; }
+        .score-value { font-size: 32px; font-weight: bold; color: #667eea; }
+        .score-value.correct { color: #28a745; }
+        .score-value.wrong { color: #dc3545; }
+
+        .quiz-area {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 40px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 60px; border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center; margin-bottom: 40px; min-width: 600px;
+        }
+
+        .question { color: white; font-size: 2em; font-weight: bold; margin-bottom: 20px; line-height: 1.3; }
+
+        .shape-visualization {
+            background: white; border-radius: 15px; padding: 20px;
+            margin: 20px auto; display: block; max-width: 240px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .shape-visualization svg { display: block; width: 100%; height: auto; }
+        .category-label { color: rgba(255,255,255,0.8); font-size: 1.2em; }
+
+        .answer-box {
+            display: flex; gap: 20px; align-items: center;
+            justify-content: center; flex-wrap: wrap;
+        }
+
+        .answer-input {
+            padding: 20px 30px; font-size: 2.5em;
+            border: 4px solid #667eea; border-radius: 15px;
+            text-align: center; width: 300px; font-weight: bold;
+        }
+
+        .answer-input:focus { outline: none; border-color: #f093fb; box-shadow: 0 0 20px rgba(240,147,251,0.5); }
+        .answer-input.correct { border-color: #28a745; background: #d4edda; }
+        .answer-input.wrong { border-color: #dc3545; background: #f8d7da; }
+
+        .unit-label { font-size: 1.8em; font-weight: bold; color: #667eea; }
+
+        .button-group { display: flex; gap: 20px; margin-top: 30px; }
+
+        .btn {
+            padding: 15px 40px; font-size: 1.3em; font-weight: bold;
+            border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s;
+        }
+
+        .btn-check { background: #667eea; color: white; }
+        .btn-check:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-next { background: #28a745; color: white; display: none; }
+        .btn-next:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(40,167,69,0.4); }
+        .btn-next.show { display: block; }
+
+        .feedback {
+            margin-top: 20px; font-size: 1.3em; font-weight: bold;
+            min-height: 40px; max-width: 800px; text-align: center;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .feedback.correct { color: #28a745; }
+        .feedback.wrong { color: #dc3545; }
+
+        .explanation {
+            background: #fff8e1; border: 2px solid #ffc107;
+            border-radius: 12px; padding: 16px 20px; margin-top: 14px;
+            text-align: left; max-width: 520px; width: 100%;
+        }
+
+        .expl-title { font-weight: bold; color: #664d00; margin-bottom: 8px; font-size: 1em; }
+
+        .expl-formula {
+            background: #fff3cd; border-left: 4px solid #ffc107;
+            padding: 6px 10px; border-radius: 4px; font-family: monospace;
+            font-size: 1em; color: #333; margin-bottom: 8px;
+        }
+
+        .expl-step { color: #444; font-size: 0.95em; padding: 3px 0; line-height: 1.6; }
+        .expl-step b { color: #28a745; font-size: 1.1em; }
+
+        .final-screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+        .final-screen.show { display: flex; }
+
+        .final-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 60px 80px; border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center; margin-bottom: 40px; min-width: 600px;
+        }
+
+        .final-title { color: white; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
+        .final-grade { color: white; font-size: 5em; font-weight: bold; margin: 20px 0; }
+        .final-message { color: white; font-size: 1.5em; margin-bottom: 10px; }
+
+        .history-box {
+            background: #f8f9fa; padding: 30px; border-radius: 15px;
+            margin-bottom: 30px; min-width: 600px;
+        }
+
+        .history-title { color: #667eea; font-size: 1.5em; font-weight: bold; margin-bottom: 20px; text-align: center; }
+        .history-list { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+
+        .history-item {
+            background: white; padding: 15px 25px; border-radius: 10px;
+            border: 3px solid #667eea; font-size: 1.3em; font-weight: bold; color: #667eea;
+        }
+
+        .history-item.current { background: #667eea; color: white; transform: scale(1.1); }
+
+        .trend { margin-top: 15px; font-size: 1.3em; font-weight: bold; text-align: center; }
+        .trend.improving { color: #28a745; }
+        .trend.declining { color: #dc3545; }
+        .trend.stable { color: #ffc107; }
+
+        .btn-restart {
+            background: #667eea; color: white; padding: 20px 60px;
+            font-size: 1.5em; font-weight: bold; border: none;
+            border-radius: 15px; cursor: pointer; transition: all 0.3s;
+        }
+
+        .btn-restart:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-reset-history {
+            background: #dc3545; color: white; padding: 15px 40px;
+            font-size: 1.2em; font-weight: bold; border: none;
+            border-radius: 10px; cursor: pointer; transition: all 0.3s; margin-top: 20px;
+        }
+
+        .btn-reset-history:hover { background: #c82333; transform: translateY(-2px); }
+
+        .category-tabs { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+
+        .tab {
+            flex: 1; padding: 15px 20px; background: #e9ecef;
+            border: none; border-radius: 10px; cursor: pointer;
+            font-size: 18px; font-weight: bold; transition: all 0.3s; min-width: 120px;
+        }
+
+        .tab:hover { background: #d3d6db; transform: translateY(-2px); }
+        .tab.active { background: #667eea; color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+
+        .help-container { position: relative; display: inline-block; margin-left: 15px; vertical-align: middle; }
+
+        .help-icon {
+            width: 35px; height: 35px; background: #667eea; color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s;
+        }
+
+        .help-icon:hover { background: #5568d3; transform: scale(1.1); }
+
+        .help-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 999;
+        }
+
+        .help-overlay.show { display: block; }
+
+        .help-tooltip {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white; border: 3px solid #667eea; border-radius: 15px;
+            padding: 25px; padding-top: 45px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            z-index: 1000; max-width: 90vw; max-height: 80vh; overflow-y: auto;
+        }
+
+        .help-tooltip.show { display: block; }
+
+        .help-close {
+            position: absolute; top: 10px; right: 10px;
+            width: 30px; height: 30px; background: #dc3545;
+            color: white; border: none; border-radius: 50%;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s;
+        }
+
+        .help-close:hover { background: #c82333; transform: rotate(90deg); }
+        .help-tooltip h3 { color: #667eea; margin-bottom: 20px; font-size: 1.3em; text-align: center; }
+        .help-content { color: #333; line-height: 1.8; text-align: left; }
+        .help-section { margin-bottom: 15px; }
+        .help-section-title { color: #764ba2; font-weight: bold; font-size: 1.1em; margin-bottom: 10px; }
+
+        .help-example {
+            background: #f8f9fa; padding: 10px; border-radius: 8px;
+            margin-top: 5px; font-family: monospace; font-size: 1em;
+        }
+
+        .back-button {
+            display: inline-flex; align-items: center; gap: 10px;
+            color: #667eea; text-decoration: none; font-size: 1em; font-weight: bold;
+            padding: 10px 20px; background: white; border: 2px solid #667eea;
+            border-radius: 10px; transition: all 0.3s;
+            position: absolute; top: 20px; left: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .back-button:hover { background: #667eea; color: white; transform: translateX(-5px); }
+
+        .formula-btn-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 35px; height: 35px; background: #764ba2; color: white;
+            border-radius: 50%; text-decoration: none; font-size: 16px;
+            vertical-align: middle; margin-left: 10px; transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(118,75,162,0.3);
+        }
+
+        .formula-btn-icon:hover { background: #5a3780; transform: scale(1.1); }
+
+        .btn-show-solution {
+            background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px;
+            padding: 8px 18px; font-size: 0.95em; font-weight: bold;
+            color: #664d00; cursor: pointer; margin-top: 10px; transition: all 0.3s;
+        }
+
+        .btn-show-solution:hover { background: #ffc107; transform: translateY(-1px); }
+
+        .language-selector {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; gap: 10px; background: white;
+            padding: 10px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn {
+            background: transparent; border: 2px solid #667eea; color: #667eea;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s;
+        }
+
+        .lang-btn:hover { background: rgba(102,126,234,0.1); }
+        .lang-btn.active { background: #667eea; color: white; }
+
+        .dimension-label { font-size: 13px; font-weight: bold; fill: #667eea; }
+
+        .buy-me-coffee {
+            position: fixed; bottom: 20px; right: 20px; z-index: 1000; transition: transform 0.3s ease;
+        }
+
+        .buy-me-coffee:hover { transform: translateY(-5px); }
+
+        .buy-me-coffee img {
+            height: 50px; width: auto; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            h1 { font-size: 1.8em; margin-bottom: 15px; }
+
+            .back-button { position: relative; top: auto; left: auto; margin-bottom: 10px; font-size: 0.9em; padding: 8px 15px; }
+            .language-selector { position: relative; top: auto; right: auto; margin-bottom: 15px; justify-content: center; }
+
+            .score-section { flex-wrap: wrap; padding: 15px; gap: 15px; }
+            .score-item { flex: 1 1 40%; min-width: 120px; }
+            .score-label { font-size: 12px; }
+            .score-value { font-size: 24px; }
+
+            .category-tabs { flex-wrap: wrap; gap: 10px; }
+            .tab { flex: 1 1 45%; padding: 12px 15px; font-size: 14px; }
+
+            .quiz-area { padding: 15px 10px; justify-content: flex-start; }
+
+            .question-box { padding: 20px 15px; border-radius: 15px; margin-bottom: 20px; min-width: auto; width: 100%; }
+            .question { font-size: 1.4em; word-break: break-word; }
+            .category-label { font-size: 0.95em; }
+            .shape-visualization { padding: 12px; margin: 12px auto; }
+
+            .answer-box { flex-direction: column; gap: 12px; align-items: center; }
+            .answer-input { padding: 12px 15px; font-size: 1.6em; width: 100%; max-width: 220px; }
+            .unit-label { font-size: 1.2em; }
+
+            .button-group { flex-direction: column; gap: 12px; margin-top: 15px; width: 100%; align-items: center; }
+            .btn { padding: 12px 30px; font-size: 1.1em; width: 100%; max-width: 280px; }
+
+            .feedback { font-size: 1em; padding: 15px 10px; margin-top: 10px; min-height: 60px; display: flex; align-items: center; justify-content: center; }
+
+            .final-box { padding: 30px 20px; border-radius: 15px; margin-bottom: 30px; min-width: auto; width: 100%; }
+            .final-title { font-size: 1.8em; }
+            .final-grade { font-size: 3.5em; }
+            .final-message { font-size: 1.2em; }
+            .history-box { padding: 20px; border-radius: 10px; margin-bottom: 20px; min-width: auto; width: 100%; }
+            .history-title { font-size: 1.2em; }
+            .history-item { padding: 10px 15px; font-size: 1.1em; }
+            .trend { font-size: 1.1em; }
+            .btn-restart { padding: 15px 40px; font-size: 1.2em; width: 100%; max-width: 300px; }
+            .btn-reset-history { padding: 12px 30px; font-size: 1em; width: 100%; max-width: 300px; }
+
+            .help-container { display: block; margin-left: 0; margin-top: 10px; }
+            .help-icon { width: 30px; height: 30px; font-size: 18px; }
+            .help-tooltip { max-width: 95vw; width: 95vw; padding: 10px; padding-top: 40px; max-height: 85vh; }
+            .help-tooltip h3 { font-size: 1.1em; margin-bottom: 15px; }
+
+            .buy-me-coffee {
+                width: 48px; height: 48px; background: #FFDD00; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                bottom: 15px; right: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            }
+
+            .buy-me-coffee img { display: none; }
+            .buy-me-coffee::after { content: '☕'; font-size: 22px; }
+
+            .container { padding-bottom: 80px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.4em; }
+            .question-box { padding: 15px 10px; margin-bottom: 15px; }
+            .question { font-size: 1.2em; }
+            .answer-input { font-size: 1.4em; padding: 10px 12px; max-width: 200px; }
+            .unit-label { font-size: 1em; }
+            .button-group { margin-top: 10px; gap: 10px; }
+            .btn { font-size: 0.95em; padding: 10px 20px; max-width: 260px; }
+            .feedback { font-size: 0.95em; padding: 12px 8px; min-height: 50px; }
+            .final-grade { font-size: 2.5em; }
+            .tab { flex: 1 1 100%; font-size: 13px; padding: 10px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span data-i18n="back">← Matematica</span>
+    </a>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it')">IT</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+    <div class="container">
+        <h1>
+            <span data-i18n="title">Quiz Solidi Geometrici</span>
+            <a href="solidi-formule.html" target="_blank" class="formula-btn-icon" title="Formulario">📄</a>
+            <div class="help-container">
+                <div class="help-icon" onclick="toggleHelp()">?</div>
+            </div>
+        </h1>
+
+        <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+        <div class="help-tooltip" id="helpTooltip">
+            <button class="help-close" onclick="toggleHelp()">&times;</button>
+            <h3 data-i18n="help-title">Formule Solidi Geometrici</h3>
+            <div class="help-content">
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-cube-title">Cubo (lato l)</div>
+                    <div class="help-example">S.lat = 4·l² &nbsp;&nbsp;&nbsp; S.tot = 6·l²</div>
+                    <div class="help-example">V = l³ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l = ∛V</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-cuboid-title">Parallelepipedo (a × b × h)</div>
+                    <div class="help-example">S.lat = 2(a+b)·h &nbsp;&nbsp; S.tot = S.lat + 2·a·b</div>
+                    <div class="help-example">V = a·b·h &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; h = V / (a·b)</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-prism-title">Prisma (A_b, p_b, h)</div>
+                    <div class="help-example">S.lat = p_b·h &nbsp;&nbsp;&nbsp; S.tot = S.lat + 2·A_b</div>
+                    <div class="help-example">V = A_b·h &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; h = V / A_b</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-rhombus-title">Base rombica (diag. d₁, d₂)</div>
+                    <div class="help-example">A_b = d₁·d₂ / 2</div>
+                    <div class="help-example">lato = √((d₁/2)² + (d₂/2)²)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="score">Punteggio</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct">Corrette</div>
+                <div class="score-value correct" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong">Sbagliate</div>
+                <div class="score-value wrong" id="wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="questions">Domande</div>
+                <div class="score-value" id="total">0/10</div>
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="tab active" onclick="changeCategory('tutte')" data-i18n="all">Tutti</button>
+            <button class="tab" onclick="changeCategory('cubo')" data-i18n="cube-tab">Cubo</button>
+            <button class="tab" onclick="changeCategory('parallelepipedo')" data-i18n="cuboid-tab">Parallelepipedo</button>
+            <button class="tab" onclick="changeCategory('prisma')" data-i18n="prism-tab">Prisma</button>
+        </div>
+
+        <div class="quiz-area">
+            <div class="question-box">
+                <div class="question" id="question"></div>
+                <div class="shape-visualization" id="shapeVisualization"></div>
+                <div class="category-label" id="categoryLabel"></div>
+            </div>
+            <div class="answer-box" id="answerBox"></div>
+            <div class="button-group">
+                <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()" data-i18n="check">Verifica</button>
+                <button class="btn btn-next" id="btnNext" onclick="nextQuestion()" data-i18n="next">Prossima Domanda</button>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message">
+                    <span data-i18n="answered-correctly">Hai risposto correttamente a</span>
+                    <span id="finalCorrect">0</span>
+                    <span data-i18n="questions-out-of">domande su 10</span>
+                </div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+            </div>
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee">
+    </a>
+
+    <script>
+        let currentLanguage = 'it';
+
+        const translations = {
+            it: {
+                'back': '← Matematica',
+                'formula-sheet': 'Formulario',
+                'title': 'Quiz Solidi Geometrici',
+                'score': 'Punteggio',
+                'correct': 'Corrette',
+                'wrong': 'Sbagliate',
+                'questions': 'Domande',
+                'all': 'Tutti',
+                'cube-tab': 'Cubo',
+                'cuboid-tab': 'Parallelepipedo',
+                'prism-tab': 'Prisma',
+                'check': 'Verifica',
+                'next': 'Prossima Domanda',
+                'restart': 'Ricomincia Quiz',
+                'reset-history': 'Cancella Storico Voti',
+                'help-title': 'Formule Solidi Geometrici',
+                'help-cube-title': 'Cubo (lato l)',
+                'help-cuboid-title': 'Parallelepipedo (a × b × h)',
+                'help-prism-title': 'Prisma (A_b, p_b, h)',
+                'help-rhombus-title': 'Base rombica (diag. d₁, d₂)',
+                'insert-value': 'Inserisci un valore!',
+                'correct-answer': 'Corretto!',
+                'wrong-answer': 'Sbagliato! La risposta corretta è',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti',
+                'improving': 'Stai migliorando!',
+                'declining': 'Stai peggiorando',
+                'same-result': 'Stesso risultato',
+                'overall-trend': 'Trend generale: miglioramento (media',
+                'vs': 'vs',
+                'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+                'history-deleted': 'Storico voti cancellato!',
+                'cat-cube': 'Cubo',
+                'cat-cuboid': 'Parallelepipedo',
+                'cat-prism': 'Prisma'
+            },
+            en: {
+                'back': '← Mathematics',
+                'formula-sheet': 'Formula Sheet',
+                'title': 'Geometric Solids Quiz',
+                'score': 'Score',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'questions': 'Questions',
+                'all': 'All',
+                'cube-tab': 'Cube',
+                'cuboid-tab': 'Cuboid',
+                'prism-tab': 'Prism',
+                'check': 'Check',
+                'next': 'Next Question',
+                'restart': 'Restart Quiz',
+                'reset-history': 'Clear History',
+                'help-title': 'Geometric Solids Formulas',
+                'help-cube-title': 'Cube (side l)',
+                'help-cuboid-title': 'Cuboid (a × b × h)',
+                'help-prism-title': 'Prism (A_b, p_b, h)',
+                'help-rhombus-title': 'Rhombus base (diag. d₁, d₂)',
+                'insert-value': 'Please insert a value!',
+                'correct-answer': 'Correct!',
+                'wrong-answer': 'Wrong! The correct answer is',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades',
+                'improving': 'You\'re improving!',
+                'declining': 'You\'re declining',
+                'same-result': 'Same result',
+                'overall-trend': 'Overall trend: improvement (average',
+                'vs': 'vs',
+                'confirm-reset': 'Are you sure you want to delete all saved grades?',
+                'history-deleted': 'History deleted!',
+                'cat-cube': 'Cube',
+                'cat-cuboid': 'Cuboid',
+                'cat-prism': 'Prism'
+            }
+        };
+
+        const categoryNames = {
+            cubo:           { it: 'Cubo',           en: 'Cube' },
+            parallelepipedo:{ it: 'Parallelepipedo', en: 'Cuboid' },
+            prisma:         { it: 'Prisma',          en: 'Prism' }
+        };
+
+        function t(key) { return translations[currentLanguage][key] || key; }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('solidiLanguage', lang);
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.textContent = translations[lang][key];
+            });
+            if (currentQuestion) updateQuestionDisplay();
+        }
+
+        let currentQuestion = null;
+        let score = 0, correct = 0, wrong = 0, total = 0;
+        let selectedCategory = 'tutte';
+        const MAX_QUESTIONS = 10;
+        let previousQuestions = [];
+
+        function changeCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            if (total > 0) {
+                score = 0; correct = 0; wrong = 0; total = 0; previousQuestions = [];
+                document.getElementById('score').textContent = 0;
+                document.getElementById('correct').textContent = 0;
+                document.getElementById('wrong').textContent = 0;
+                document.getElementById('total').textContent = `0/${MAX_QUESTIONS}`;
+            }
+            nextQuestion();
+        }
+
+        // ── SVG 3D drawings (cabinet oblique projection) ──────────────────────
+
+        function drawCube(labelL) {
+            // Front face 80×80 starting at x=35 (left margin for label)
+            // Front: A(35,125) B(115,125) C(115,45) D(35,45)
+            // Back (dx=30,dy=18): E(65,107) F(145,107) G(145,27) H(65,27)
+            const sc = '#667eea', hc = '#aaa';
+            return `<svg width="200" height="175" viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+              <line x1="65" y1="107" x2="35" y2="125" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="65" y1="107" x2="145" y2="107" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="65" y1="107" x2="65" y2="27" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <polygon points="35,125 115,125 115,45 35,45" fill="rgba(102,126,234,0.20)" stroke="${sc}" stroke-width="2"/>
+              <polygon points="115,125 145,107 145,27 115,45" fill="rgba(102,126,234,0.12)" stroke="${sc}" stroke-width="2"/>
+              <polygon points="35,45 115,45 145,27 65,27" fill="rgba(102,126,234,0.07)" stroke="${sc}" stroke-width="2"/>
+              <!-- label below front bottom edge (centred) -->
+              <text x="75" y="142" text-anchor="middle" class="dimension-label">${labelL}</text>
+              <!-- label to the left of front left edge -->
+              <line x1="31" y1="85" x2="34" y2="85" stroke="${sc}" stroke-width="1" opacity="0.6"/>
+              <text x="28" y="89" text-anchor="end" class="dimension-label">${labelL}</text>
+            </svg>`;
+        }
+
+        function drawParallelepiped(labelA, labelB, labelH) {
+            // Front 80×60 starting at x=40 (left margin for h label)
+            // Front: A(40,122) B(120,122) C(120,62) D(40,62)
+            // Back (dx=28,dy=16): E(68,106) F(148,106) G(148,46) H(68,46)
+            const sc = '#667eea', hc = '#aaa';
+            return `<svg width="200" height="165" viewBox="0 0 200 148" xmlns="http://www.w3.org/2000/svg">
+              <line x1="68" y1="106" x2="40" y2="122" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="68" y1="106" x2="148" y2="106" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="68" y1="106" x2="68" y2="46" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <polygon points="40,122 120,122 120,62 40,62" fill="rgba(102,126,234,0.20)" stroke="${sc}" stroke-width="2"/>
+              <polygon points="120,122 148,106 148,46 120,62" fill="rgba(102,126,234,0.12)" stroke="${sc}" stroke-width="2"/>
+              <polygon points="40,62 120,62 148,46 68,46" fill="rgba(102,126,234,0.07)" stroke="${sc}" stroke-width="2"/>
+              <!-- a: below front bottom edge -->
+              <text x="80" y="138" text-anchor="middle" class="dimension-label">${labelA}</text>
+              <!-- h: clearly to the left of front left edge (edge at x=40) -->
+              <line x1="36" y1="92" x2="39" y2="92" stroke="${sc}" stroke-width="1" opacity="0.6"/>
+              <text x="34" y="96" text-anchor="end" class="dimension-label">${labelH}</text>
+              <!-- b: clearly to the right of depth edge B-F (F at x=148) -->
+              <line x1="148" y1="116" x2="153" y2="116" stroke="${sc}" stroke-width="1" opacity="0.6"/>
+              <text x="155" y="120" text-anchor="start" class="dimension-label">${labelB}</text>
+            </svg>`;
+        }
+
+        function drawPrism(labelAb, labelH) {
+            // Right-triangle prism: front A(25,125) B(105,125) C(25,62)
+            // Back (dx=38,dy=14): D(63,111) E(143,111) F(63,48)
+            const sc = '#667eea', hc = '#aaa';
+            return `<svg width="200" height="165" viewBox="0 0 190 148" xmlns="http://www.w3.org/2000/svg">
+              <line x1="25" y1="125" x2="63" y2="111" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="63" y1="111" x2="143" y2="111" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="63" y1="111" x2="63" y2="48" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <polygon points="105,125 25,62 63,48 143,111" fill="rgba(102,126,234,0.09)" stroke="${sc}" stroke-width="1.5"/>
+              <polygon points="25,125 105,125 25,62" fill="rgba(102,126,234,0.22)" stroke="${sc}" stroke-width="2"/>
+              <line x1="105" y1="125" x2="143" y2="111" stroke="${sc}" stroke-width="2"/>
+              <line x1="25" y1="62" x2="63" y2="48" stroke="${sc}" stroke-width="2"/>
+              <line x1="143" y1="111" x2="63" y2="48" stroke="${sc}" stroke-width="1.5" stroke-dasharray="5,3"/>
+              <polyline points="33,125 33,117 25,117" fill="none" stroke="${sc}" stroke-width="1.5"/>
+              <!-- A_b: centroid of front triangle -->
+              <text x="52" y="106" text-anchor="middle" class="dimension-label">${labelAb}</text>
+              <!-- h: to the right of depth edge B-E, outside solid -->
+              <line x1="143" y1="118" x2="149" y2="118" stroke="${sc}" stroke-width="1" opacity="0.6"/>
+              <text x="151" y="122" text-anchor="start" class="dimension-label">${labelH}</text>
+            </svg>`;
+        }
+
+        // ── Question generation ───────────────────────────────────────────────
+
+        function generateQuestion() {
+            let attempts = 0;
+            while (attempts < 60) {
+                attempts++;
+
+                let category;
+                if (selectedCategory === 'tutte') {
+                    const cats = ['cubo','parallelepipedo','prisma'];
+                    category = cats[Math.floor(Math.random() * cats.length)];
+                } else {
+                    category = selectedCategory;
+                }
+
+                let q = null;
+
+                if (category === 'cubo') {
+                    const types = ['cube-slat','cube-stot','cube-vol','cube-side-from-vol','cube-vol-from-slat'];
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    const lVals = [2,3,4,5,6,7,8,9,10];
+                    const l = lVals[Math.floor(Math.random() * lVals.length)];
+
+                    if (type === 'cube-slat') {
+                        q = { category, type, l, answer: 4*l*l };
+                    } else if (type === 'cube-stot') {
+                        q = { category, type, l, answer: 6*l*l };
+                    } else if (type === 'cube-vol') {
+                        q = { category, type, l, answer: l*l*l };
+                    } else if (type === 'cube-side-from-vol') {
+                        const cubes = [{l:2,V:8},{l:3,V:27},{l:4,V:64},{l:5,V:125},{l:6,V:216},{l:7,V:343},{l:8,V:512}];
+                        const c = cubes[Math.floor(Math.random() * cubes.length)];
+                        q = { category, type, l: c.l, V: c.V, answer: c.l };
+                    } else if (type === 'cube-vol-from-slat') {
+                        q = { category, type, l, slat: 4*l*l, answer: l*l*l };
+                    }
+
+                } else if (category === 'parallelepipedo') {
+                    const types = ['cuboid-slat','cuboid-stot','cuboid-vol','cuboid-h-from-vol','cuboid-h-from-stot'];
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    const aVals = [3,4,5,6,8,9], bVals = [3,4,5,6,8,9], hVals = [2,3,4,5,6,7,8,10,12];
+                    const a = aVals[Math.floor(Math.random() * aVals.length)];
+                    const b = bVals[Math.floor(Math.random() * bVals.length)];
+                    const h = hVals[Math.floor(Math.random() * hVals.length)];
+                    const slat = 2*(a+b)*h, ab = a*b, stot = slat+2*ab, vol = ab*h;
+
+                    if (type === 'cuboid-slat')         q = { category, type, a, b, h, answer: slat };
+                    else if (type === 'cuboid-stot')    q = { category, type, a, b, h, answer: stot };
+                    else if (type === 'cuboid-vol')     q = { category, type, a, b, h, answer: vol };
+                    else if (type === 'cuboid-h-from-vol')  q = { category, type, a, b, h, vol, answer: h };
+                    else if (type === 'cuboid-h-from-stot') q = { category, type, a, b, h, stot, slat, ab, answer: vol };
+
+                } else if (category === 'prisma') {
+                    const types = ['prism-slat','prism-stot','prism-vol','prism-h-from-vol','prism-ab-from-vol','prism-rhombus'];
+                    const type = types[Math.floor(Math.random() * types.length)];
+
+                    if (type === 'prism-rhombus') {
+                        const pairs = [{d1:6,d2:8,side:5},{d1:12,d2:16,side:10},{d1:10,d2:24,side:13},{d1:18,d2:24,side:15}];
+                        const rp = pairs[Math.floor(Math.random() * pairs.length)];
+                        const hVals = [3,4,5,6,7,8,10];
+                        const h = hVals[Math.floor(Math.random() * hVals.length)];
+                        const Ab = rp.d1*rp.d2/2, pb = 4*rp.side;
+                        const vol = Ab*h, slat = pb*h, stot = slat+2*Ab;
+                        q = { category, type, d1: rp.d1, d2: rp.d2, side: rp.side, Ab, pb, h, vol, slat, stot, answer: stot };
+                    } else {
+                        const abVals = [6,8,10,12,15,18,20,24,30,36,40,48,60];
+                        const pbVals = [12,15,18,20,24,28,30,36,40];
+                        const hVals  = [3,4,5,6,7,8,10];
+                        const Ab = abVals[Math.floor(Math.random() * abVals.length)];
+                        const pb = pbVals[Math.floor(Math.random() * pbVals.length)];
+                        const h  = hVals[Math.floor(Math.random() * hVals.length)];
+                        const slat = pb*h, stot = slat+2*Ab, vol = Ab*h;
+
+                        if (type === 'prism-slat')        q = { category, type, Ab, pb, h, answer: slat };
+                        else if (type === 'prism-stot')   q = { category, type, Ab, pb, h, answer: stot };
+                        else if (type === 'prism-vol')    q = { category, type, Ab, pb, h, answer: vol };
+                        else if (type === 'prism-h-from-vol')  q = { category, type, Ab, h, vol, answer: h };
+                        else if (type === 'prism-ab-from-vol') q = { category, type, h, Ab, vol, answer: Ab };
+                    }
+                }
+
+                if (!q) continue;
+
+                const key = JSON.stringify({ type: q.type, answer: q.answer });
+                if (previousQuestions.includes(key)) continue;
+                previousQuestions.push(key);
+                if (previousQuestions.length > 3) previousQuestions.shift();
+                return q;
+            }
+
+            return { category: 'cubo', type: 'cube-vol', l: 5, answer: 125 };
+        }
+
+        // ── Display ───────────────────────────────────────────────────────────
+
+        function updateQuestionDisplay() {
+            const q = currentQuestion;
+            const il = currentLanguage === 'it';
+            document.getElementById('answerBox').innerHTML = '';
+            document.getElementById('shapeVisualization').innerHTML = '';
+
+            let qText = '', svg = '', unit = 'cm³';
+
+            if (q.category === 'cubo') {
+                if (q.type === 'cube-slat') {
+                    qText = `${il?'Lato':'Side'} <b>l = ${q.l} cm</b><br>${il?'Calcola la superficie laterale S.lat = 4·l²:':'Find lateral surface S.lat = 4·l²:'}`;
+                    svg = drawCube(`l=${q.l}`); unit = 'cm²';
+                } else if (q.type === 'cube-stot') {
+                    qText = `${il?'Lato':'Side'} <b>l = ${q.l} cm</b><br>${il?'Calcola la superficie totale S.tot = 6·l²:':'Find total surface S.tot = 6·l²:'}`;
+                    svg = drawCube(`l=${q.l}`); unit = 'cm²';
+                } else if (q.type === 'cube-vol') {
+                    qText = `${il?'Lato':'Side'} <b>l = ${q.l} cm</b><br>${il?'Calcola il volume V = l³:':'Find volume V = l³:'}`;
+                    svg = drawCube(`l=${q.l}`); unit = 'cm³';
+                } else if (q.type === 'cube-side-from-vol') {
+                    qText = `${il?'Il volume di un cubo è':'A cube has volume'} <b>V = ${q.V} cm³</b><br>${il?'Trova il lato l = ∛V:':'Find side l = ∛V:'}`;
+                    svg = drawCube('l=?'); unit = 'cm';
+                } else if (q.type === 'cube-vol-from-slat') {
+                    qText = `${il?'La superficie laterale di un cubo misura':'A cube has lateral surface'} <b>S.lat = ${q.slat} cm²</b><br>${il?'Calcola il volume V:':'Find the volume V:'}`;
+                    svg = drawCube('l=?'); unit = 'cm³';
+                }
+                document.getElementById('categoryLabel').textContent = categoryNames.cubo[currentLanguage];
+
+            } else if (q.category === 'parallelepipedo') {
+                const side = il ? 'Lati' : 'Sides';
+                const height = il ? 'altezza' : 'height';
+                if (q.type === 'cuboid-slat') {
+                    qText = `${side} <b>a = ${q.a}</b>, <b>b = ${q.b} cm</b>, ${height} <b>h = ${q.h} cm</b><br>${il?'Calcola la superficie laterale S.lat = 2(a+b)·h:':'Find lateral surface S.lat = 2(a+b)·h:'}`;
+                    svg = drawParallelepiped(`a=${q.a}`,`b=${q.b}`,`h=${q.h}`); unit = 'cm²';
+                } else if (q.type === 'cuboid-stot') {
+                    qText = `${side} <b>a = ${q.a}</b>, <b>b = ${q.b} cm</b>, ${height} <b>h = ${q.h} cm</b><br>${il?'Calcola la superficie totale S.tot:':'Find total surface area S.tot:'}`;
+                    svg = drawParallelepiped(`a=${q.a}`,`b=${q.b}`,`h=${q.h}`); unit = 'cm²';
+                } else if (q.type === 'cuboid-vol') {
+                    qText = `${side} <b>a = ${q.a}</b>, <b>b = ${q.b} cm</b>, ${height} <b>h = ${q.h} cm</b><br>${il?'Calcola il volume V = a·b·h:':'Find volume V = a·b·h:'}`;
+                    svg = drawParallelepiped(`a=${q.a}`,`b=${q.b}`,`h=${q.h}`); unit = 'cm³';
+                } else if (q.type === 'cuboid-h-from-vol') {
+                    qText = `${side} <b>a = ${q.a}</b>, <b>b = ${q.b} cm</b>, ${il?'volume':'volume'} <b>V = ${q.vol} cm³</b><br>${il?'Trova l\'altezza h = V / (a·b):':'Find height h = V / (a·b):'}`;
+                    svg = drawParallelepiped(`a=${q.a}`,`b=${q.b}`,'h=?'); unit = 'cm';
+                } else if (q.type === 'cuboid-h-from-stot') {
+                    qText = `${il?'Base':'Base'} <b>a = ${q.a} cm</b>, <b>b = ${q.b} cm</b> — ${il?'sup. totale':'total surface'} <b>S.tot = ${q.stot} cm²</b><br>${il?'Trova l\'altezza h, poi calcola il volume V:':'Find height h, then calculate volume V:'}`;
+                    svg = drawParallelepiped(`a=${q.a}`,`b=${q.b}`,'h=?'); unit = 'cm³';
+                }
+                document.getElementById('categoryLabel').textContent = categoryNames.parallelepipedo[currentLanguage];
+
+            } else if (q.category === 'prisma') {
+                if (q.type === 'prism-slat') {
+                    qText = `${il?'Perimetro base':'Base perimeter'} <b>p_b = ${q.pb} cm</b>, ${il?'altezza':'height'} <b>h = ${q.h} cm</b><br>${il?'Calcola la superficie laterale S.lat = p_b·h:':'Find lateral surface S.lat = p_b·h:'}`;
+                    svg = drawPrism(`p_b=${q.pb}`,`h=${q.h}`); unit = 'cm²';
+                } else if (q.type === 'prism-stot') {
+                    qText = `${il?'Area base':'Base area'} <b>A_b = ${q.Ab} cm²</b>, <b>p_b = ${q.pb} cm</b>, <b>h = ${q.h} cm</b><br>${il?'Calcola la superficie totale S.tot:':'Find total surface area S.tot:'}`;
+                    svg = drawPrism(`A_b=${q.Ab}`,`h=${q.h}`); unit = 'cm²';
+                } else if (q.type === 'prism-vol') {
+                    qText = `${il?'Area base':'Base area'} <b>A_b = ${q.Ab} cm²</b>, ${il?'altezza':'height'} <b>h = ${q.h} cm</b><br>${il?'Calcola il volume V = A_b·h:':'Find volume V = A_b·h:'}`;
+                    svg = drawPrism(`A_b=${q.Ab}`,`h=${q.h}`); unit = 'cm³';
+                } else if (q.type === 'prism-h-from-vol') {
+                    qText = `${il?'Volume':'Volume'} <b>V = ${q.vol} cm³</b>, ${il?'area base':'base area'} <b>A_b = ${q.Ab} cm²</b><br>${il?'Trova l\'altezza h = V / A_b:':'Find height h = V / A_b:'}`;
+                    svg = drawPrism(`A_b=${q.Ab}`,'h=?'); unit = 'cm';
+                } else if (q.type === 'prism-ab-from-vol') {
+                    qText = `${il?'Volume':'Volume'} <b>V = ${q.vol} cm³</b>, ${il?'altezza':'height'} <b>h = ${q.h} cm</b><br>${il?'Trova l\'area della base A_b = V / h:':'Find base area A_b = V / h:'}`;
+                    svg = drawPrism('A_b=?',`h=${q.h}`); unit = 'cm²';
+                } else if (q.type === 'prism-rhombus') {
+                    qText = `${il?'Prisma a base rombica — diagonali':'Rhombus prism — diagonals'} <b>d₁ = ${q.d1} cm</b>, <b>d₂ = ${q.d2} cm</b>, ${il?'volume':'volume'} <b>V = ${q.vol} cm³</b><br>${il?'Calcola la superficie totale S.tot:':'Find total surface area S.tot:'}`;
+                    svg = drawPrism(`d₁=${q.d1},d₂=${q.d2}`,'h=?'); unit = 'cm²';
+                }
+                document.getElementById('categoryLabel').textContent = categoryNames.prisma[currentLanguage];
+            }
+
+            document.getElementById('question').innerHTML = qText;
+            document.getElementById('shapeVisualization').innerHTML = svg;
+            document.getElementById('answerBox').innerHTML = `
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" step="1" autofocus>
+                <div class="unit-label">${unit}</div>
+            `;
+        }
+
+        // ── Explanation boxes ─────────────────────────────────────────────────
+
+        function getExplanation(q) {
+            const il = currentLanguage === 'it';
+            const how = il ? 'Come si calcola:' : 'How to calculate:';
+            function box(formula, steps) {
+                return `<div class="explanation">
+                    <div class="expl-title">${how}</div>
+                    <div class="expl-formula">${formula}</div>
+                    ${steps.map(s=>`<div class="expl-step">${s}</div>`).join('')}
+                </div>`;
+            }
+
+            if (q.type === 'cube-slat')
+                return box('S.lat = 4 × l²', [`S.lat = 4 × ${q.l}² = 4 × ${q.l*q.l}`, `S.lat = <b>${q.answer} cm²</b>`]);
+            if (q.type === 'cube-stot')
+                return box('S.tot = 6 × l²', [`S.tot = 6 × ${q.l}² = 6 × ${q.l*q.l}`, `S.tot = <b>${q.answer} cm²</b>`]);
+            if (q.type === 'cube-vol')
+                return box('V = l³', [`V = ${q.l}³ = ${q.l} × ${q.l} × ${q.l}`, `V = <b>${q.answer} cm³</b>`]);
+            if (q.type === 'cube-side-from-vol')
+                return box('l = ∛V', [`l = ∛${q.V}`, `l = <b>${q.answer} cm</b>`]);
+            if (q.type === 'cube-vol-from-slat')
+                return box('1) l = √(S.lat / 4)   2) V = l³', [
+                    `1) l = √(${q.slat} / 4) = √${q.slat/4} = ${q.l} cm`,
+                    `2) V = ${q.l}³ = ${q.l}×${q.l}×${q.l}`,
+                    `V = <b>${q.answer} cm³</b>`
+                ]);
+
+            if (q.type === 'cuboid-slat') {
+                const pb = 2*(q.a+q.b);
+                return box('S.lat = 2(a+b) × h', [
+                    `S.lat = 2 × (${q.a}+${q.b}) × ${q.h} = ${pb} × ${q.h}`,
+                    `S.lat = <b>${q.answer} cm²</b>`
+                ]);
+            }
+            if (q.type === 'cuboid-stot') {
+                const slat = 2*(q.a+q.b)*q.h;
+                return box('S.tot = S.lat + 2·a·b', [
+                    `S.lat = 2(${q.a}+${q.b})×${q.h} = ${slat} cm²`,
+                    `2·a·b = 2×${q.a}×${q.b} = ${2*q.a*q.b} cm²`,
+                    `S.tot = ${slat} + ${2*q.a*q.b} = <b>${q.answer} cm²</b>`
+                ]);
+            }
+            if (q.type === 'cuboid-vol')
+                return box('V = a × b × h', [`V = ${q.a} × ${q.b} × ${q.h}`, `V = <b>${q.answer} cm³</b>`]);
+            if (q.type === 'cuboid-h-from-vol') {
+                return box('h = V / (a × b)', [
+                    `h = ${q.vol} / (${q.a} × ${q.b}) = ${q.vol} / ${q.a*q.b}`,
+                    `h = <b>${q.answer} cm</b>`
+                ]);
+            }
+            if (q.type === 'cuboid-h-from-stot') {
+                const pb2 = 2*(q.a+q.b);
+                return box('1) h = (S.tot − 2ab) / (2(a+b))   2) V = a·b·h', [
+                    `1) h = (${q.stot} − 2×${q.ab}) / ${pb2} = ${q.stot-2*q.ab} / ${pb2} = ${q.h} cm`,
+                    `2) V = ${q.a} × ${q.b} × ${q.h}`,
+                    `V = <b>${q.answer} cm³</b>`
+                ]);
+            }
+
+            if (q.type === 'prism-slat')
+                return box('S.lat = p_b × h', [`S.lat = ${q.pb} × ${q.h}`, `S.lat = <b>${q.answer} cm²</b>`]);
+            if (q.type === 'prism-stot') {
+                const sl = q.pb*q.h;
+                return box('S.tot = p_b·h + 2·A_b', [
+                    `S.lat = ${q.pb}×${q.h} = ${sl} cm²`,
+                    `S.tot = ${sl} + 2×${q.Ab} = ${sl} + ${2*q.Ab}`,
+                    `S.tot = <b>${q.answer} cm²</b>`
+                ]);
+            }
+            if (q.type === 'prism-vol')
+                return box('V = A_b × h', [`V = ${q.Ab} × ${q.h}`, `V = <b>${q.answer} cm³</b>`]);
+            if (q.type === 'prism-h-from-vol')
+                return box('h = V / A_b', [`h = ${q.vol} / ${q.Ab}`, `h = <b>${q.answer} cm</b>`]);
+            if (q.type === 'prism-ab-from-vol')
+                return box('A_b = V / h', [`A_b = ${q.vol} / ${q.h}`, `A_b = <b>${q.answer} cm²</b>`]);
+            if (q.type === 'prism-rhombus') {
+                const hd1 = q.d1/2, hd2 = q.d2/2;
+                return box('A_b=d₁·d₂/2 → lato=√((d₁/2)²+(d₂/2)²) → p_b=4·lato → h=V/A_b → S.tot', [
+                    `A_b = ${q.d1}×${q.d2}/2 = <b>${q.Ab} cm²</b>`,
+                    `lato = √(${hd1}²+${hd2}²) = √${hd1*hd1+hd2*hd2} = <b>${q.side} cm</b>`,
+                    `p_b = 4×${q.side} = <b>${q.pb} cm</b>`,
+                    `h = ${q.vol} / ${q.Ab} = <b>${q.h} cm</b>`,
+                    `S.tot = ${q.pb}×${q.h} + 2×${q.Ab} = ${q.slat}+${2*q.Ab} = <b>${q.answer} cm²</b>`
+                ]);
+            }
+            return '';
+        }
+
+        // ── Game logic ────────────────────────────────────────────────────────
+
+        function nextQuestion() {
+            currentQuestion = generateQuestion();
+            updateQuestionDisplay();
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('btnCheck').style.display = 'block';
+            document.getElementById('btnNext').classList.remove('show');
+            const inp = document.querySelector('.answer-input');
+            if (inp) inp.focus();
+        }
+
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            const inp = document.getElementById('answerInput');
+            const userAns = parseFloat(inp.value);
+
+            if (isNaN(userAns)) {
+                feedback.textContent = t('insert-value');
+                feedback.className = 'feedback wrong';
+                return;
+            }
+
+            const isCorrect = userAns === currentQuestion.answer;
+            inp.classList.add(isCorrect ? 'correct' : 'wrong');
+            inp.disabled = true;
+            total++;
+
+            if (isCorrect) {
+                correct++; score += 10;
+                feedback.textContent = t('correct-answer');
+                feedback.className = 'feedback correct';
+            } else {
+                wrong++;
+                const expl = getExplanation(currentQuestion);
+                const showLabel = currentLanguage === 'it' ? '🔍 Mostra come si risolve' : '🔍 Show solution';
+                feedback.innerHTML = `
+                    <span>${t('wrong-answer')} <b>${currentQuestion.answer}</b></span>
+                    ${expl ? `<button class="btn-show-solution" onclick="this.style.display='none';document.getElementById('sol-steps').style.display='flex';">${showLabel}</button>
+                    <div id="sol-steps" style="display:none">${expl}</div>` : ''}
+                `;
+                feedback.className = 'feedback wrong';
+            }
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = `${total}/${MAX_QUESTIONS}`;
+            document.getElementById('btnCheck').style.display = 'none';
+
+            if (total >= MAX_QUESTIONS) {
+                setTimeout(showFinalResults, 1500);
+            } else {
+                document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        function showFinalResults() {
+            document.querySelector('.quiz-area').style.display = 'none';
+            document.getElementById('finalScreen').classList.add('show');
+            const grade = correct;
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalGrade').textContent = `${grade}/10`;
+
+            const comments = {
+                it: ['Devi esercitarti ancora un po\'!','Sufficiente, continua a esercitarti!','Discreto, ma puoi fare meglio!','Bene! Stai migliorando!','Molto bene! Continua così!','Eccellente! Ottimo lavoro!','Perfetto! Sei un campione!'],
+                en: ['You need more practice!','Sufficient, keep practicing!','Fair, but you can do better!','Good! You\'re improving!','Very good! Keep it up!','Excellent! Great job!','Perfect! You\'re a champion!']
+            };
+
+            let ci;
+            if (grade===10) ci=6; else if (grade>=9) ci=5; else if (grade>=8) ci=4;
+            else if (grade>=7) ci=3; else if (grade>=6) ci=2; else if (grade>=5) ci=1; else ci=0;
+            document.getElementById('finalComment').textContent = comments[currentLanguage][ci];
+
+            saveGrade(grade);
+            displayHistory();
+        }
+
+        function saveGrade(grade) {
+            let h = JSON.parse(localStorage.getItem('solidiHistory') || '[]');
+            h.push(grade);
+            if (h.length > 10) h = h.slice(-10);
+            localStorage.setItem('solidiHistory', JSON.stringify(h));
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('solidiHistory') || '[]');
+            if (history.length === 0) { document.getElementById('historyBox').style.display = 'none'; return; }
+
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            history.forEach((g, i) => {
+                const item = document.createElement('div');
+                item.className = 'history-item' + (i === history.length - 1 ? ' current' : '');
+                item.textContent = `${g}/10`;
+                list.appendChild(item);
+            });
+
+            if (history.length >= 2) {
+                const last = history[history.length-1], prev = history[history.length-2];
+                const tm = document.getElementById('trendMessage');
+                if (last > prev) { tm.textContent = `${t('improving')} (+${last-prev})`; tm.className = 'trend improving'; }
+                else if (last < prev) { tm.textContent = `${t('declining')} (${last-prev})`; tm.className = 'trend declining'; }
+                else { tm.textContent = t('same-result'); tm.className = 'trend stable'; }
+
+                if (history.length >= 6) {
+                    const ra = (history.slice(-3).reduce((a,b)=>a+b,0)/3).toFixed(1);
+                    const pa = (history.slice(-6,-3).reduce((a,b)=>a+b,0)/3).toFixed(1);
+                    if (ra > pa) tm.textContent += ` | ${t('overall-trend')} ${ra} ${t('vs')} ${pa})`;
+                }
+            }
+        }
+
+        function restartQuiz() {
+            score=0; correct=0; wrong=0; total=0; previousQuestions=[];
+            document.getElementById('score').textContent=0;
+            document.getElementById('correct').textContent=0;
+            document.getElementById('wrong').textContent=0;
+            document.getElementById('total').textContent=`0/${MAX_QUESTIONS}`;
+            document.getElementById('finalScreen').classList.remove('show');
+            document.querySelector('.quiz-area').style.display='flex';
+            nextQuestion();
+        }
+
+        function resetHistory() {
+            if (confirm(t('confirm-reset'))) {
+                localStorage.removeItem('solidiHistory');
+                document.getElementById('historyBox').style.display='none';
+                alert(t('history-deleted'));
+            }
+        }
+
+        function toggleHelp() {
+            document.getElementById('helpOverlay').classList.toggle('show');
+            document.getElementById('helpTooltip').classList.toggle('show');
+        }
+
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const btnCheck = document.getElementById('btnCheck');
+                if (btnCheck.style.display !== 'none') checkAnswer();
+                else nextQuestion();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('solidiLanguage') || 'it';
+            currentLanguage = saved;
+            if (saved === 'en') {
+                document.querySelector('.lang-btn.active').classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations.en[key]) el.textContent = translations.en[key];
+                });
+            }
+        });
+
+        nextQuestion();
+    </script>
+</body>
+</html>
