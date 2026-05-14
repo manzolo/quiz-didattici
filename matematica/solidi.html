@@ -388,6 +388,7 @@
                     <div class="help-example">S.lat = 2(a+b)·h &nbsp;&nbsp; S.tot = S.lat + 2·a·b</div>
                     <div class="help-example">V = a·b·h &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; h = V / (a·b)</div>
                     <div class="help-example">h = S.lat / (2(a+b)) &nbsp; h = (S.tot−2ab) / (2(a+b))</div>
+                    <div class="help-example">b = (S.tot − 2·a·h) / (2·(a+h))</div>
                 </div>
                 <div class="help-section">
                     <div class="help-section-title" data-i18n="help-prism-title">Prisma (A_b, p_b, h)</div>
@@ -738,7 +739,7 @@
 
                 } else if (category === 'parallelepipedo') {
                     const types = ['cuboid-slat','cuboid-stot','cuboid-vol','cuboid-h-from-vol','cuboid-h-from-stot','cuboid-h-from-slat',
-                                   'cuboid-slat-from-stot','cuboid-stot-from-slat'];
+                                   'cuboid-slat-from-stot','cuboid-stot-from-slat','cuboid-b-from-stot'];
                     const type = types[Math.floor(Math.random() * types.length)];
                     const aVals = [3,4,5,6,8,9], bVals = [3,4,5,6,8,9], hVals = [2,3,4,5,6,7,8,10,12];
                     const a = aVals[Math.floor(Math.random() * aVals.length)];
@@ -754,6 +755,7 @@
                     else if (type === 'cuboid-h-from-slat')     q = { category, type, a, b, h, slat, answer: h };
                     else if (type === 'cuboid-slat-from-stot') q = { category, type, a, b, slat, stot, ab, answer: slat };
                     else if (type === 'cuboid-stot-from-slat') q = { category, type, a, b, slat, stot, ab, answer: stot };
+                    else if (type === 'cuboid-b-from-stot') q = { category, type, a, b, h, stot, answer: b };
 
                 } else if (category === 'prisma') {
                     const types = ['prism-slat','prism-stot','prism-vol','prism-h-from-vol','prism-ab-from-vol','prism-rhombus',
@@ -866,6 +868,9 @@
                 } else if (q.type === 'cuboid-h-from-slat') {
                     qText = `${side} <b>a = ${q.a} cm</b>, <b>b = ${q.b} cm</b> — ${il?'sup. laterale':'lateral surface'} <b>S.lat = ${q.slat} cm²</b><br>${il?'Trova l\'altezza h = S.lat / (2(a+b)):':'Find height h = S.lat / (2(a+b)):'}`;
                     svg = drawParallelepiped(`a=${q.a}`,`b=${q.b}`,'h=?'); unit = 'cm';
+                } else if (q.type === 'cuboid-b-from-stot') {
+                    qText = `${side} <b>a = ${q.a} cm</b>, ${il?'altezza':'height'} <b>h = ${q.h} cm</b> — ${il?'sup. totale':'total surface'} <b>S.tot = ${q.stot} cm²</b><br>${il?'Trova la base b = (S.tot − 2·a·h) / (2·(a+h)):':'Find side b = (S.tot − 2·a·h) / (2·(a+h)):'}`;
+                    svg = drawParallelepiped(`a=${q.a}`,'b=?',`h=${q.h}`); unit = 'cm';
                 } else if (q.type === 'cuboid-slat-from-stot') {
                     qText = `${side} <b>a = ${q.a} cm</b>, <b>b = ${q.b} cm</b> — ${il?'sup. totale':'total surface'} <b>S.tot = ${q.stot} cm²</b><br>${il?'Calcola la superficie laterale S.lat = S.tot − 2·a·b:':'Find lateral surface S.lat = S.tot − 2·a·b:'}`;
                     svg = drawParallelepiped(`a=${q.a}`,`b=${q.b}`,`h=?`); unit = 'cm²';
@@ -1019,6 +1024,16 @@
                     `1) h = (${q.stot} − 2×${q.ab}) / ${pb2} = ${q.stot-2*q.ab} / ${pb2} = ${q.h} cm`,
                     `2) V = ${q.a} × ${q.b} × ${q.h}`,
                     `V = <b>${q.answer} cm³</b>`
+                ]);
+            }
+            if (q.type === 'cuboid-b-from-stot') {
+                const num = q.stot - 2*q.a*q.h;
+                const den = 2*(q.a+q.h);
+                return box('b = (S.tot − 2·a·h) / (2·(a+h))', [
+                    `b = (${q.stot} − 2×${q.a}×${q.h}) / (2×(${q.a}+${q.h}))`,
+                    `b = (${q.stot} − ${2*q.a*q.h}) / (2×${q.a+q.h})`,
+                    `b = ${num} / ${den}`,
+                    `b = <b>${q.answer} cm</b>`
                 ]);
             }
 
