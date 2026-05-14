@@ -637,6 +637,35 @@
             </svg>`;
         }
 
+        function drawRhombusPrism(labelD1, labelD2, labelH) {
+            // Rhombus-base prism: front diamond T(60,60) R(100,95) B(60,128) L(20,95)
+            // Back (dx=38,dy=-14): T'(98,46) R'(138,81) B'(98,114) L'(58,81)
+            const sc = '#667eea', hc = '#aaa';
+            return `<svg width="200" height="165" viewBox="0 0 190 148" xmlns="http://www.w3.org/2000/svg">
+              <!-- Hidden edges: L-L', L'-T', L'-B' -->
+              <line x1="20" y1="95" x2="58" y2="81" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="58" y1="81" x2="98" y2="46" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="58" y1="81" x2="98" y2="114" stroke="${hc}" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <!-- Top-right lateral face: T-R-R'-T' -->
+              <polygon points="60,60 100,95 138,81 98,46" fill="rgba(102,126,234,0.10)" stroke="${sc}" stroke-width="1.5"/>
+              <!-- Bottom-right lateral face: R-B-B'-R' -->
+              <polygon points="100,95 60,128 98,114 138,81" fill="rgba(102,126,234,0.07)" stroke="${sc}" stroke-width="1.5"/>
+              <!-- Front rhombus face -->
+              <polygon points="60,60 100,95 60,128 20,95" fill="rgba(102,126,234,0.22)" stroke="${sc}" stroke-width="2"/>
+              <!-- Visible depth edges: T-T', R-R', B-B'(dashed) -->
+              <line x1="60" y1="60" x2="98" y2="46" stroke="${sc}" stroke-width="2"/>
+              <line x1="100" y1="95" x2="138" y2="81" stroke="${sc}" stroke-width="2"/>
+              <line x1="60" y1="128" x2="98" y2="114" stroke="${hc}" stroke-width="1.5" stroke-dasharray="5,3"/>
+              <!-- d₁: horizontal diagonal label -->
+              <text x="60" y="143" text-anchor="middle" class="dimension-label">${labelD1}</text>
+              <!-- d₂: vertical diagonal label -->
+              <text x="103" y="100" text-anchor="start" class="dimension-label">${labelD2}</text>
+              <!-- h label -->
+              <line x1="138" y1="88" x2="144" y2="88" stroke="${sc}" stroke-width="1" opacity="0.6"/>
+              <text x="146" y="92" text-anchor="start" class="dimension-label">${labelH}</text>
+            </svg>`;
+        }
+
         function drawPrism(labelAb, labelH) {
             // Right-triangle prism: front A(25,125) B(105,125) C(25,62)
             // Back (dx=38,dy=14): D(63,111) E(143,111) F(63,48)
@@ -864,7 +893,7 @@
                     svg = drawPrism('A_b=?',`h=${q.h}`); unit = 'cm²';
                 } else if (q.type === 'prism-rhombus') {
                     qText = `${il?'Prisma a base rombica — diagonali':'Rhombus prism — diagonals'} <b>d₁ = ${q.d1} cm</b>, <b>d₂ = ${q.d2} cm</b>, ${il?'volume':'volume'} <b>V = ${q.vol} cm³</b><br>${il?'Calcola la superficie totale S.tot:':'Find total surface area S.tot:'}`;
-                    svg = drawPrism(`d₁=${q.d1},d₂=${q.d2}`,'h=?'); unit = 'cm²';
+                    svg = drawRhombusPrism(`d₁=${q.d1}`,`d₂=${q.d2}`,'h=?'); unit = 'cm²';
                 } else if (q.type === 'prism-h-from-slat') {
                     qText = `${il?'Perimetro base':'Base perimeter'} <b>p_b = ${q.pb} cm</b>, ${il?'sup. laterale':'lateral surface'} <b>S.lat = ${q.slat} cm²</b><br>${il?'Trova l\'altezza h = S.lat / p_b:':'Find height h = S.lat / p_b:'}`;
                     svg = drawPrism(`p_b=${q.pb}`,'h=?'); unit = 'cm';
