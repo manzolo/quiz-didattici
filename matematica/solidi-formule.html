@@ -197,16 +197,38 @@
                         <span class="formula-label">Lato (da S.lat):</span>
                         <span class="formula"><span class="result">l</span> = √(S.lat / 4)</span>
                     </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Lato (da S.tot):</span>
+                        <span class="formula"><span class="result">l</span> = √(S.tot / 6)</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Lato (da A faccia):</span>
+                        <span class="formula"><span class="result">l</span> = √A_faccia</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">S.lat (da S.tot):</span>
+                        <span class="formula"><span class="result">S.lat</span> = S.tot − 2·l²</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">S.tot (da S.lat):</span>
+                        <span class="formula"><span class="result">S.tot</span> = S.lat + 2·l²</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">A faccia (da S.tot):</span>
+                        <span class="formula"><span class="result">A_faccia</span> = S.tot / 6</span>
+                    </div>
                     <div class="example">
                         <span class="ex-title">Esempio — l = 5 cm:</span>
                         S.lat = 4×25 = <span class="ex-ans">100 cm²</span> &nbsp;|&nbsp;
                         S.tot = 6×25 = <span class="ex-ans">150 cm²</span> &nbsp;|&nbsp;
-                        V = 5³ = <span class="ex-ans">125 cm³</span>
+                        V = 5³ = <span class="ex-ans">125 cm³</span> &nbsp;|&nbsp;
+                        A_faccia = 25 cm²
                     </div>
                     <div class="example">
-                        <span class="ex-title">Esempio inverso — S.lat = 324 cm²:</span>
-                        l = √(324/4) = √81 = <span class="ex-ans">9 cm</span> &nbsp;&nbsp;→&nbsp;&nbsp;
-                        V = 9³ = <span class="ex-ans">729 cm³</span>
+                        <span class="ex-title">Esempi inversi — S.tot = 150 cm²:</span>
+                        l = √(150/6) = √25 = <span class="ex-ans">5 cm</span> &nbsp;|&nbsp;
+                        A_faccia = 150/6 = <span class="ex-ans">25 cm²</span> &nbsp;|&nbsp;
+                        S.lat = 150−2×25 = <span class="ex-ans">100 cm²</span>
                     </div>
                 </div>
             </div>
@@ -250,8 +272,20 @@
                         <span class="formula"><span class="result">h</span> = V / (a·b)</span>
                     </div>
                     <div class="formula-row">
+                        <span class="formula-label">Altezza (da S.lat):</span>
+                        <span class="formula"><span class="result">h</span> = S.lat / (2(a+b))</span>
+                    </div>
+                    <div class="formula-row">
                         <span class="formula-label">Altezza (da S.tot):</span>
                         <span class="formula"><span class="result">h</span> = (S.tot − 2ab) / (2(a+b))</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">S.lat (da S.tot):</span>
+                        <span class="formula"><span class="result">S.lat</span> = S.tot − 2·a·b</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">S.tot (da S.lat):</span>
+                        <span class="formula"><span class="result">S.tot</span> = S.lat + 2·a·b</span>
                     </div>
                     <div class="example">
                         <span class="ex-title">Esempio — a=5, b=3, h=4 cm:</span>
@@ -311,8 +345,24 @@
                         <span class="formula"><span class="result">h</span> = V / A_b</span>
                     </div>
                     <div class="formula-row">
+                        <span class="formula-label">Altezza (da S.lat):</span>
+                        <span class="formula"><span class="result">h</span> = S.lat / p_b</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Perim. base (da S.lat):</span>
+                        <span class="formula"><span class="result">p_b</span> = S.lat / h</span>
+                    </div>
+                    <div class="formula-row">
                         <span class="formula-label">Area base (da V):</span>
                         <span class="formula"><span class="result">A_b</span> = V / h</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Area base (da S.tot):</span>
+                        <span class="formula"><span class="result">A_b</span> = (S.tot − p_b·h) / 2</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">S.lat (da S.tot):</span>
+                        <span class="formula"><span class="result">S.lat</span> = S.tot − 2·A_b</span>
                     </div>
                     <div class="example">
                         <span class="ex-title">Esempio — A_b=24, p_b=20, h=5 cm:</span>
@@ -359,6 +409,42 @@
                         <div class="warning-box">
                             ⚠ Coppie pitagoriche utili: (6,8→5), (12,16→10), (10,24→13), (18,24→15)
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── FORMULE INVERSE ──────────────────────────────────────────────── -->
+        <div class="card red" style="margin-bottom:10px;">
+            <div class="card-header">🔁 Formule Inverse — Schema Riassuntivo</div>
+            <div class="card-body">
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px 14px;">
+                    <div>
+                        <div style="font-size:11px;font-weight:bold;color:#dc3545;margin-bottom:6px;border-bottom:1px solid #dc3545;padding-bottom:2px;">Cubo (lato l)</div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:90px">lato da V:</span><span class="formula" style="font-size:11px">l = ∛V</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:90px">lato da S.lat:</span><span class="formula" style="font-size:11px">l = √(S.lat/4)</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:90px">lato da S.tot:</span><span class="formula" style="font-size:11px">l = √(S.tot/6)</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:90px">lato da A_f:</span><span class="formula" style="font-size:11px">l = √A_faccia</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:90px">S.lat da S.tot:</span><span class="formula" style="font-size:11px">S.lat = S.tot − 2l²</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:90px">S.tot da S.lat:</span><span class="formula" style="font-size:11px">S.tot = S.lat + 2l²</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:90px">A_faccia:</span><span class="formula" style="font-size:11px">A_f = S.tot / 6</span></div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;font-weight:bold;color:#dc3545;margin-bottom:6px;border-bottom:1px solid #dc3545;padding-bottom:2px;">Parallelepipedo</div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">h da V:</span><span class="formula" style="font-size:11px">h = V / (a·b)</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">h da S.lat:</span><span class="formula" style="font-size:11px">h = S.lat / (2(a+b))</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">h da S.tot:</span><span class="formula" style="font-size:11px">h = (S.tot−2ab) / (2(a+b))</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">S.lat da S.tot:</span><span class="formula" style="font-size:11px">S.lat = S.tot − 2·a·b</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">S.tot da S.lat:</span><span class="formula" style="font-size:11px">S.tot = S.lat + 2·a·b</span></div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;font-weight:bold;color:#dc3545;margin-bottom:6px;border-bottom:1px solid #dc3545;padding-bottom:2px;">Prisma</div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">h da V:</span><span class="formula" style="font-size:11px">h = V / A_b</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">h da S.lat:</span><span class="formula" style="font-size:11px">h = S.lat / p_b</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">A_b da V:</span><span class="formula" style="font-size:11px">A_b = V / h</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">A_b da S.tot:</span><span class="formula" style="font-size:11px">A_b = (S.tot − p_b·h) / 2</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">p_b da S.lat:</span><span class="formula" style="font-size:11px">p_b = S.lat / h</span></div>
+                        <div class="formula-row"><span class="formula-label" style="min-width:100px">S.lat da S.tot:</span><span class="formula" style="font-size:11px">S.lat = S.tot − 2·A_b</span></div>
                     </div>
                 </div>
             </div>
