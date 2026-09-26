@@ -454,6 +454,16 @@
             .final-grade { font-size: 2.5em; }
         }
 
+        .formula-btn-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 35px; height: 35px; background: #764ba2; color: white;
+            border-radius: 50%; text-decoration: none; font-size: 16px;
+            vertical-align: middle; margin-left: 10px; transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(118,75,162,0.3);
+        }
+
+        .formula-btn-icon:hover { background: #5a3780; transform: scale(1.1); }
+
         /* ── Exponents ──────────────────────────────────────── */
         .question sup  { font-size: 0.6em; vertical-align: super; line-height: 0; }
         .expl-step sup { font-size: 0.75em; line-height: 0; }
@@ -478,6 +488,7 @@
     <div class="container">
         <h1>
             <span data-i18n="title">Quiz Potenze</span>
+            <a href="potenze-formule.html" target="_blank" class="formula-btn-icon" title="Formulario">📄</a>
             <div class="help-container">
                 <div class="help-icon" onclick="toggleHelp()">?</div>
             </div>
@@ -509,6 +520,12 @@
                     <div data-i18n="help-same-desc">Si lascia l'esponente e si moltiplicano (o dividono) le basi</div>
                     <div class="help-example">a<sup>n</sup> × b<sup>n</sup> = (a×b)<sup>n</sup> &nbsp;&nbsp; 5<sup>3</sup> × 2<sup>3</sup> = 10<sup>3</sup></div>
                     <div class="help-example">a<sup>n</sup> ÷ b<sup>n</sup> = (a÷b)<sup>n</sup> &nbsp;&nbsp; 10<sup>4</sup> ÷ 2<sup>4</sup> = 5<sup>4</sup></div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-diff-title">Basi diverse</div>
+                    <div data-i18n="help-diff-desc">Cerca lo stesso esponente, oppure riscrivi le basi come potenze della stessa base (8 = 2³, 16 = 2⁴)</div>
+                    <div class="help-example">2<sup>3</sup> × 8<sup>3</sup> ÷ 16<sup>2</sup> = 16<sup>3</sup> ÷ 16<sup>2</sup> = 16</div>
+                    <div class="help-example">2<sup>3</sup> × 2<sup>9</sup> ÷ 2<sup>8</sup> = 2<sup>4</sup> = 16</div>
                 </div>
                 <div class="help-section">
                     <div class="help-section-title" data-i18n="help-special-title">Esponenti speciali</div>
@@ -627,6 +644,8 @@
                 'help-powpow-desc': 'Si lascia la base e si moltiplicano gli esponenti',
                 'help-same-title': 'Stesso esponente',
                 'help-same-desc': 'Si lascia l\'esponente e si moltiplicano (o dividono) le basi',
+                'help-diff-title': 'Basi diverse',
+                'help-diff-desc': 'Cerca lo stesso esponente, oppure riscrivi le basi come potenze della stessa base (8 = 2³, 16 = 2⁴)',
                 'help-special-title': 'Esponenti speciali',
                 'help-special-desc': 'Esponente 1 → la base stessa; esponente 0 → sempre 1',
                 'help-order-title': 'Ordine delle parentesi',
@@ -667,7 +686,8 @@
                 'rule-parens-same-exp': 'Prima le parentesi tonde, poi le potenze con lo stesso esponente',
                 'rule-pow-then-add': 'Prima semplifica le potenze, poi addiziona',
                 'rule-quot-equal': 'a<sup>m</sup> ÷ a<sup>m</sup> = a<sup>0</sup> = 1 e a<sup>1</sup> = a',
-                'rule-same-exp-trick': 'Stesso esponente: moltiplica prima le basi, il calcolo diventa più facile'
+                'rule-same-exp-trick': 'Stesso esponente: moltiplica prima le basi, il calcolo diventa più facile',
+                'rule-rewrite-base': 'Basi diverse: riscrivi tutto come potenze della stessa base (es. 8 = 2³), poi somma/sottrai gli esponenti'
             },
             en: {
                 'back': '← Mathematics',
@@ -693,6 +713,8 @@
                 'help-powpow-desc': 'Keep the base and multiply the exponents',
                 'help-same-title': 'Same exponent',
                 'help-same-desc': 'Keep the exponent and multiply (or divide) the bases',
+                'help-diff-title': 'Different bases',
+                'help-diff-desc': 'Look for the same exponent, or rewrite the bases as powers of the same base (8 = 2³, 16 = 2⁴)',
                 'help-special-title': 'Special exponents',
                 'help-special-desc': 'Exponent 1 → the base itself; exponent 0 → always 1',
                 'help-order-title': 'Order of brackets',
@@ -733,7 +755,8 @@
                 'rule-parens-same-exp': 'First the round brackets, then powers with the same exponent',
                 'rule-pow-then-add': 'First simplify the powers, then add',
                 'rule-quot-equal': 'a<sup>m</sup> ÷ a<sup>m</sup> = a<sup>0</sup> = 1 and a<sup>1</sup> = a',
-                'rule-same-exp-trick': 'Same exponent: multiply the bases first, the calculation gets easier'
+                'rule-same-exp-trick': 'Same exponent: multiply the bases first, the calculation gets easier',
+                'rule-rewrite-base': 'Different bases: rewrite everything as powers of the same base (e.g. 8 = 2³), then add/subtract the exponents'
             }
         };
 
@@ -980,6 +1003,33 @@
                 };
             },
 
+            E7() {
+                // b^m × c^k ÷ d^x  with b, c, d powers of the same base g (e.g. 2³ × 8³ ÷ 16²)
+                const g = pick([2, 2, 3]);
+                const bases = g === 2 ? [[2, 1], [4, 2], [8, 3], [16, 4]] : [[3, 1], [9, 2], [27, 3]];
+                const terms = [pick(bases), pick(bases), pick(bases)].map(([b, i]) => ({ b, i, e: ri(2, 4) }));
+                if (terms.every(tm => tm.b === terms[0].b)) return null;
+                const [t1, t2, t3] = terms.map(tm => ({ ...tm, g: tm.i * tm.e }));
+                const same = (x, y) => x.b === y.b && x.e === y.e;
+                if (same(t1, t3) || same(t2, t3)) return null;      // would cancel out trivially
+                const f = t1.g + t2.g - t3.g;
+                if (f < 1 || Math.pow(g, f) > MAX_VALUE) return null;
+                const rewrite = [...new Set([t1, t2, t3]
+                    .filter(tm => tm.b !== g)
+                    .map(tm => `${tm.b} = ${sup(g, tm.i)} → ${sup(tm.b, tm.e)} = (${sup(g, tm.i)})<sup>${tm.e}</sup> = <b>${sup(g, tm.g)}</b>`))];
+                return {
+                    category: 'espressioni', ask: 'ask-value',
+                    html: `${sup(t1.b, t1.e)} × ${sup(t2.b, t2.e)} ÷ ${sup(t3.b, t3.e)}`,
+                    answer: Math.pow(g, f),
+                    ruleKey: 'rule-rewrite-base',
+                    steps: [
+                        ...rewrite,
+                        `${sup(g, t1.g)} × ${sup(g, t2.g)} ÷ ${sup(g, t3.g)} = ${sup(g, t1.g + '+' + t2.g + '−' + t3.g)} = <b>${sup(g, f)}</b>`,
+                        valueStep(g, f)
+                    ]
+                };
+            },
+
             /* ══════════════ MISTE ══════════════ */
 
             M1() {
@@ -1099,7 +1149,7 @@
 
         const typesByCategory = {
             proprieta:   ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'],
-            espressioni: ['E1', 'E2', 'E3', 'E4', 'E5', 'E6'],
+            espressioni: ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7'],
             miste:       ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
         };
 

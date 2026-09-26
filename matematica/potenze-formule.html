@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Potenze</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+
+        .page {
+            background: white; width: 210mm; min-height: 297mm;
+            margin: 0 auto; padding: 12mm 14mm;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center; border: 3px solid #667eea; border-radius: 10px;
+            padding: 10px; margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+        }
+
+        .header h1 { font-size: 20px; letter-spacing: 1px; text-transform: uppercase; }
+        .header .subtitle { font-size: 12px; margin-top: 3px; opacity: 0.9; }
+
+        .symbols-note {
+            text-align: center; font-size: 12px; background: #fff3cd;
+            border: 2px solid #ffc107; border-radius: 6px;
+            padding: 5px; margin-bottom: 10px; font-weight: bold; color: #664d00;
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+        .card { border-radius: 8px; border: 2px solid; overflow: hidden; }
+        .card-header { padding: 6px 10px; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-body { padding: 8px 10px; }
+
+        .blue   { border-color: #667eea; }
+        .blue   .card-header { background: #667eea; color: white; }
+        .green  { border-color: #28a745; }
+        .green  .card-header { background: #28a745; color: white; }
+        .orange { border-color: #fd7e14; }
+        .orange .card-header { background: #fd7e14; color: white; }
+        .purple { border-color: #764ba2; }
+        .purple .card-header { background: #764ba2; color: white; }
+        .red    { border-color: #dc3545; }
+        .red    .card-header { background: #dc3545; color: white; }
+
+        .formula-row {
+            display: flex; align-items: baseline; gap: 8px;
+            padding: 4px 0; border-bottom: 1px dashed #ddd;
+        }
+
+        .formula-row:last-child { border-bottom: none; }
+
+        .formula-label { font-size: 10px; color: #888; min-width: 90px; flex-shrink: 0; }
+        .formula { font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; color: #222; }
+        .formula .result { color: #667eea; }
+
+        sup { font-size: 0.7em; line-height: 0; }
+
+        .example {
+            background: #f8f9fa; border-left: 3px solid #667eea;
+            padding: 4px 7px; margin-top: 5px; border-radius: 0 4px 4px 0;
+            font-size: 11.5px; color: #444; line-height: 1.8;
+        }
+
+        .example .ex-title { font-weight: bold; color: #667eea; display: block; margin-bottom: 1px; }
+        .example .ex-ans { color: #28a745; font-weight: bold; }
+
+        .warning-box {
+            background: #fff5f5; border: 1.5px solid #dc3545; border-radius: 6px;
+            padding: 5px 8px; margin-top: 6px; font-size: 11px; color: #721c24; line-height: 1.7;
+        }
+
+        /* ── Focus box: 2³ × 8³ ÷ 16² ─────────────────────────── */
+        .focus {
+            border: 3px solid #fd7e14; border-radius: 10px; overflow: hidden;
+            margin-bottom: 10px; break-inside: avoid;
+        }
+
+        .focus-header {
+            background: #fd7e14; color: white; padding: 7px 12px;
+            font-size: 14px; font-weight: bold;
+        }
+
+        .focus-expr {
+            text-align: center; font-family: 'Courier New', monospace;
+            font-size: 22px; font-weight: bold; padding: 8px; background: #fff4e6; color: #222;
+        }
+
+        .focus-body { padding: 8px 12px; }
+        .focus-intro { font-size: 11.5px; color: #333; margin-bottom: 8px; line-height: 1.6; }
+
+        .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .method { background: #f8f9fa; border-radius: 8px; padding: 8px 10px; border: 1.5px solid #ddd; }
+        .method-title { font-weight: bold; font-size: 12px; color: #764ba2; margin-bottom: 4px; }
+        .method-why { font-size: 10.5px; color: #666; margin-bottom: 5px; font-style: italic; }
+
+        .mstep { display: flex; gap: 6px; align-items: baseline; font-size: 12px; line-height: 1.9; }
+        .mstep .n {
+            background: #667eea; color: white; border-radius: 50%;
+            width: 17px; height: 17px; font-size: 10px; font-weight: bold;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .mstep .m { font-family: 'Courier New', monospace; font-weight: bold; }
+        .mstep .c { font-size: 10.5px; color: #666; }
+        .ok { color: #28a745; font-weight: bold; }
+
+        .mistakes { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        .mistake {
+            background: #fff5f5; border: 1.5px solid #dc3545; border-radius: 6px;
+            padding: 4px 7px; font-size: 10.5px; color: #721c24; line-height: 1.6;
+        }
+        .mistake .m { font-family: 'Courier New', monospace; font-weight: bold; }
+
+        /* ── Tables ────────────────────────────────────────────── */
+        table.pow { border-collapse: collapse; width: 100%; font-size: 11.5px; }
+        table.pow td, table.pow th { border: 1px solid #ddd; padding: 3px 4px; text-align: center; }
+        table.pow th { background: #f0f4ff; color: #667eea; font-weight: bold; }
+        table.pow td:first-child { font-weight: bold; color: #764ba2; background: #faf7fd; }
+
+        .steps-card {
+            background: #f0f4ff; border: 2px solid #667eea;
+            border-radius: 8px; padding: 8px 12px; margin-bottom: 10px;
+        }
+
+        .steps-title {
+            font-size: 12px; font-weight: bold; text-transform: uppercase;
+            color: #667eea; margin-bottom: 6px;
+            border-bottom: 1px solid #667eea; padding-bottom: 3px;
+        }
+
+        .steps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+        .step-item { font-size: 11px; color: #333; line-height: 1.6; }
+        .step-item strong { color: #764ba2; }
+
+        .footer { text-align: center; font-size: 9px; color: #aaa; margin-top: 8px; border-top: 1px solid #eee; padding-top: 6px; }
+
+        @media print {
+            @page { size: A4; margin: 8mm 10mm; }
+            body { background: white; padding: 0; }
+            .page { width: 100%; min-height: auto; box-shadow: none; padding: 0; }
+            .no-print { display: none !important; }
+            .card, .steps-card, .focus { break-inside: avoid; }
+        }
+
+        .print-bar {
+            width: 210mm; margin: 0 auto 15px;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+        }
+
+        .print-bar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+        .btn-print {
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+            border: none; padding: 10px 24px; border-radius: 8px;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 3px 10px rgba(102,126,234,0.4); transition: opacity 0.2s;
+        }
+
+        .btn-print:hover { opacity: 0.85; }
+        .print-hint { font-size: 11px; color: #888; text-align: right; }
+
+        .btn-back {
+            background: white; color: #667eea; border: 2px solid #667eea;
+            padding: 10px 20px; border-radius: 8px; font-size: 14px;
+            font-weight: bold; cursor: pointer; text-decoration: none;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        @media screen and (max-width: 820px) {
+            body { padding: 10px; }
+            .page { width: 100%; min-height: auto; padding: 12px; }
+            .print-bar { width: 100%; }
+            .grid, .methods, .steps-grid, .mistakes { grid-template-columns: 1fr; }
+            .focus-expr { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-bar no-print">
+        <a href="potenze.html" class="btn-back">← Torna al quiz</a>
+        <div class="print-bar-right">
+            <button class="btn-print" onclick="window.print()">📥 Salva come PDF</button>
+            <div class="print-hint">Si apre il dialogo di stampa → scegli "Salva come PDF"</div>
+        </div>
+    </div>
+
+    <div class="page">
+
+        <div class="header">
+            <h1>🚀 Formulario — Potenze</h1>
+            <div class="subtitle">Scuola Media (2ª) &nbsp;|&nbsp; Proprietà · Esponenti speciali · Espressioni</div>
+        </div>
+
+        <div class="symbols-note">
+            a<sup>n</sup> = a × a × … × a (n volte) &nbsp;|&nbsp; a = base &nbsp;|&nbsp; n = esponente
+            &nbsp;|&nbsp; esempio: 2<sup>5</sup> = 2 × 2 × 2 × 2 × 2 = 32
+        </div>
+
+        <!-- ── LE 5 PROPRIETÀ ─────────────────────────────────────────────── -->
+        <div class="grid">
+            <div class="card blue">
+                <div class="card-header">① Stessa base — prodotto</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Regola:</span>
+                        <span class="formula">a<sup>m</sup> × a<sup>n</sup> = <span class="result">a<sup>m+n</sup></span></span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Si lascia la base, si SOMMANO gli esponenti</span>
+                        13<sup>3</sup> × 13<sup>4</sup> = 13<sup>3+4</sup> = <span class="ex-ans">13<sup>7</sup></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card blue">
+                <div class="card-header">② Stessa base — quoziente</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Regola:</span>
+                        <span class="formula">a<sup>m</sup> ÷ a<sup>n</sup> = <span class="result">a<sup>m−n</sup></span></span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Si lascia la base, si SOTTRAGGONO gli esponenti</span>
+                        6<sup>12</sup> ÷ 6<sup>10</sup> = 6<sup>12−10</sup> = <span class="ex-ans">6<sup>2</sup> = 36</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card purple">
+                <div class="card-header">③ Potenza di potenza</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Regola:</span>
+                        <span class="formula">(a<sup>m</sup>)<sup>n</sup> = <span class="result">a<sup>m×n</sup></span></span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Si lascia la base, si MOLTIPLICANO gli esponenti</span>
+                        (2<sup>3</sup>)<sup>2</sup> = 2<sup>3×2</sup> = <span class="ex-ans">2<sup>6</sup> = 64</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card purple">
+                <div class="card-header">④⑤ Stesso esponente</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Prodotto:</span>
+                        <span class="formula">a<sup>n</sup> × b<sup>n</sup> = <span class="result">(a × b)<sup>n</sup></span></span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Quoziente:</span>
+                        <span class="formula">a<sup>n</sup> ÷ b<sup>n</sup> = <span class="result">(a ÷ b)<sup>n</sup></span></span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Si lascia l'esponente, si opera sulle BASI</span>
+                        5<sup>3</sup> × 2<sup>3</sup> = (5×2)<sup>3</sup> = <span class="ex-ans">10<sup>3</sup> = 1000</span>
+                        &nbsp;·&nbsp; 10<sup>4</sup> ÷ 2<sup>4</sup> = <span class="ex-ans">5<sup>4</sup></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card green">
+                <div class="card-header">Esponenti speciali</div>
+                <div class="card-body">
+                    <div class="formula-row">
+                        <span class="formula-label">Esponente 1:</span>
+                        <span class="formula">a<sup>1</sup> = <span class="result">a</span></span>
+                        <span class="formula-label" style="min-width:0">&nbsp;es. 16<sup>1</sup> = 16</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Esponente 0:</span>
+                        <span class="formula">a<sup>0</sup> = <span class="result">1</span></span>
+                        <span class="formula-label" style="min-width:0">&nbsp;(a ≠ 0)</span>
+                    </div>
+                    <div class="formula-row">
+                        <span class="formula-label">Base 1 e 0:</span>
+                        <span class="formula">1<sup>n</sup> = 1 &nbsp; 0<sup>n</sup> = 0</span>
+                    </div>
+                    <div class="example">
+                        <span class="ex-title">Perché a<sup>0</sup> = 1?</span>
+                        7<sup>3</sup> ÷ 7<sup>3</sup> = 7<sup>3−3</sup> = 7<sup>0</sup> &nbsp;ma anche&nbsp; 343 ÷ 343 = 1
+                        <br>(8<sup>7</sup> + 8<sup>8</sup>)<sup>0</sup> = <span class="ex-ans">1</span> → non serve calcolare la parentesi!
+                    </div>
+                </div>
+            </div>
+
+            <div class="card red">
+                <div class="card-header">⚠ Cosa NON si può fare</div>
+                <div class="card-body">
+                    <div class="warning-box" style="margin-top:0">
+                        <b>Con + e − le proprietà NON valgono:</b><br>
+                        2<sup>2</sup> + 2<sup>3</sup> ≠ 2<sup>5</sup> → 4 + 8 = <b>12</b> (non 32)<br>
+                        3<sup>2</sup> + 4<sup>2</sup> ≠ (3+4)<sup>2</sup> → 9 + 16 = <b>25</b> (non 49)
+                    </div>
+                    <div class="warning-box">
+                        <b>Non confondere:</b> 2<sup>3</sup> = 2×2×2 = 8 (non 2×3 = 6)<br>
+                        (2<sup>3</sup>)<sup>2</sup> = 2<sup>6</sup> (non 2<sup>9</sup>) &nbsp;·&nbsp; 2<sup>3</sup> × 2<sup>2</sup> = 2<sup>5</sup> (non 4<sup>5</sup>)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── FOCUS: 2³ × 8³ ÷ 16² ───────────────────────────────────────── -->
+        <div class="focus">
+            <div class="focus-header">🔎 Come si risolve un'espressione con basi diverse</div>
+            <div class="focus-expr">2<sup>3</sup> × 8<sup>3</sup> ÷ 16<sup>2</sup> = ?</div>
+            <div class="focus-body">
+                <div class="focus-intro">
+                    Le basi sono <b>diverse</b> (2, 8, 16): le regole ① e ② non si possono usare subito.
+                    Prima di tutto guarda: <b>che cosa hanno in comune</b> le potenze? Ci sono due strade, e danno lo stesso risultato.
+                    Ricorda: × e ÷ si eseguono <b>da sinistra a destra</b>.
+                </div>
+                <div class="methods">
+                    <div class="method">
+                        <div class="method-title">Metodo A — stesso esponente</div>
+                        <div class="method-why">2<sup>3</sup> e 8<sup>3</sup> hanno lo stesso esponente (3) → regola ④</div>
+                        <div class="mstep"><span class="n">1</span><span><span class="m">2<sup>3</sup> × 8<sup>3</sup> = (2 × 8)<sup>3</sup> = 16<sup>3</sup></span></span></div>
+                        <div class="mstep"><span class="n">2</span><span><span class="m">16<sup>3</sup> ÷ 16<sup>2</sup> = 16<sup>3−2</sup> = 16<sup>1</sup></span> <span class="c">ora la base è uguale → regola ②</span></span></div>
+                        <div class="mstep"><span class="n">3</span><span><span class="m">16<sup>1</sup> = <span class="ok">16</span></span></span></div>
+                    </div>
+                    <div class="method">
+                        <div class="method-title">Metodo B — tutto in base 2</div>
+                        <div class="method-why">8 e 16 sono potenze di 2: 8 = 2<sup>3</sup>, 16 = 2<sup>4</sup> → regola ③</div>
+                        <div class="mstep"><span class="n">1</span><span><span class="m">8<sup>3</sup> = (2<sup>3</sup>)<sup>3</sup> = 2<sup>9</sup></span> &nbsp; <span class="m">16<sup>2</sup> = (2<sup>4</sup>)<sup>2</sup> = 2<sup>8</sup></span></span></div>
+                        <div class="mstep"><span class="n">2</span><span><span class="m">2<sup>3</sup> × 2<sup>9</sup> ÷ 2<sup>8</sup> = 2<sup>3+9−8</sup> = 2<sup>4</sup></span></span></div>
+                        <div class="mstep"><span class="n">3</span><span><span class="m">2<sup>4</sup> = <span class="ok">16</span></span> <span class="c">✔ stesso risultato!</span></span></div>
+                    </div>
+                </div>
+                <div class="mistakes">
+                    <div class="mistake">✘ <span class="m">2<sup>3</sup> × 8<sup>3</sup> = 16<sup>6</sup></span><br>Stesso esponente: l'esponente <b>resta 3</b>, non si somma!</div>
+                    <div class="mistake">✘ <span class="m">2<sup>3</sup> × 8<sup>3</sup> = 2<sup>6</sup></span><br>Basi diverse: non si può tenere la base 2 e sommare gli esponenti.</div>
+                    <div class="mistake">✘ <span class="m">16<sup>3</sup> ÷ 16<sup>2</sup> = 1<sup>1</sup></span><br>Stessa base: la base <b>resta 16</b>, si sottraggono solo gli esponenti.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TABELLE + ESEMPIO GUIDATO ──────────────────────────────────── -->
+        <div class="grid">
+            <div class="card orange">
+                <div class="card-header">Potenze da conoscere</div>
+                <div class="card-body">
+                    <table class="pow">
+                        <tr><th></th><th><sup>2</sup></th><th><sup>3</sup></th><th><sup>4</sup></th><th><sup>5</sup></th><th><sup>6</sup></th></tr>
+                        <tr><td>2</td><td>4</td><td>8</td><td>16</td><td>32</td><td>64</td></tr>
+                        <tr><td>3</td><td>9</td><td>27</td><td>81</td><td>243</td><td>729</td></tr>
+                        <tr><td>4</td><td>16</td><td>64</td><td>256</td><td>1024</td><td>—</td></tr>
+                        <tr><td>5</td><td>25</td><td>125</td><td>625</td><td>—</td><td>—</td></tr>
+                        <tr><td>10</td><td>100</td><td>1000</td><td>10000</td><td>—</td><td>—</td></tr>
+                    </table>
+                    <div class="example">
+                        <span class="ex-title">Riscrivere la base (per il metodo B)</span>
+                        4 = 2<sup>2</sup> &nbsp; 8 = 2<sup>3</sup> &nbsp; 16 = 2<sup>4</sup> &nbsp; 32 = 2<sup>5</sup>
+                        &nbsp;|&nbsp; 9 = 3<sup>2</sup> &nbsp; 27 = 3<sup>3</sup> &nbsp;|&nbsp; 25 = 5<sup>2</sup>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card blue">
+                <div class="card-header">Esempio guidato con parentesi</div>
+                <div class="card-body">
+                    <div class="formula" style="font-size:13px; margin-bottom:4px;">[(11<sup>2</sup>)<sup>3</sup> × 11<sup>2</sup> ÷ 11<sup>7</sup>]<sup>2</sup></div>
+                    <div class="mstep"><span class="n">1</span><span><span class="m">(11<sup>2</sup>)<sup>3</sup> = 11<sup>6</sup></span> <span class="c">potenza di potenza</span></span></div>
+                    <div class="mstep"><span class="n">2</span><span><span class="m">11<sup>6</sup> × 11<sup>2</sup> = 11<sup>8</sup></span> <span class="c">stessa base, ×</span></span></div>
+                    <div class="mstep"><span class="n">3</span><span><span class="m">11<sup>8</sup> ÷ 11<sup>7</sup> = 11<sup>1</sup></span> <span class="c">stessa base, ÷</span></span></div>
+                    <div class="mstep"><span class="n">4</span><span><span class="m">[11<sup>1</sup>]<sup>2</sup> = 11<sup>2</sup> = <span class="ok">121</span></span> <span class="c">chiudo la quadra</span></span></div>
+                    <div class="example">
+                        <span class="ex-title">Trucco</span>
+                        Lavora sempre sugli <b>esponenti</b> e calcola il numero <b>solo alla fine</b>: i conti restano piccoli!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── METODO ─────────────────────────────────────────────────────── -->
+        <div class="steps-card">
+            <div class="steps-title">📝 Metodo per le espressioni con le potenze</div>
+            <div class="steps-grid">
+                <div class="step-item"><strong>1. Parentesi dall'interno</strong><br>Prima ( ), poi [ ], poi { }.</div>
+                <div class="step-item"><strong>2. Ordine delle operazioni</strong><br>Potenze → × e ÷ (da sinistra a destra) → + e −.</div>
+                <div class="step-item"><strong>3. Stessa base?</strong><br>Usa ① ② ③ lavorando solo sugli esponenti.</div>
+                <div class="step-item"><strong>4. Basi diverse?</strong><br>Stesso esponente → ④ ⑤. Altrimenti riscrivi come potenze della stessa base (8 = 2<sup>3</sup>).</div>
+                <div class="step-item"><strong>5. Ci sono + o −?</strong><br>Le proprietà non valgono: calcola ogni potenza separatamente.</div>
+                <div class="step-item"><strong>6. Solo alla fine il numero</strong><br>Controlla: esponente 1 → la base; esponente 0 → 1.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Quiz Potenze &nbsp;|&nbsp; quiz-didattici &nbsp;|&nbsp; Scuola Media
+        </div>
+
+    </div>
+</body>
+</html>
