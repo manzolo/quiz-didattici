@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Potenze</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            background: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-item { text-align: center; }
+        .score-label { font-size: 14px; color: #666; margin-bottom: 5px; }
+        .score-value { font-size: 32px; font-weight: bold; color: #667eea; }
+        .score-value.correct { color: #28a745; }
+        .score-value.wrong { color: #dc3545; }
+
+        .quiz-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .question {
+            color: white;
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            letter-spacing: 0.02em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .category-label { color: rgba(255,255,255,0.8); font-size: 1.1em; margin-top: 8px; }
+
+        .answer-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .answer-input {
+            padding: 20px 30px;
+            font-size: 2.5em;
+            border: 4px solid #667eea;
+            border-radius: 15px;
+            text-align: center;
+            width: 200px;
+            font-weight: bold;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #f093fb;
+            box-shadow: 0 0 20px rgba(240,147,251,0.5);
+        }
+
+        .answer-input.correct { border-color: #28a745; background: #d4edda; }
+        .answer-input.wrong   { border-color: #dc3545; background: #f8d7da; }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-check { background: #667eea; color: white; }
+        .btn-check:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-next { background: #28a745; color: white; display: none; }
+        .btn-next:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(40,167,69,0.4); }
+        .btn-next.show { display: block; }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 40px;
+            max-width: 800px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feedback.correct { color: #28a745; }
+        .feedback.wrong   { color: #dc3545; }
+
+        .explanation {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 14px;
+            text-align: left;
+            max-width: 540px;
+            width: 100%;
+        }
+
+        .expl-title { font-weight: bold; color: #664d00; margin-bottom: 8px; font-size: 1em; }
+
+        .expl-formula {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .expl-step { color: #444; font-size: 0.95em; padding: 3px 0; line-height: 1.6; }
+        .expl-step b { color: #28a745; font-size: 1.1em; }
+
+        .btn-show-solution {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #664d00;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-show-solution:hover { background: #ffc107; transform: translateY(-1px); }
+
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .final-screen.show { display: flex; }
+
+        .final-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 60px 80px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 40px;
+            min-width: 600px;
+        }
+
+        .final-title   { color: white; font-size: 2.5em; font-weight: bold; margin-bottom: 20px; }
+        .final-grade   { color: white; font-size: 5em; font-weight: bold; margin: 20px 0; }
+        .final-message { color: white; font-size: 1.5em; margin-bottom: 10px; }
+
+        .history-box {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-width: 600px;
+        }
+
+        .history-title { color: #667eea; font-size: 1.5em; font-weight: bold; margin-bottom: 20px; text-align: center; }
+        .history-list  { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+
+        .history-item {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history-item.current { background: #667eea; color: white; transform: scale(1.1); }
+
+        .trend { margin-top: 15px; font-size: 1.3em; font-weight: bold; text-align: center; }
+        .trend.improving { color: #28a745; }
+        .trend.declining { color: #dc3545; }
+        .trend.stable    { color: #ffc107; }
+
+        .btn-restart {
+            background: #667eea; color: white;
+            padding: 20px 60px; font-size: 1.5em; font-weight: bold;
+            border: none; border-radius: 15px; cursor: pointer; transition: all 0.3s;
+        }
+
+        .btn-restart:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+        .btn-reset-history {
+            background: #dc3545; color: white;
+            padding: 15px 40px; font-size: 1.2em; font-weight: bold;
+            border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; margin-top: 20px;
+        }
+
+        .btn-reset-history:hover { background: #c82333; transform: translateY(-2px); }
+
+        .category-tabs {
+            display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .tab:hover { background: #d3d6db; transform: translateY(-2px); }
+        .tab.active { background: #667eea; color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+
+        .help-container { position: relative; display: inline-block; margin-left: 15px; vertical-align: middle; }
+
+        .help-icon {
+            width: 35px; height: 35px;
+            background: #667eea; color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s;
+        }
+
+        .help-icon:hover { background: #5568d3; transform: scale(1.1); }
+
+        .help-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 999;
+        }
+
+        .help-overlay.show { display: block; }
+
+        .help-tooltip {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            padding-top: 45px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            min-width: 340px;
+        }
+
+        .help-tooltip.show { display: block; }
+
+        .help-close {
+            position: absolute; top: 10px; right: 10px;
+            width: 30px; height: 30px;
+            background: #dc3545; color: white;
+            border: none; border-radius: 50%;
+            font-size: 18px; font-weight: bold;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-close:hover { background: #c82333; transform: rotate(90deg); }
+
+        .help-tooltip h3 { color: #667eea; margin-bottom: 20px; font-size: 1.3em; text-align: center; }
+        .help-content { color: #333; line-height: 1.8; text-align: left; }
+        .help-section { margin-bottom: 15px; }
+        .help-section-title { color: #764ba2; font-weight: bold; font-size: 1.1em; margin-bottom: 8px; }
+        .help-example {
+            background: #f8f9fa; padding: 8px 12px; border-radius: 8px;
+            margin-top: 5px; font-family: monospace; font-size: 0.95em;
+        }
+
+        .back-button {
+            display: inline-flex; align-items: center; gap: 10px;
+            color: #667eea; text-decoration: none;
+            font-size: 1em; font-weight: bold;
+            padding: 10px 20px;
+            background: white; border: 2px solid #667eea;
+            border-radius: 10px; transition: all 0.3s;
+            position: absolute; top: 20px; left: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .back-button:hover { background: #667eea; color: white; transform: translateX(-5px); }
+
+        .language-selector {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; gap: 10px;
+            background: white; padding: 10px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn {
+            background: transparent; border: 2px solid #667eea;
+            color: #667eea; padding: 8px 15px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; transition: all 0.3s;
+        }
+
+        .lang-btn:hover { background: rgba(102,126,234,0.1); }
+        .lang-btn.active { background: #667eea; color: white; }
+
+        .buy-me-coffee {
+            position: fixed; bottom: 20px; right: 20px;
+            z-index: 1000; transition: transform 0.3s ease;
+        }
+
+        .buy-me-coffee:hover { transform: translateY(-5px); }
+        .buy-me-coffee img { height: 50px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        /* ── Responsive ─────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+
+            h1 { font-size: 1.6em; margin-bottom: 15px; }
+
+            .back-button {
+                position: relative; top: auto; left: auto;
+                margin-bottom: 10px; font-size: 0.9em; padding: 8px 15px;
+            }
+
+            .language-selector {
+                position: relative; top: auto; right: auto;
+                margin-bottom: 15px; justify-content: center;
+            }
+
+            .score-section { flex-wrap: wrap; padding: 15px; gap: 15px; }
+            .score-item    { flex: 1 1 40%; min-width: 120px; }
+            .score-label   { font-size: 12px; }
+            .score-value   { font-size: 24px; }
+
+            .category-tabs { flex-wrap: wrap; gap: 10px; }
+            .tab           { flex: 1 1 45%; padding: 12px 15px; font-size: 13px; }
+
+            .quiz-area     { padding: 15px 10px; justify-content: flex-start; }
+
+            .question-box  {
+                padding: 20px 15px; border-radius: 15px;
+                margin-bottom: 20px; min-width: auto; width: 100%;
+            }
+
+            .question { font-size: 1.3em; word-break: break-word; }
+
+            .answer-box    { flex-direction: column; gap: 12px; align-items: center; }
+            .answer-input  { padding: 12px 15px; font-size: 1.8em; width: 160px; }
+
+            .button-group  { flex-direction: column; gap: 12px; margin-top: 15px; width: 100%; align-items: center; }
+            .btn           { padding: 12px 30px; font-size: 1.1em; width: 100%; max-width: 280px; }
+
+            .feedback { font-size: 1em; padding: 15px 10px; margin-top: 10px; min-height: 60px; }
+
+            .final-box     { padding: 30px 20px; min-width: auto; width: 100%; }
+            .final-title   { font-size: 1.8em; }
+            .final-grade   { font-size: 3.5em; }
+            .final-message { font-size: 1.2em; }
+
+            .history-box   { padding: 20px; min-width: auto; width: 100%; }
+            .history-title { font-size: 1.2em; }
+            .history-item  { padding: 10px 15px; font-size: 1.1em; }
+
+            .btn-restart       { padding: 15px 40px; font-size: 1.2em; width: 100%; max-width: 300px; }
+            .btn-reset-history { padding: 12px 30px; font-size: 1em; width: 100%; max-width: 300px; }
+
+            .help-container { display: block; margin-left: 0; margin-top: 10px; }
+            .help-icon      { width: 30px; height: 30px; font-size: 18px; }
+            .help-tooltip   { max-width: 95vw; width: 95vw; padding: 10px; padding-top: 40px; max-height: 85vh; min-width: auto; }
+            .help-tooltip h3{ font-size: 1.1em; margin-bottom: 15px; }
+
+            .buy-me-coffee {
+                width: 48px;
+                height: 48px;
+                background: #FFDD00;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                bottom: 15px;
+                right: 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            }
+
+            .buy-me-coffee img { display: none; }
+            .buy-me-coffee::after { content: '☕'; font-size: 22px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.3em; }
+            .question { font-size: 1.1em; }
+            .answer-input { font-size: 1.5em; width: 140px; }
+            .tab { flex: 1 1 100%; font-size: 12px; padding: 10px 12px; }
+            .final-grade { font-size: 2.5em; }
+        }
+
+        /* ── Exponents ──────────────────────────────────────── */
+        .question sup  { font-size: 0.6em; vertical-align: super; line-height: 0; }
+        .expl-step sup { font-size: 0.75em; line-height: 0; }
+        .help-example sup, .help-content sup { font-size: 0.75em; line-height: 0; }
+        .expl-step b sup { font-size: 0.75em; }
+
+        @media (max-width: 768px) {
+            .container { padding-bottom: 80px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span data-i18n="back">← Matematica</span>
+    </a>
+
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="setLanguage('it', this)">IT</button>
+        <button class="lang-btn" onclick="setLanguage('en', this)">EN</button>
+    </div>
+
+    <div class="container">
+        <h1>
+            <span data-i18n="title">Quiz Potenze</span>
+            <div class="help-container">
+                <div class="help-icon" onclick="toggleHelp()">?</div>
+            </div>
+        </h1>
+
+        <!-- Help overlay -->
+        <div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+        <div class="help-tooltip" id="helpTooltip">
+            <button class="help-close" onclick="toggleHelp()">&times;</button>
+            <h3 data-i18n="help-title">Proprietà delle Potenze</h3>
+            <div class="help-content">
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-prod-title">Prodotto con la stessa base</div>
+                    <div data-i18n="help-prod-desc">Si lascia la base e si sommano gli esponenti</div>
+                    <div class="help-example">a<sup>m</sup> × a<sup>n</sup> = a<sup>m+n</sup> &nbsp;&nbsp; 13<sup>3</sup> × 13<sup>4</sup> = 13<sup>7</sup></div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-quot-title">Quoziente con la stessa base</div>
+                    <div data-i18n="help-quot-desc">Si lascia la base e si sottraggono gli esponenti</div>
+                    <div class="help-example">a<sup>m</sup> ÷ a<sup>n</sup> = a<sup>m−n</sup> &nbsp;&nbsp; 6<sup>12</sup> ÷ 6<sup>10</sup> = 6<sup>2</sup></div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-powpow-title">Potenza di potenza</div>
+                    <div data-i18n="help-powpow-desc">Si lascia la base e si moltiplicano gli esponenti</div>
+                    <div class="help-example">(a<sup>m</sup>)<sup>n</sup> = a<sup>m×n</sup> &nbsp;&nbsp; (11<sup>2</sup>)<sup>3</sup> = 11<sup>6</sup></div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-same-title">Stesso esponente</div>
+                    <div data-i18n="help-same-desc">Si lascia l'esponente e si moltiplicano (o dividono) le basi</div>
+                    <div class="help-example">a<sup>n</sup> × b<sup>n</sup> = (a×b)<sup>n</sup> &nbsp;&nbsp; 5<sup>3</sup> × 2<sup>3</sup> = 10<sup>3</sup></div>
+                    <div class="help-example">a<sup>n</sup> ÷ b<sup>n</sup> = (a÷b)<sup>n</sup> &nbsp;&nbsp; 10<sup>4</sup> ÷ 2<sup>4</sup> = 5<sup>4</sup></div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-special-title">Esponenti speciali</div>
+                    <div data-i18n="help-special-desc">Esponente 1 → la base stessa; esponente 0 → sempre 1</div>
+                    <div class="help-example">a<sup>1</sup> = a &nbsp;&nbsp; a<sup>0</sup> = 1 &nbsp;&nbsp; (8<sup>7</sup> + 8<sup>8</sup>)<sup>0</sup> = 1</div>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title" data-i18n="help-order-title">Ordine delle parentesi</div>
+                    <div data-i18n="help-order-desc">Calcola dall'interno verso l'esterno; × e ÷ da sinistra a destra</div>
+                    <div class="help-example">prima &nbsp;( )&nbsp; poi &nbsp;[ ]&nbsp; poi &nbsp;{ }</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score -->
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-label" data-i18n="score">Punteggio</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="correct">Corrette</div>
+                <div class="score-value correct" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="wrong">Sbagliate</div>
+                <div class="score-value wrong" id="wrong">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" data-i18n="questions">Domande</div>
+                <div class="score-value" id="total">0/10</div>
+            </div>
+        </div>
+
+        <!-- Category tabs -->
+        <div class="category-tabs">
+            <button class="tab active" onclick="changeCategory('tutte', this)"       data-i18n="all">Tutte</button>
+            <button class="tab" onclick="changeCategory('proprieta', this)"   data-i18n="prop-tab">Proprietà</button>
+            <button class="tab" onclick="changeCategory('espressioni', this)" data-i18n="expr-tab">Espressioni</button>
+            <button class="tab" onclick="changeCategory('miste', this)"       data-i18n="mix-tab">Miste</button>
+        </div>
+
+        <!-- Quiz area -->
+        <div class="quiz-area" id="quizArea">
+            <div class="question-box">
+                <div class="question" id="question"></div>
+                <div class="category-label" id="categoryLabel"></div>
+            </div>
+
+            <div class="answer-box" id="answerBox">
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" step="1">
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()" data-i18n="check">Verifica</button>
+                <button class="btn btn-next"  id="btnNext"  onclick="nextQuestion()" data-i18n="next">Prossima Domanda</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- Final screen -->
+        <div class="final-screen" id="finalScreen">
+            <div class="final-box">
+                <div class="final-title" data-i18n="quiz-completed">Quiz Completato!</div>
+                <div class="final-message">
+                    <span data-i18n="answered-correctly">Hai risposto correttamente a</span>
+                    <span id="finalCorrect">0</span>
+                    <span data-i18n="questions-out-of">domande su 10</span>
+                </div>
+                <div class="final-grade" id="finalGrade">0/10</div>
+                <div class="final-message" id="finalComment"></div>
+            </div>
+
+            <div class="history-box" id="historyBox">
+                <div class="history-title" data-i18n="last-grades">I tuoi ultimi voti</div>
+                <div class="history-list" id="historyList"></div>
+                <div class="trend" id="trendMessage"></div>
+                <div class="trend" id="overallTrend"></div>
+            </div>
+
+            <button class="btn-restart" onclick="restartQuiz()" data-i18n="restart">Ricomincia Quiz</button>
+            <button class="btn-reset-history" onclick="resetHistory()" data-i18n="reset-history">Cancella Storico Voti</button>
+        </div>
+    </div>
+
+    <a href="https://www.buymeacoffee.com/manzolo" target="_blank" class="buy-me-coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee">
+    </a>
+
+    <script>
+        let currentLanguage = 'it';
+
+        const translations = {
+            it: {
+                'back': '← Matematica',
+                'title': 'Quiz Potenze',
+                'score': 'Punteggio',
+                'correct': 'Corrette',
+                'wrong': 'Sbagliate',
+                'questions': 'Domande',
+                'all': 'Tutte',
+                'prop-tab': 'Proprietà',
+                'expr-tab': 'Espressioni',
+                'mix-tab': 'Miste',
+                'check': 'Verifica',
+                'next': 'Prossima Domanda',
+                'restart': 'Ricomincia Quiz',
+                'reset-history': 'Cancella Storico Voti',
+                'help-title': 'Proprietà delle Potenze',
+                'help-prod-title': 'Prodotto con la stessa base',
+                'help-prod-desc': 'Si lascia la base e si sommano gli esponenti',
+                'help-quot-title': 'Quoziente con la stessa base',
+                'help-quot-desc': 'Si lascia la base e si sottraggono gli esponenti',
+                'help-powpow-title': 'Potenza di potenza',
+                'help-powpow-desc': 'Si lascia la base e si moltiplicano gli esponenti',
+                'help-same-title': 'Stesso esponente',
+                'help-same-desc': 'Si lascia l\'esponente e si moltiplicano (o dividono) le basi',
+                'help-special-title': 'Esponenti speciali',
+                'help-special-desc': 'Esponente 1 → la base stessa; esponente 0 → sempre 1',
+                'help-order-title': 'Ordine delle parentesi',
+                'help-order-desc': 'Calcola dall\'interno verso l\'esterno; × e ÷ da sinistra a destra',
+                'insert-value': 'Inserisci un numero!',
+                'correct-answer': 'Corretto! 🎉',
+                'wrong-answer': 'Sbagliato! La risposta corretta è',
+                'show-solution': '🔍 Mostra come si risolve',
+                'how-to-solve': 'Come si risolve:',
+                'rule-label': 'Regola:',
+                'quiz-completed': 'Quiz Completato!',
+                'answered-correctly': 'Hai risposto correttamente a',
+                'questions-out-of': 'domande su 10',
+                'last-grades': 'I tuoi ultimi voti',
+                'improving': '📈 Stai migliorando!',
+                'declining': '📉 Stai peggiorando',
+                'same-result': '➡️ Stesso risultato',
+                'overall-trend': 'Andamento generale (media)',
+                'vs': 'vs',
+                'confirm-reset': 'Sei sicuro di voler cancellare tutti i voti salvati?',
+                'history-deleted': 'Storico voti cancellato!',
+                'cat-prop': 'Proprietà',
+                'cat-expr': 'Espressioni',
+                'cat-mix': 'Miste',
+                'ask-exp': 'scrivi l\'esponente mancante',
+                'ask-base': 'scrivi la base mancante',
+                'ask-value': 'calcola il risultato',
+                'rule-prod': 'Stessa base, prodotto: si sommano gli esponenti',
+                'rule-quot': 'Stessa base, quoziente: si sottraggono gli esponenti',
+                'rule-powpow': 'Potenza di potenza: si moltiplicano gli esponenti',
+                'rule-same-exp-prod': 'Stesso esponente, prodotto: si moltiplicano le basi',
+                'rule-same-exp-quot': 'Stesso esponente, quoziente: si dividono le basi',
+                'rule-prod-quot': 'Stessa base: + esponenti per ×, − esponenti per ÷ (da sinistra a destra)',
+                'rule-brackets-pow': 'Prima dentro le parentesi, poi la potenza esterna',
+                'rule-big-expr': 'Dall\'interno verso l\'esterno: ( ) → [ ] → operazioni esterne',
+                'rule-zero-bracket': 'Una parentesi elevata a 0 vale 1: non serve calcolare cosa c\'è dentro!',
+                'rule-zero-add': 'Qualsiasi numero (diverso da 0) elevato a 0 fa 1',
+                'rule-parens-same-exp': 'Prima le parentesi tonde, poi le potenze con lo stesso esponente',
+                'rule-pow-then-add': 'Prima semplifica le potenze, poi addiziona',
+                'rule-quot-equal': 'a<sup>m</sup> ÷ a<sup>m</sup> = a<sup>0</sup> = 1 e a<sup>1</sup> = a',
+                'rule-same-exp-trick': 'Stesso esponente: moltiplica prima le basi, il calcolo diventa più facile'
+            },
+            en: {
+                'back': '← Mathematics',
+                'title': 'Powers Quiz',
+                'score': 'Score',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'questions': 'Questions',
+                'all': 'All',
+                'prop-tab': 'Properties',
+                'expr-tab': 'Expressions',
+                'mix-tab': 'Mixed',
+                'check': 'Check',
+                'next': 'Next Question',
+                'restart': 'Restart Quiz',
+                'reset-history': 'Clear History',
+                'help-title': 'Properties of Powers',
+                'help-prod-title': 'Product with the same base',
+                'help-prod-desc': 'Keep the base and add the exponents',
+                'help-quot-title': 'Quotient with the same base',
+                'help-quot-desc': 'Keep the base and subtract the exponents',
+                'help-powpow-title': 'Power of a power',
+                'help-powpow-desc': 'Keep the base and multiply the exponents',
+                'help-same-title': 'Same exponent',
+                'help-same-desc': 'Keep the exponent and multiply (or divide) the bases',
+                'help-special-title': 'Special exponents',
+                'help-special-desc': 'Exponent 1 → the base itself; exponent 0 → always 1',
+                'help-order-title': 'Order of brackets',
+                'help-order-desc': 'Work from the inside out; × and ÷ from left to right',
+                'insert-value': 'Please enter a number!',
+                'correct-answer': 'Correct! 🎉',
+                'wrong-answer': 'Wrong! The correct answer is',
+                'show-solution': '🔍 Show solution',
+                'how-to-solve': 'How to solve:',
+                'rule-label': 'Rule:',
+                'quiz-completed': 'Quiz Completed!',
+                'answered-correctly': 'You answered correctly to',
+                'questions-out-of': 'questions out of 10',
+                'last-grades': 'Your last grades',
+                'improving': '📈 You\'re improving!',
+                'declining': '📉 You\'re declining',
+                'same-result': '➡️ Same result',
+                'overall-trend': 'Overall trend (average)',
+                'vs': 'vs',
+                'confirm-reset': 'Are you sure you want to delete all saved grades?',
+                'history-deleted': 'History deleted!',
+                'cat-prop': 'Properties',
+                'cat-expr': 'Expressions',
+                'cat-mix': 'Mixed',
+                'ask-exp': 'write the missing exponent',
+                'ask-base': 'write the missing base',
+                'ask-value': 'calculate the result',
+                'rule-prod': 'Same base, product: add the exponents',
+                'rule-quot': 'Same base, quotient: subtract the exponents',
+                'rule-powpow': 'Power of a power: multiply the exponents',
+                'rule-same-exp-prod': 'Same exponent, product: multiply the bases',
+                'rule-same-exp-quot': 'Same exponent, quotient: divide the bases',
+                'rule-prod-quot': 'Same base: + exponents for ×, − exponents for ÷ (left to right)',
+                'rule-brackets-pow': 'First inside the brackets, then the outer power',
+                'rule-big-expr': 'From the inside out: ( ) → [ ] → outer operations',
+                'rule-zero-bracket': 'A bracket raised to 0 equals 1: no need to calculate what\'s inside!',
+                'rule-zero-add': 'Any number (other than 0) raised to 0 equals 1',
+                'rule-parens-same-exp': 'First the round brackets, then powers with the same exponent',
+                'rule-pow-then-add': 'First simplify the powers, then add',
+                'rule-quot-equal': 'a<sup>m</sup> ÷ a<sup>m</sup> = a<sup>0</sup> = 1 and a<sup>1</sup> = a',
+                'rule-same-exp-trick': 'Same exponent: multiply the bases first, the calculation gets easier'
+            }
+        };
+
+        function t(key) { return translations[currentLanguage][key] || key; }
+
+        // ── Helpers ──────────────────────────────────────────────────
+        const MAX_VALUE = 1000;   // largest final result to compute by hand
+
+        function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function sup(b, e) { return `${b}<sup>${e}</sup>`; }
+        function divisors(n, min, max) {
+            const out = [];
+            for (let d = min; d <= max; d++) if (n % d === 0) out.push(d);
+            return out;
+        }
+        // Last step: a^f = value (a^1 = a is written explicitly)
+        function valueStep(a, f) {
+            return `${sup(a, f)} = <b>${Math.pow(a, f)}</b>`;
+        }
+        // Random base and exponent with a^f in [4, MAX_VALUE]
+        function pickBaseExp(minF, maxF, maxBase = 15) {
+            for (let i = 0; i < 50; i++) {
+                const a = ri(2, maxBase), f = ri(minF, maxF);
+                const v = Math.pow(a, f);
+                if (v >= 4 && v <= MAX_VALUE) return { a, f };
+            }
+            return { a: 3, f: 2 };
+        }
+
+        // ── Question generators ──────────────────────────────────────
+        // Each returns a question object or null (if constraints not met)
+
+        const generators = {
+
+            /* ══════════════ PROPRIETÀ ══════════════ */
+
+            P1() {
+                // a^m × a^n = a^?
+                const a = ri(2, 15), m = ri(2, 9), n = ri(2, 9);
+                return {
+                    category: 'proprieta', ask: 'ask-exp',
+                    html: `${sup(a, m)} × ${sup(a, n)} = ${sup(a, '?')}`,
+                    answer: m + n,
+                    ruleKey: 'rule-prod',
+                    steps: [`${sup(a, m)} × ${sup(a, n)} = ${sup(a, m + '+' + n)} = <b>${sup(a, m + n)}</b>`]
+                };
+            },
+
+            P2() {
+                // a^m ÷ a^n = a^?
+                const a = ri(2, 15), m = ri(5, 15), n = ri(2, m - 1);
+                return {
+                    category: 'proprieta', ask: 'ask-exp',
+                    html: `${sup(a, m)} ÷ ${sup(a, n)} = ${sup(a, '?')}`,
+                    answer: m - n,
+                    ruleKey: 'rule-quot',
+                    steps: [`${sup(a, m)} ÷ ${sup(a, n)} = ${sup(a, m + '−' + n)} = <b>${sup(a, m - n)}</b>`]
+                };
+            },
+
+            P3() {
+                // (a^m)^n = a^?
+                const a = ri(2, 15), m = ri(2, 6), n = ri(2, 5);
+                return {
+                    category: 'proprieta', ask: 'ask-exp',
+                    html: `(${sup(a, m)})<sup>${n}</sup> = ${sup(a, '?')}`,
+                    answer: m * n,
+                    ruleKey: 'rule-powpow',
+                    steps: [`(${sup(a, m)})<sup>${n}</sup> = ${sup(a, m + '×' + n)} = <b>${sup(a, m * n)}</b>`]
+                };
+            },
+
+            P4() {
+                // a^n × b^n = ?^n
+                const a = ri(2, 9), b = ri(2, 9), n = ri(2, 7);
+                if (a === b) return null;
+                return {
+                    category: 'proprieta', ask: 'ask-base',
+                    html: `${sup(a, n)} × ${sup(b, n)} = ${sup('?', n)}`,
+                    answer: a * b,
+                    ruleKey: 'rule-same-exp-prod',
+                    steps: [`${sup(a, n)} × ${sup(b, n)} = (${a} × ${b})<sup>${n}</sup> = <b>${sup(a * b, n)}</b>`]
+                };
+            },
+
+            P5() {
+                // a^n ÷ b^n = ?^n   (a multiple of b)
+                const b = ri(2, 6), k = ri(2, 6), n = ri(2, 7);
+                const a = b * k;
+                return {
+                    category: 'proprieta', ask: 'ask-base',
+                    html: `${sup(a, n)} ÷ ${sup(b, n)} = ${sup('?', n)}`,
+                    answer: k,
+                    ruleKey: 'rule-same-exp-quot',
+                    steps: [`${sup(a, n)} ÷ ${sup(b, n)} = (${a} ÷ ${b})<sup>${n}</sup> = <b>${sup(k, n)}</b>`]
+                };
+            },
+
+            P6() {
+                // a^m × a^n ÷ a^k = a^?
+                const a = ri(2, 15), m = ri(2, 9), n = ri(2, 9), k = ri(2, m + n - 1);
+                return {
+                    category: 'proprieta', ask: 'ask-exp',
+                    html: `${sup(a, m)} × ${sup(a, n)} ÷ ${sup(a, k)} = ${sup(a, '?')}`,
+                    answer: m + n - k,
+                    ruleKey: 'rule-prod-quot',
+                    steps: [
+                        `${sup(a, m)} × ${sup(a, n)} = <b>${sup(a, m + n)}</b>`,
+                        `${sup(a, m + n)} ÷ ${sup(a, k)} = <b>${sup(a, m + n - k)}</b>`
+                    ]
+                };
+            },
+
+            /* ══════════════ ESPRESSIONI ══════════════ */
+
+            E1() {
+                // a^m × a^n ÷ a^k
+                const { a, f } = pickBaseExp(1, 3);
+                const m = ri(2, 8), n = ri(2, 8), k = m + n - f;
+                if (k < 2) return null;
+                return {
+                    category: 'espressioni', ask: 'ask-value',
+                    html: `${sup(a, m)} × ${sup(a, n)} ÷ ${sup(a, k)}`,
+                    answer: Math.pow(a, f),
+                    ruleKey: 'rule-prod-quot',
+                    steps: [
+                        `${sup(a, m)} × ${sup(a, n)} = <b>${sup(a, m + n)}</b>`,
+                        `${sup(a, m + n)} ÷ ${sup(a, k)} = <b>${sup(a, f)}</b>`,
+                        valueStep(a, f)
+                    ]
+                };
+            },
+
+            E2() {
+                // a^m ÷ a^n × a^k   (left to right)
+                const { a, f } = pickBaseExp(3, 4);
+                const k = ri(2, f - 1), d = f - k;      // d = m − n ≥ 1
+                const n = ri(2, 9), m = n + d;
+                return {
+                    category: 'espressioni', ask: 'ask-value',
+                    html: `${sup(a, m)} ÷ ${sup(a, n)} × ${sup(a, k)}`,
+                    answer: Math.pow(a, f),
+                    ruleKey: 'rule-prod-quot',
+                    steps: [
+                        `${sup(a, m)} ÷ ${sup(a, n)} = <b>${sup(a, d)}</b>`,
+                        `${sup(a, d)} × ${sup(a, k)} = <b>${sup(a, f)}</b>`,
+                        valueStep(a, f)
+                    ]
+                };
+            },
+
+            E3() {
+                // [(a^m)^n × a^k ÷ a^j]^p
+                const r = ri(1, 2), p = ri(2, 3);
+                const f = r * p;
+                const a = ri(2, 15);
+                if (Math.pow(a, f) > MAX_VALUE) return null;
+                const m = ri(2, 4), n = ri(2, 3), k = ri(2, 5);
+                const mn = m * n, j = mn + k - r;
+                return {
+                    category: 'espressioni', ask: 'ask-value',
+                    html: `[(${sup(a, m)})<sup>${n}</sup> × ${sup(a, k)} ÷ ${sup(a, j)}]<sup>${p}</sup>`,
+                    answer: Math.pow(a, f),
+                    ruleKey: 'rule-big-expr',
+                    steps: [
+                        `(${sup(a, m)})<sup>${n}</sup> = <b>${sup(a, mn)}</b>`,
+                        `${sup(a, mn)} × ${sup(a, k)} = <b>${sup(a, mn + k)}</b>`,
+                        `${sup(a, mn + k)} ÷ ${sup(a, j)} = <b>${sup(a, r)}</b>`,
+                        `[${sup(a, r)}]<sup>${p}</sup> = <b>${sup(a, f)}</b>`,
+                        valueStep(a, f)
+                    ]
+                };
+            },
+
+            E4() {
+                // (a^m ÷ a^n)^p
+                const r = ri(1, 2), p = ri(2, 3);
+                const f = r * p;
+                const a = ri(2, 15);
+                if (Math.pow(a, f) > MAX_VALUE) return null;
+                const n = ri(2, 9), m = n + r;
+                return {
+                    category: 'espressioni', ask: 'ask-value',
+                    html: `(${sup(a, m)} ÷ ${sup(a, n)})<sup>${p}</sup>`,
+                    answer: Math.pow(a, f),
+                    ruleKey: 'rule-brackets-pow',
+                    steps: [
+                        `${sup(a, m)} ÷ ${sup(a, n)} = <b>${sup(a, r)}</b>`,
+                        `(${sup(a, r)})<sup>${p}</sup> = <b>${sup(a, f)}</b>`,
+                        valueStep(a, f)
+                    ]
+                };
+            },
+
+            E5() {
+                // a^n × b^n ÷ c^k   with c = a × b
+                const a = ri(2, 6), b = ri(2, 6);
+                if (a === b) return null;
+                const c = a * b, f = ri(1, 2);
+                if (Math.pow(c, f) > MAX_VALUE) return null;
+                const n = ri(3, 6), k = n - f;
+                return {
+                    category: 'espressioni', ask: 'ask-value',
+                    html: `${sup(a, n)} × ${sup(b, n)} ÷ ${sup(c, k)}`,
+                    answer: Math.pow(c, f),
+                    ruleKey: 'rule-same-exp-prod',
+                    steps: [
+                        `${sup(a, n)} × ${sup(b, n)} = (${a} × ${b})<sup>${n}</sup> = <b>${sup(c, n)}</b>`,
+                        `${sup(c, n)} ÷ ${sup(c, k)} = <b>${sup(c, f)}</b>`,
+                        valueStep(c, f)
+                    ]
+                };
+            },
+
+            E6() {
+                // [(a^m × b^m)^p ÷ (b^x ÷ b^y)^q] ÷ (a^r)^s
+                const a = pick([2, 3, 5, 7]), b = pick([2, 3, 5, 7]);
+                if (a === b) return null;
+                const c = a * b;
+                const m = ri(2, 4), p = ri(2, 3), N = m * p;
+                const q = pick(divisors(N, 2, 6)), d = N / q;
+                const y = ri(2, 4), x = y + d;
+                const f = ri(1, 3);
+                if (Math.pow(a, f) > MAX_VALUE) return null;
+                const rs = N - f;
+                const rOpts = divisors(rs, 2, rs / 2);
+                if (rOpts.length === 0) return null;
+                const r = pick(rOpts), s = rs / r;
+                return {
+                    category: 'espressioni', ask: 'ask-value',
+                    html: `[(${sup(a, m)} × ${sup(b, m)})<sup>${p}</sup> ÷ (${sup(b, x)} ÷ ${sup(b, y)})<sup>${q}</sup>] ÷ (${sup(a, r)})<sup>${s}</sup>`,
+                    answer: Math.pow(a, f),
+                    ruleKey: 'rule-big-expr',
+                    steps: [
+                        `${sup(a, m)} × ${sup(b, m)} = (${a} × ${b})<sup>${m}</sup> = <b>${sup(c, m)}</b>`,
+                        `(${sup(c, m)})<sup>${p}</sup> = <b>${sup(c, N)}</b>`,
+                        `${sup(b, x)} ÷ ${sup(b, y)} = ${sup(b, d)} → (${sup(b, d)})<sup>${q}</sup> = <b>${sup(b, N)}</b>`,
+                        `[${sup(c, N)} ÷ ${sup(b, N)}] = (${c} ÷ ${b})<sup>${N}</sup> = <b>${sup(a, N)}</b>`,
+                        `(${sup(a, r)})<sup>${s}</sup> = <b>${sup(a, rs)}</b>`,
+                        `${sup(a, N)} ÷ ${sup(a, rs)} = <b>${sup(a, f)}</b>`,
+                        valueStep(a, f)
+                    ]
+                };
+            },
+
+            /* ══════════════ MISTE ══════════════ */
+
+            M1() {
+                // a^n + b^0
+                const { a, f: n } = pickBaseExp(2, 5, 10);
+                const b = pick([a, ri(2, 20)]);
+                const an = Math.pow(a, n);
+                return {
+                    category: 'miste', ask: 'ask-value',
+                    html: `${sup(a, n)} + ${sup(b, 0)}`,
+                    answer: an + 1,
+                    ruleKey: 'rule-zero-add',
+                    steps: [
+                        `${sup(a, n)} = <b>${an}</b>`,
+                        `${sup(b, 0)} = <b>1</b>`,
+                        `${an} + 1 = <b>${an + 1}</b>`
+                    ]
+                };
+            },
+
+            M2() {
+                // [(a^m + a^n)^0 × b]^p
+                const a = ri(2, 15), m = ri(2, 9), n = ri(2, 9);
+                const b = ri(2, 12), p = ri(2, 3);
+                const val = Math.pow(b, p);
+                if (val > MAX_VALUE) return null;
+                return {
+                    category: 'miste', ask: 'ask-value',
+                    html: `[(${sup(a, m)} + ${sup(a, n)})<sup>0</sup> × ${b}]<sup>${p}</sup>`,
+                    answer: val,
+                    ruleKey: 'rule-zero-bracket',
+                    steps: [
+                        `(${sup(a, m)} + ${sup(a, n)})<sup>0</sup> = <b>1</b>`,
+                        `[1 × ${b}]<sup>${p}</sup> = <b>${sup(b, p)}</b>`,
+                        valueStep(b, p)
+                    ]
+                };
+            },
+
+            M3() {
+                // (a + b)^n × (c + d)^n
+                const s1 = ri(2, 6), s2 = ri(2, 6), n = ri(2, 3);
+                const val = Math.pow(s1 * s2, n);
+                if (val > MAX_VALUE) return null;
+                const a = ri(1, s1 - 1), b = s1 - a;
+                const c = ri(1, s2 - 1), d = s2 - c;
+                const last = s1 === s2
+                    ? `${sup(s1, n)} × ${sup(s1, n)} = <b>${sup(s1, 2 * n)}</b> = <b>${val}</b>`
+                    : `${sup(s1, n)} × ${sup(s2, n)} = (${s1} × ${s2})<sup>${n}</sup> = ${sup(s1 * s2, n)} = <b>${val}</b>`;
+                return {
+                    category: 'miste', ask: 'ask-value',
+                    html: `(${a} + ${b})<sup>${n}</sup> × (${c} + ${d})<sup>${n}</sup>`,
+                    answer: val,
+                    ruleKey: 'rule-parens-same-exp',
+                    steps: [
+                        `(${a} + ${b}) = <b>${s1}</b> &nbsp; (${c} + ${d}) = <b>${s2}</b>`,
+                        last
+                    ]
+                };
+            },
+
+            M4() {
+                // (a^m)^n ÷ a^k + c
+                const { a, f } = pickBaseExp(1, 3);
+                const m = ri(2, 4), n = ri(2, 4), mn = m * n, k = mn - f;
+                if (k < 2) return null;
+                const c = ri(2, 20), af = Math.pow(a, f);
+                return {
+                    category: 'miste', ask: 'ask-value',
+                    html: `(${sup(a, m)})<sup>${n}</sup> ÷ ${sup(a, k)} + ${c}`,
+                    answer: af + c,
+                    ruleKey: 'rule-pow-then-add',
+                    steps: [
+                        `(${sup(a, m)})<sup>${n}</sup> = <b>${sup(a, mn)}</b>`,
+                        `${sup(a, mn)} ÷ ${sup(a, k)} = ${sup(a, f)} = <b>${af}</b>`,
+                        `${af} + ${c} = <b>${af + c}</b>`
+                    ]
+                };
+            },
+
+            M5() {
+                // b^2 × (a^m ÷ a^m) + c^1
+                const a = ri(2, 15), m = ri(2, 9), b = ri(2, 12), c = ri(2, 20);
+                const b2 = b * b;
+                return {
+                    category: 'miste', ask: 'ask-value',
+                    html: `${sup(b, 2)} × (${sup(a, m)} ÷ ${sup(a, m)}) + ${sup(c, 1)}`,
+                    answer: b2 + c,
+                    ruleKey: 'rule-quot-equal',
+                    steps: [
+                        `(${sup(a, m)} ÷ ${sup(a, m)}) = ${sup(a, 0)} = <b>1</b>`,
+                        `${sup(b, 2)} × 1 = <b>${b2}</b> &nbsp; ${sup(c, 1)} = <b>${c}</b>`,
+                        `${b2} + ${c} = <b>${b2 + c}</b>`
+                    ]
+                };
+            },
+
+            M6() {
+                // a^n × b^n  → (a×b)^n
+                const [a, b] = pick([[2, 5], [5, 2], [4, 5], [5, 4], [2, 3], [3, 2], [2, 4], [3, 4], [2, 6], [3, 3]]);
+                const c = a * b;
+                const n = ri(2, 3);
+                const val = Math.pow(c, n);
+                if (val > MAX_VALUE) return null;
+                return {
+                    category: 'miste', ask: 'ask-value',
+                    html: `${sup(a, n)} × ${sup(b, n)}`,
+                    answer: val,
+                    ruleKey: 'rule-same-exp-trick',
+                    steps: [
+                        `${sup(a, n)} × ${sup(b, n)} = (${a} × ${b})<sup>${n}</sup> = <b>${sup(c, n)}</b>`,
+                        valueStep(c, n)
+                    ]
+                };
+            }
+        };
+
+        const typesByCategory = {
+            proprieta:   ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'],
+            espressioni: ['E1', 'E2', 'E3', 'E4', 'E5', 'E6'],
+            miste:       ['M1', 'M2', 'M3', 'M4', 'M5', 'M6']
+        };
+
+        const catKeys = { proprieta: 'cat-prop', espressioni: 'cat-expr', miste: 'cat-mix' };
+
+        // ── State ────────────────────────────────────────────────────
+        let currentQuestion = null;
+        let score = 0, correct = 0, wrong = 0, total = 0;
+        let selectedCategory = 'tutte';
+        const MAX_QUESTIONS = 10;
+        const HISTORY_KEY = 'potenzeHistory';
+        let previousKeys = [];
+
+        // ── Generate question ────────────────────────────────────────
+        function generateQuestion() {
+            for (let attempt = 0; attempt < 100; attempt++) {
+                const cat = selectedCategory === 'tutte'
+                    ? pick(Object.keys(typesByCategory))
+                    : selectedCategory;
+                const type = pick(typesByCategory[cat]);
+                const q = generators[type]();
+                if (!q) continue;
+
+                // Avoid repeating the same exercise type too soon
+                if (previousKeys.includes(type)) continue;
+                previousKeys.push(type);
+                if (previousKeys.length > 3) previousKeys.shift();
+
+                return q;
+            }
+
+            // Fallback
+            return {
+                category: 'espressioni', ask: 'ask-value',
+                html: `${sup(13, 3)} × ${sup(13, 4)} ÷ ${sup(13, 5)}`,
+                answer: 169,
+                ruleKey: 'rule-prod-quot',
+                steps: [`${sup(13, 3)} × ${sup(13, 4)} = <b>${sup(13, 7)}</b>`,
+                        `${sup(13, 7)} ÷ ${sup(13, 5)} = <b>${sup(13, 2)}</b>`,
+                        valueStep(13, 2)]
+            };
+        }
+
+        // ── Display question ─────────────────────────────────────────
+        function updateCategoryLabel() {
+            if (!currentQuestion) return;
+            document.getElementById('categoryLabel').textContent =
+                `${t(catKeys[currentQuestion.category])} · ${t(currentQuestion.ask)}`;
+        }
+
+        function displayQuestion(q) {
+            document.getElementById('question').innerHTML = q.html;
+            updateCategoryLabel();
+
+            document.getElementById('answerBox').innerHTML =
+                `<input type="number" class="answer-input" id="answerInput" placeholder="?" step="1">`;
+
+            document.getElementById('answerInput').addEventListener('keydown', e => {
+                if (e.key === 'Enter') checkAnswer();
+            });
+
+            setTimeout(() => {
+                const inp = document.getElementById('answerInput');
+                if (inp) inp.focus();
+            }, 60);
+        }
+
+        // ── Explanation box ──────────────────────────────────────────
+        function getExplanation(q) {
+            const stepsHtml = q.steps.map((s, i) =>
+                `<div class="expl-step">${i + 1}) ${s}</div>`
+            ).join('');
+
+            return `<div class="explanation">
+                <div class="expl-title">${t('how-to-solve')}</div>
+                <div class="expl-formula">${t('rule-label')} ${t(q.ruleKey)}</div>
+                ${stepsHtml}
+            </div>`;
+        }
+
+        // ── Check answer ─────────────────────────────────────────────
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            const input    = document.getElementById('answerInput');
+            const val      = input.value.trim();
+
+            if (val === '' || isNaN(parseInt(val, 10))) {
+                feedback.textContent = t('insert-value');
+                feedback.className = 'feedback wrong';
+                return;
+            }
+
+            const isCorrect = parseInt(val, 10) === currentQuestion.answer;
+
+            input.classList.add(isCorrect ? 'correct' : 'wrong');
+            input.disabled = true;
+            total++;
+
+            if (isCorrect) {
+                correct++;
+                score += 10;
+                feedback.textContent = t('correct-answer');
+                feedback.className = 'feedback correct';
+            } else {
+                wrong++;
+                feedback.innerHTML = `
+                    <span>${t('wrong-answer')} <b>${currentQuestion.answer}</b></span>
+                    <button class="btn-show-solution" onclick="
+                        this.style.display='none';
+                        document.getElementById('expl-block').style.display='block';
+                    ">${t('show-solution')}</button>
+                    <div id="expl-block" style="display:none">${getExplanation(currentQuestion)}</div>
+                `;
+                feedback.className = 'feedback wrong';
+            }
+
+            updateScoreboard();
+            document.getElementById('btnCheck').style.display = 'none';
+
+            if (total >= MAX_QUESTIONS) {
+                setTimeout(showFinalResults, 1500);
+            } else {
+                document.getElementById('btnNext').classList.add('show');
+            }
+        }
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent   = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent   = wrong;
+            document.getElementById('total').textContent   = `${total}/${MAX_QUESTIONS}`;
+        }
+
+        function resetCounters() {
+            score = correct = wrong = total = 0;
+            previousKeys = [];
+            updateScoreboard();
+        }
+
+        // ── Next question ────────────────────────────────────────────
+        function nextQuestion() {
+            currentQuestion = generateQuestion();
+            displayQuestion(currentQuestion);
+
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('btnCheck').style.display = 'block';
+            document.getElementById('btnNext').classList.remove('show');
+        }
+
+        // ── Category change ──────────────────────────────────────────
+        function changeCategory(cat, btn) {
+            selectedCategory = cat;
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+
+            resetCounters();
+            document.getElementById('finalScreen').classList.remove('show');
+            document.getElementById('quizArea').style.display = 'flex';
+            nextQuestion();
+        }
+
+        // ── Final results ────────────────────────────────────────────
+        function showFinalResults() {
+            document.getElementById('quizArea').style.display = 'none';
+            document.getElementById('finalScreen').classList.add('show');
+
+            document.getElementById('finalCorrect').textContent = correct;
+            document.getElementById('finalGrade').textContent   = `${correct}/10`;
+
+            const comments = {
+                it: ['Continua ad allenarti!', 'Quasi! Riprova.', 'Discreto!', 'Bravo!', 'Eccellente! 🌟'],
+                en: ['Keep practicing!', 'Almost! Try again.', 'Fair!', 'Good job!', 'Excellent! 🌟']
+            };
+            const idx = correct <= 3 ? 0 : correct <= 5 ? 1 : correct <= 7 ? 2 : correct <= 9 ? 3 : 4;
+            document.getElementById('finalComment').textContent = comments[currentLanguage][idx];
+
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            history.push(correct);
+            if (history.length > 10) history = history.slice(-10);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+            displayHistory(history);
+        }
+
+        function displayHistory(history) {
+            document.getElementById('historyList').innerHTML = history.map((g, i) =>
+                `<div class="history-item${i === history.length - 1 ? ' current' : ''}">${g}/10</div>`
+            ).join('');
+
+            const trend = document.getElementById('trendMessage');
+            if (history.length >= 2) {
+                const last = history[history.length - 1];
+                const prev = history[history.length - 2];
+                if (last > prev)      { trend.textContent = t('improving');   trend.className = 'trend improving'; }
+                else if (last < prev) { trend.textContent = t('declining');   trend.className = 'trend declining'; }
+                else                  { trend.textContent = t('same-result'); trend.className = 'trend stable'; }
+            } else {
+                trend.textContent = '';
+                trend.className = 'trend';
+            }
+
+            // Long-term trend: first half vs second half average
+            const overall = document.getElementById('overallTrend');
+            if (history.length >= 6) {
+                const half = Math.floor(history.length / 2);
+                const avg = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
+                const oldAvg = avg(history.slice(0, half)), newAvg = avg(history.slice(half));
+                const icon = newAvg > oldAvg ? '📈' : newAvg < oldAvg ? '📉' : '➡️';
+                overall.textContent = `${icon} ${t('overall-trend')}: ${oldAvg.toFixed(1)} ${t('vs')} ${newAvg.toFixed(1)}`;
+                overall.className = 'trend ' + (newAvg > oldAvg ? 'improving' : newAvg < oldAvg ? 'declining' : 'stable');
+            } else {
+                overall.textContent = '';
+                overall.className = 'trend';
+            }
+        }
+
+        // ── Restart ──────────────────────────────────────────────────
+        function restartQuiz() {
+            resetCounters();
+            document.getElementById('finalScreen').classList.remove('show');
+            document.getElementById('quizArea').style.display = 'flex';
+            nextQuestion();
+        }
+
+        // ── Reset history ────────────────────────────────────────────
+        function resetHistory() {
+            if (confirm(t('confirm-reset'))) {
+                localStorage.removeItem(HISTORY_KEY);
+                alert(t('history-deleted'));
+                displayHistory([]);
+            }
+        }
+
+        // ── Help tooltip ─────────────────────────────────────────────
+        function toggleHelp() {
+            document.getElementById('helpOverlay').classList.toggle('show');
+            document.getElementById('helpTooltip').classList.toggle('show');
+        }
+
+        // ── Language ─────────────────────────────────────────────────
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLanguage][key]) el.textContent = translations[currentLanguage][key];
+            });
+            updateCategoryLabel();
+        }
+
+        function setLanguage(lang, btn) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyTranslations();
+        }
+
+        // ── Init ──────────────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('language') || 'it';
+            if (saved === 'en') {
+                currentLanguage = 'en';
+                document.querySelectorAll('.lang-btn')[0].classList.remove('active');
+                document.querySelectorAll('.lang-btn')[1].classList.add('active');
+                applyTranslations();
+            }
+            nextQuestion();
+        });
+    </script>
+</body>
+</html>
